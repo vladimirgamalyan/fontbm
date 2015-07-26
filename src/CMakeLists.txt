@@ -1,7 +1,9 @@
 SET(SOURCES
 	main.cpp
+	Font.cpp
 	maxRectsBinPack/MaxRectsBinPack.cpp
 	sdlSavePng/savepng.c
+	tinyxml2/tinyxml2.cpp
 )
 
 ADD_EXECUTABLE(fontbm ${SOURCES})
