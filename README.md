@@ -8,3 +8,5 @@ Thanks too
 
 * [SDL_SavePNG](https://github.com/driedfruit/SDL_SavePNG)
 * [www.libpng.org](http://www.libpng.org/)
+* [RectangleBinPack](https://github.com/juj/RectangleBinPack) by [Jukka Jylänki](https://github.com/juj)
+* 
