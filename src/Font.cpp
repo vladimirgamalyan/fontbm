@@ -395,11 +395,11 @@ void Font::writeToXmlFile(const std::string &fileName) const
     root->InsertEndChild(pagesElement);
 
     tinyxml2::XMLElement* charsElement = doc.NewElement("chars");
-    charsElement->SetAttribute("count", chars.size());
+    charsElement->SetAttribute("count", static_cast<int>(chars.size()));
     root->InsertEndChild(charsElement);
 
     tinyxml2::XMLElement* kerningsElement = doc.NewElement("kernings");
-    kerningsElement->SetAttribute("count", kernings.size());
+    kerningsElement->SetAttribute("count", static_cast<int>(kernings.size()));
     root->InsertEndChild(kerningsElement);
 
     for(auto p: pages )
