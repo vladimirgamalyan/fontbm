@@ -7,6 +7,6 @@ Command line font generator, compatible with BMFont.
 Thanks too
 
 * [libSDL2pp](https://github.com/AMDmi3/libSDL2pp)
-* [RectangleBinPack](https://github.com/juj/RectangleBinPack) by [Jukka Jylänki](https://github.com/juj) 
+* [RectangleBinPack](https://github.com/juj/RectangleBinPack)
 * [www.libpng.org](http://www.libpng.org/)
 * [SDL_SavePNG](https://github.com/driedfruit/SDL_SavePNG)
