@@ -39,34 +39,9 @@ struct GlyphInfo
 
 int main(int /*argc*/, char** /*argv*/) try {
 
-    SDL2pp::SDL sdl(SDL_INIT_VIDEO);
-    //SDL2pp::Window window("fontbm", SDL_WINDOWPOS_UNDEFINED, SDL_WINDOWPOS_UNDEFINED, 640, 480, SDL_WINDOW_RESIZABLE);
-    //SDL2pp::Renderer render(window, -1, SDL_RENDERER_ACCELERATED);
-
     SDL2pp::SDLTTF ttf;
     SDL2pp::Font font("./testdata/Vera.ttf", 41);
 
-    //SDL2pp::Surface surface = font.RenderText_Blended("y", SDL_Color {255, 255, 255, 255} );
-    //std::cout << surface.GetSize() << std::endl;
-    //SDL_SavePNG(surface.Get(), "./testdata/output.png");
-
-    //std::cout << getKerning(font, 'H', 'y') << std::endl;
-    //printGlyphData(font, 'y');
-
-    //std::cout << "outline: " << font.GetOutline() << std::endl;
-//    std::cout << "fontAscent: " << font.GetAscent() << std::endl;
-//    std::cout << "fontDescent: " << font.GetDescent() << std::endl;
-//    std::cout << "fontHeight: " << font.GetHeight() << std::endl;
-//    std::cout << "fontLineSkip: " << font.GetLineSkip() << std::endl;
-
-
-    //SDL2pp::Surface surface1 = font.RenderGlyph_Blended('y', SDL_Color {255, 255, 255, 255} );
-    //std::cout << surface1.GetSize() << std::endl;
-    //SDL_SavePNG(surface1.Get(), "./testdata/y.png");
-    //std::cout << font.GetGlyphRect('y') << std::endl;
-
-
-    ////////////////////////////////////////////
 
     int fontAscent = font.GetAscent();
 
@@ -103,11 +78,6 @@ int main(int /*argc*/, char** /*argv*/) try {
             rs.height = glyphInfo.h;
             rs.tag = glyphInfo.id;
             srcRects.push_back(rs);
-
-//            SDL2pp::Surface surface = font.RenderGlyph_Blended(id, SDL_Color {255, 255, 255, 255} );
-//            std::stringstream ss;
-//            ss << "./testdata/t/_" << id << ".png";
-//            SDL_SavePNG(surface.Get(), ss.str().c_str());
         }
     }
 
@@ -161,18 +131,6 @@ int main(int /*argc*/, char** /*argv*/) try {
                                         glyph.w, glyph.h,
                                         glyph.minx, fontAscent - glyph.maxy,
                                         glyph.advance, 0, 15});
-        /*
-        int id;
-        int x;
-        int y;
-        int width;
-        int height;
-        int xoffset;
-        int yoffset;
-        int xadvance;
-        int page;
-        int chnl;
-         */
     }
 
     //f.info.size = 48;
