@@ -4,7 +4,7 @@
 Command line font generator, compatible with BMFont.
 
 
-Thanks too
+Thanks to
 
 * [libSDL2pp](https://github.com/AMDmi3/libSDL2pp)
 * [RectangleBinPack](https://github.com/juj/RectangleBinPack)
