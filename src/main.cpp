@@ -2,9 +2,21 @@
 #include <SDL2/SDL.h>
 #include <SDL2pp/SDL2pp.hh>
 #include <map>
+#include <boost/program_options.hpp>
+#include <boost/filesystem.hpp>
+#include <fstream>
 #include "sdlSavePng/savepng.h"
 #include "Font.h"
 #include "maxRectsBinPack/MaxRectsBinPack.h"
+#include "rapidjson/document.h"
+#include "rapidjson/filereadstream.h"
+#include "rapidjson/encodedstream.h"
+#include "rapidjson/error/en.h"
+#include "rapidjson/reader.h"
+#include "IStreamWrapper.h"
+
+namespace po = boost::program_options;
+namespace fs = boost::filesystem;
 
 int getKerning(const SDL2pp::Font& font, Uint16 ch0, Uint16 ch1) {
     Uint16 text[ 3 ] = {ch0, ch1, 0};
@@ -37,7 +49,66 @@ struct GlyphInfo
     int advance;
 };
 
-int main(int /*argc*/, char** /*argv*/) try {
+int main(int argc, char** argv) try {
+
+    po::options_description desc( "Allowed options" );
+    fs::path configPath;
+    desc.add_options()
+            ( "help", "produce help message" )
+            ( "config", po::value< fs::path >( &configPath)->required(), "config file" );
+    po::variables_map vm;
+    po::store( po::parse_command_line( argc, argv, desc ), vm );
+
+    if ( vm.count( "help" ) )
+    {
+        std::cout << desc << std::endl;
+        return 1;
+    }
+
+    po::notify( vm );
+
+    ///////////////////////////////////////
+
+    if (!fs::is_regular_file(configPath))
+        throw std::runtime_error("config not found");
+
+    std::ifstream ifs(configPath.generic_string(), std::ifstream::binary);
+    if (!ifs)
+        throw std::runtime_error("can't open config file");
+    IStreamWrapper bis(ifs);
+    //rapidjson::AutoUTFInputStream<unsigned, IStreamWrapper> eis(bis);
+    rapidjson::Document document;
+    if (document.ParseStream<0>(bis).HasParseError())
+    {
+        std::stringstream ss;
+        ss << "JSON parse error: " << rapidjson::GetParseError_En(document.GetParseError()) << " (" << document.GetErrorOffset() << ")";
+        throw std::runtime_error(ss.str());
+    }
+    if (!document.IsObject())
+        throw std::runtime_error("bad config");
+
+    if (!document.HasMember("fontFile"))
+        throw std::runtime_error("fontFile not defined");
+    if (!document["fontFile"].IsString())
+        throw std::runtime_error("fontFile not a string");
+    std::string fontFace = document["fontFile"].GetString();
+
+    std::cout << "fontFace: " << fontFace << std::endl;
+
+
+    int maxTextureSizeX = 2048;
+    if (document.HasMember("maxTextureSizeX"))
+    {
+        if (!document["maxTextureSizeX"].IsInt())
+            throw std::runtime_error("maxTextureSizeX not an integer");
+        maxTextureSizeX = document["maxTextureSizeX"].GetInt();
+        if (maxTextureSizeX < 1)
+            throw std::runtime_error("invalid maxTextureSizeX");
+    }
+
+    std::cout << "maxTextureSizeX: " << maxTextureSizeX << std::endl;
+
+    ///////////////////////////////////////
 
     SDL2pp::SDLTTF ttf;
     SDL2pp::Font font("./testdata/Vera.ttf", 41);

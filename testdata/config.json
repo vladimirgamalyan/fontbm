@@ -1,0 +1,8 @@
+{
+	"fontFile": "Vera.ttf",
+	"maxTextureSizeX": 256,
+	"maxTextureSizeY": 256,
+	"fontSize": 41,
+	"textureFile": "output.png",
+	"fntFile": "output.fnt"
+}
