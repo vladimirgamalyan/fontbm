@@ -69,6 +69,8 @@ int main(int argc, char** argv) try {
 
     ///////////////////////////////////////
 
+    // https://miloyip.github.io/rapidjson/index.html
+
     if (!fs::is_regular_file(configPath))
         throw std::runtime_error("config not found");
 
