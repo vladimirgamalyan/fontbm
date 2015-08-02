@@ -77,7 +77,7 @@ int main(int argc, char** argv) try {
     //TODO: output parse errors, check value's ranges.
     json j;
     j << ifs;
-    const std::string fontFace = j["fontFile"];
+    const std::string fontFile = j["fontFile"];
     const int maxTextureSizeX = j["maxTextureSizeX"];
     const int maxTextureSizeY = j["maxTextureSizeY"];
     const int fontSize = j["fontSize"];
@@ -85,7 +85,12 @@ int main(int argc, char** argv) try {
     const std::string fntFile = j["fntFile"];
 
 
-    std::cout << "fontFace: " << fontFace << std::endl;
+    std::cout << "fontFile: " << fontFile << std::endl;
+    std::cout << "maxTextureSizeX: " << maxTextureSizeX << std::endl;
+    std::cout << "maxTextureSizeY: " << maxTextureSizeY << std::endl;
+    std::cout << "fontSize: " << fontSize << std::endl;
+    std::cout << "textureFile: " << textureFile << std::endl;
+    std::cout << "fntFile: " << fntFile << std::endl;
 
     ///////////////////////////////////////
 
