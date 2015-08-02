@@ -16,6 +16,6 @@
 	"textureFile": "tmp/output.png",
 	
 	"dataFile": "tmp/output.fnt",
-	"dataFileFormat": "txt",
+	"dataFileFormat": "xml",
 	"includeKerningPairs": false
 }
