@@ -335,6 +335,19 @@ int main(int argc, char** argv) try {
     f.kernings.clear();
     f.pages.clear();
 
+    std::set<Uint16> glyphCodes2(glyphCodes);
+    for (auto& ch0 : glyphCodes)
+    {
+        for (auto& ch1 : glyphCodes2)
+        {
+            int k = getKerning(font, ch0, ch1);
+            if (k)
+                f.kernings.emplace_back(Font::Kerning{ch0, ch1, k});
+        }
+        glyphCodes2.erase(ch0);
+    }
+
+
     for (int i = 0; i < pageCount; ++i )
         f.pages.emplace_back(Font::Page{i, pageNames.at(i)});
 
