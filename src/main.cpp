@@ -121,7 +121,7 @@ void collectGlyphInfo(const SDL2pp::Font& font, const std::set<Uint16>& codes, s
 
 int jsonGetInt( const json& j, const char* key, int min = std::numeric_limits<int>::min(), int max = std::numeric_limits<int>::max() )
 {
-    json k = j[key];
+    const json& k = j[key];
     if (k.is_null())
         throw std::runtime_error(std::string(key) + " not found");
     if (!k.is_number_integer())
