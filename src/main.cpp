@@ -8,6 +8,7 @@
 #include "Font.h"
 #include "maxRectsBinPack/MaxRectsBinPack.h"
 #include "json.hpp"
+#include <fstream>
 
 namespace po = boost::program_options;
 namespace fs = boost::filesystem;
