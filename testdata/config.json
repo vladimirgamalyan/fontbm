@@ -3,7 +3,8 @@
 	"chars": [[32, 127]],
 	"color": [0, 0, 255],
 	"fontSize": 41,
-	
+
+	# Padding for every glyph.
 	"paddingUp": 0,
 	"paddingRight": 0,
 	"paddingDown": 0,	
