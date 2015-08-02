@@ -167,6 +167,9 @@ int main(int argc, char** argv) try {
     std::cout << "fntFile: " << fntFile << std::endl;
     std::cout << std::endl;
 
+    bool includeKerningPairs = j["includeKerningPairs"];
+
+
     ///////////////////////////////////////
 
     json colorJson = j["color"];
@@ -338,17 +341,21 @@ int main(int argc, char** argv) try {
     f.kernings.clear();
     f.pages.clear();
 
-    std::set<Uint16> glyphCodes2(glyphCodes);
-    for (auto& ch0 : glyphCodes)
+    if (includeKerningPairs)
     {
-        for (auto& ch1 : glyphCodes2)
+        std::set<Uint16> glyphCodes2(glyphCodes);
+        for (auto& ch0 : glyphCodes)
         {
-            int k = getKerning(font, ch0, ch1);
-            if (k)
-                f.kernings.emplace_back(Font::Kerning{ch0, ch1, k});
+            for (auto& ch1 : glyphCodes2)
+            {
+                int k = getKerning(font, ch0, ch1);
+                if (k)
+                    f.kernings.emplace_back(Font::Kerning{ch0, ch1, k});
+            }
+            glyphCodes2.erase(ch0);
         }
-        glyphCodes2.erase(ch0);
     }
+
 
 
     for (int i = 0; i < pageCount; ++i )

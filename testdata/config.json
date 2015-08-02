@@ -2,10 +2,11 @@
 	"fontFile": "Vera.ttf",
 	"chars": [[32, 127]],
 	"color": [0, 0, 255],
+	"fontSize": 41,	
 	"maxTextureSizeX": 256,
 	"maxTextureSizeY": 256,
-	"fontSize": 41,
 	"textureFile": "tmp/output.png",
 	"fntFile": "tmp/output.fnt",
-	"fntFileFormat": "xml"
+	"fntFileFormat": "xml",
+	"includeKerningPairs": false
 }
