@@ -107,12 +107,12 @@ void collectGlyphInfo(const SDL2pp::Font& font, const std::set<Uint16>& codes, s
 
         //TODO: add more cheks for glyph.
 
-        bool empty = (glyphInfo.w == 0) && (glyphInfo.h == 0);
-        if (empty)
-            continue;
 
-        if ((glyphInfo.w <= 0) || (glyphInfo.h <= 0))
-            throw std::runtime_error("invalid glyph (zero or negative width or height)");
+
+        bool empty = (glyphInfo.w == 0) && (glyphInfo.h == 0);
+        if (!empty)
+            if ((glyphInfo.w <= 0) || (glyphInfo.h <= 0))
+                throw std::runtime_error("invalid glyph (zero or negative width or height)");
 
         //TODO: emplace.
         glyphs[id] = glyphInfo;
@@ -121,7 +121,7 @@ void collectGlyphInfo(const SDL2pp::Font& font, const std::set<Uint16>& codes, s
 
 int jsonGetInt( json& j, const char* key, int min = std::numeric_limits<int>::min(), int max = std::numeric_limits<int>::max() )
 {
-    json k = j[key];
+    json k = j[std::string(key)];
     if (k.is_null())
         throw std::runtime_error(std::string(key) + " not found");
     if (!k.is_number_integer())
