@@ -351,7 +351,6 @@ void Font::debugFillValues()
     kernings.emplace_back(Kerning{79, 86, -1});
     kernings.emplace_back(Kerning{79, 65, -1});
     kernings.emplace_back(Kerning{79, 58, -1});
-
 }
 
 void Font::writeToXmlFile(const std::string &fileName) const

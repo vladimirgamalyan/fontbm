@@ -1,5 +1,7 @@
 {
 	"fontFile": "Vera.ttf",
+	"chars": [[32, 126], 136, 153, [168, 169], 174, [184, 185], [192, 255]],
+	"color": [0, 0, 255],
 	"maxTextureSizeX": 256,
 	"maxTextureSizeY": 256,
 	"fontSize": 41,
