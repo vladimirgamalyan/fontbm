@@ -92,11 +92,30 @@ int main(int argc, char** argv) try {
     std::cout << "fontSize: " << fontSize << std::endl;
     std::cout << "textureFile: " << textureFile << std::endl;
     std::cout << "fntFile: " << fntFile << std::endl;
+    std::cout << std::endl;
+
+    ///////////////////////////////////////
+
+    fs::path fontFilePath(fontFile);
+    if (!fontFilePath.is_absolute())
+        fontFilePath = configPath.parent_path() / fontFilePath;
+    if (!fs::is_regular_file(fontFilePath))
+        throw std::runtime_error("font file not found");
+    std::cout << fontFilePath << std::endl;
+
+    fs::path textureFilePath(textureFile);
+    if (!textureFilePath.is_absolute())
+        textureFilePath = configPath.parent_path() / textureFilePath;
+    std::cout << textureFilePath << std::endl;
+
+    fs::path fntFilePath(fntFile);
+    if (!fntFilePath.is_absolute())
+        fntFilePath = configPath.parent_path() / fntFilePath;
 
     ///////////////////////////////////////
 
     SDL2pp::SDLTTF ttf;
-    SDL2pp::Font font("./testdata/Vera.ttf", 41);
+    SDL2pp::Font font(fontFilePath.generic_string(), fontSize);
 
 
     int fontAscent = font.GetAscent();
@@ -137,8 +156,8 @@ int main(int argc, char** argv) try {
         }
     }
 
-    int textureWidth = 256;
-    int textureHeight = 256;
+    int textureWidth = maxTextureSizeX;
+    int textureHeight = maxTextureSizeY;
     rbp::MaxRectsBinPack mrbp;
     mrbp.Init(textureWidth, textureHeight);
     std::vector<rbp::Rect> readyRects;
@@ -170,7 +189,7 @@ int main(int argc, char** argv) try {
         }
     }
 
-    SDL_SavePNG(outputSurface.Get(), "./tmp/output.png");
+    SDL_SavePNG(outputSurface.Get(), textureFilePath.generic_string().c_str());
 
     Font f;
     f.debugFillValues();
@@ -197,7 +216,7 @@ int main(int argc, char** argv) try {
     f.common.scaleW = textureWidth;
     f.common.scaleH = textureHeight;
 
-    f.writeToXmlFile("tmp/output.fnt");
+    f.writeToXmlFile(fntFilePath.generic_string());
     //f.writeToTextFile("output.txt");
 
 	return 0;
