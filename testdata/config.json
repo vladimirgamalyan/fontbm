@@ -3,6 +3,7 @@
 	"maxTextureSizeX": 256,
 	"maxTextureSizeY": 256,
 	"fontSize": 41,
-	"textureFile": "output.png",
-	"fntFile": "output.fnt"
+	"textureFile": "tmp/output.png",
+	"fntFile": "tmp/output.fnt",
+	"fntFileFormat": "xml"
 }

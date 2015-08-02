@@ -106,11 +106,14 @@ int main(int argc, char** argv) try {
     fs::path textureFilePath(textureFile);
     if (!textureFilePath.is_absolute())
         textureFilePath = configPath.parent_path() / textureFilePath;
+    fs::create_directory(textureFilePath.parent_path());
     std::cout << textureFilePath << std::endl;
 
     fs::path fntFilePath(fntFile);
     if (!fntFilePath.is_absolute())
         fntFilePath = configPath.parent_path() / fntFilePath;
+    fs::create_directory(fntFilePath.parent_path());
+    std::cout << fntFilePath << std::endl;
 
     ///////////////////////////////////////
 
