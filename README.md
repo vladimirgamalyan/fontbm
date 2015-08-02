@@ -10,4 +10,4 @@ Thanks to
 * [RectangleBinPack](https://github.com/juj/RectangleBinPack)
 * [www.libpng.org](http://www.libpng.org/)
 * [SDL_SavePNG](https://github.com/driedfruit/SDL_SavePNG)
-* [RapidJSON](https://github.com/miloyip/rapidjson)
+* [nlohmann/json](https://github.com/nlohmann/json)

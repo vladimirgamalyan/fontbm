@@ -4,19 +4,14 @@
 #include <map>
 #include <boost/program_options.hpp>
 #include <boost/filesystem.hpp>
-#include <fstream>
 #include "sdlSavePng/savepng.h"
 #include "Font.h"
 #include "maxRectsBinPack/MaxRectsBinPack.h"
-#include "rapidjson/document.h"
-#include "rapidjson/filereadstream.h"
-#include "rapidjson/encodedstream.h"
-#include "rapidjson/error/en.h"
-#include "rapidjson/reader.h"
-#include "IStreamWrapper.h"
+#include "json.hpp"
 
 namespace po = boost::program_options;
 namespace fs = boost::filesystem;
+using json = nlohmann::json;
 
 int getKerning(const SDL2pp::Font& font, Uint16 ch0, Uint16 ch1) {
     Uint16 text[ 3 ] = {ch0, ch1, 0};
@@ -69,7 +64,7 @@ int main(int argc, char** argv) try {
 
     ///////////////////////////////////////
 
-    // https://miloyip.github.io/rapidjson/index.html
+    // https://github.com/nlohmann/json
 
     if (!fs::is_regular_file(configPath))
         throw std::runtime_error("config not found");
@@ -77,38 +72,20 @@ int main(int argc, char** argv) try {
     std::ifstream ifs(configPath.generic_string(), std::ifstream::binary);
     if (!ifs)
         throw std::runtime_error("can't open config file");
-    IStreamWrapper bis(ifs);
-    //rapidjson::AutoUTFInputStream<unsigned, IStreamWrapper> eis(bis);
-    rapidjson::Document document;
-    if (document.ParseStream<0>(bis).HasParseError())
-    {
-        std::stringstream ss;
-        ss << "JSON parse error: " << rapidjson::GetParseError_En(document.GetParseError()) << " (" << document.GetErrorOffset() << ")";
-        throw std::runtime_error(ss.str());
-    }
-    if (!document.IsObject())
-        throw std::runtime_error("bad config");
 
-    if (!document.HasMember("fontFile"))
-        throw std::runtime_error("fontFile not defined");
-    if (!document["fontFile"].IsString())
-        throw std::runtime_error("fontFile not a string");
-    std::string fontFace = document["fontFile"].GetString();
+
+    //TODO: output parse errors, check value's ranges.
+    json j;
+    j << ifs;
+    const std::string fontFace = j["fontFile"];
+    const int maxTextureSizeX = j["maxTextureSizeX"];
+    const int maxTextureSizeY = j["maxTextureSizeY"];
+    const int fontSize = j["fontSize"];
+    const std::string textureFile = j["textureFile"];
+    const std::string fntFile = j["fntFile"];
+
 
     std::cout << "fontFace: " << fontFace << std::endl;
-
-
-    int maxTextureSizeX = 2048;
-    if (document.HasMember("maxTextureSizeX"))
-    {
-        if (!document["maxTextureSizeX"].IsInt())
-            throw std::runtime_error("maxTextureSizeX not an integer");
-        maxTextureSizeX = document["maxTextureSizeX"].GetInt();
-        if (maxTextureSizeX < 1)
-            throw std::runtime_error("invalid maxTextureSizeX");
-    }
-
-    std::cout << "maxTextureSizeX: " << maxTextureSizeX << std::endl;
 
     ///////////////////////////////////////
 
