@@ -152,22 +152,29 @@ int main(int argc, char** argv) try {
     json j;
     j << ifs;
     const std::string fontFile = j["fontFile"];
-    const int maxTextureSizeX = j["maxTextureSizeX"];
-    const int maxTextureSizeY = j["maxTextureSizeY"];
+    const int textureWidth = j["textureWidth"];
+    const int textureHeight = j["textureHeight"];
     const int fontSize = j["fontSize"];
     const std::string textureFile = j["textureFile"];
-    const std::string fntFile = j["fntFile"];
+    const std::string dataFile = j["dataFile"];
+    const std::string dataFileFormat = j["dataFileFormat"];
 
+    if ((dataFileFormat != "xml") && (dataFileFormat != "txt"))
+        throw std::runtime_error("unknown data file format");
 
     std::cout << "fontFile: " << fontFile << std::endl;
-    std::cout << "maxTextureSizeX: " << maxTextureSizeX << std::endl;
-    std::cout << "maxTextureSizeY: " << maxTextureSizeY << std::endl;
+    std::cout << "textureWidth: " << textureWidth << std::endl;
+    std::cout << "textureHeight: " << textureHeight << std::endl;
     std::cout << "fontSize: " << fontSize << std::endl;
     std::cout << "textureFile: " << textureFile << std::endl;
-    std::cout << "fntFile: " << fntFile << std::endl;
+    std::cout << "dataFile: " << dataFile << std::endl;
     std::cout << std::endl;
 
     bool includeKerningPairs = j["includeKerningPairs"];
+
+
+    ///////////////////////////////////////
+
 
 
     ///////////////////////////////////////
@@ -206,7 +213,7 @@ int main(int argc, char** argv) try {
     fs::create_directory(textureFilePath.parent_path());
     std::cout << textureFilePath << std::endl;
 
-    fs::path fntFilePath(fntFile);
+    fs::path fntFilePath(dataFile);
     if (!fntFilePath.is_absolute())
         fntFilePath = configPath.parent_path() / fntFilePath;
     fs::create_directory(fntFilePath.parent_path());
@@ -262,7 +269,7 @@ int main(int argc, char** argv) try {
 
     std::map<Uint16, GlyphInfo> glyphs;
     collectGlyphInfo(font, glyphCodes, glyphs);
-    checkGlyphSize(glyphs, maxTextureSizeX, maxTextureSizeY);
+    checkGlyphSize(glyphs, textureWidth, textureHeight);
 
     std::vector< rbp::RectSize > srcRects;
     getSrcRects(glyphs, srcRects);
@@ -271,8 +278,6 @@ int main(int argc, char** argv) try {
     int pageCount = 0;
     for (;;)
     {
-        int textureWidth = maxTextureSizeX;
-        int textureHeight = maxTextureSizeY;
         mrbp.Init(textureWidth, textureHeight);
 
         std::vector<rbp::Rect> readyRects;
@@ -301,7 +306,7 @@ int main(int argc, char** argv) try {
     for (int page = 0; page < pageCount; ++page)
     {
         //TODO: use real texture size instead max.
-        SDL2pp::Surface outputSurface(0, maxTextureSizeX, maxTextureSizeY, 32,
+        SDL2pp::Surface outputSurface(0, textureWidth, textureHeight, 32,
                                       0x000000FF, 0x0000FF00, 0x00FF0000, 0xFF000000);
         outputSurface.FillRect(SDL2pp::NullOpt, glyphColor);
         for ( auto glyphIterator = glyphs.begin(); glyphIterator != glyphs.end(); ++glyphIterator )
@@ -377,12 +382,13 @@ int main(int argc, char** argv) try {
 
     f.common.lineHeight = font.GetLineSkip();
     f.common.base = font.GetAscent();
-    //TODO: use real texture size instead max.
-    f.common.scaleW = maxTextureSizeX;
-    f.common.scaleH = maxTextureSizeY;
+    f.common.scaleW = textureWidth;
+    f.common.scaleH = textureHeight;
 
-    f.writeToXmlFile(fntFilePath.generic_string());
-    //f.writeToTextFile("output.txt");
+    if (dataFileFormat == "xml")
+        f.writeToXmlFile(fntFilePath.generic_string());
+    if (dataFileFormat == "txt")
+        f.writeToTextFile(fntFilePath.generic_string());
 
 	return 0;
 
