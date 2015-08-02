@@ -11,6 +11,7 @@
 #include <fstream>
 #include <set>
 #include <array>
+#include <limits>
 
 namespace po = boost::program_options;
 namespace fs = boost::filesystem;
@@ -53,7 +54,7 @@ struct GlyphInfo
     int advance;
 };
 
-void getSrcRects(const std::map<Uint16, GlyphInfo> &glyphs, std::vector<rbp::RectSize> &srcRects)
+void getSrcRects(const std::map<Uint16, GlyphInfo> &glyphs, int additionalWidth, int additionalHeight, std::vector<rbp::RectSize> &srcRects)
 {
     srcRects.clear();
     for (auto& kv : glyphs)
@@ -63,8 +64,8 @@ void getSrcRects(const std::map<Uint16, GlyphInfo> &glyphs, std::vector<rbp::Rec
         if (!empty)
         {
             rbp::RectSize rs;
-            rs.width = glyphInfo.w;
-            rs.height = glyphInfo.h;
+            rs.width = glyphInfo.w + additionalHeight;
+            rs.height = glyphInfo.h + additionalWidth;
             rs.tag = glyphInfo.code;
             srcRects.push_back(rs);
         }
@@ -118,6 +119,21 @@ void collectGlyphInfo(const SDL2pp::Font& font, const std::set<Uint16>& codes, s
     }
 }
 
+int jsonGetInt( const json& j, const char* key, int min = std::numeric_limits<int>::min(), int max = std::numeric_limits<int>::max() )
+{
+    json k = j[key];
+    if (k.is_null())
+        throw std::runtime_error(std::string(key) + " not found");
+    if (!k.is_number_integer())
+        throw std::runtime_error(std::string("invalid ") + key + ", required integer number");
+    int64_t result = k;
+    if (result < min)
+        throw std::runtime_error(std::string("invalid ") + key + " value, must be greater or equal " + std::to_string(min));
+    if (result > max)
+        throw std::runtime_error(std::string("invalid ") + key + " value, must be lower or equal " + std::to_string(max));
+    return static_cast<int>(result);
+}
+
 int main(int argc, char** argv) try {
 
     po::options_description desc( "Allowed options" );
@@ -152,9 +168,9 @@ int main(int argc, char** argv) try {
     json j;
     j << ifs;
     const std::string fontFile = j["fontFile"];
-    const int textureWidth = j["textureWidth"];
-    const int textureHeight = j["textureHeight"];
-    const int fontSize = j["fontSize"];
+    const int textureWidth = jsonGetInt(j, "textureWidth", 1);
+    const int textureHeight = jsonGetInt(j, "textureHeight", 1);
+    const int fontSize = jsonGetInt(j, "fontSize", 1);
     const std::string textureFile = j["textureFile"];
     const std::string dataFile = j["dataFile"];
     const std::string dataFileFormat = j["dataFileFormat"];
@@ -172,6 +188,21 @@ int main(int argc, char** argv) try {
 
     bool includeKerningPairs = j["includeKerningPairs"];
 
+    // Add padding to glyph, affect metrics (w/h, xoffset, yoffset).
+    int paddingUp = jsonGetInt(j, "paddingUp", 0);
+    int paddingRight = jsonGetInt(j, "paddingRight", 0);
+    int paddingDown = jsonGetInt(j, "paddingDown", 0);
+    int paddingLeft = jsonGetInt(j, "paddingLeft", 0);
+    // Add spaces on target texure, doesnt affect metrics.
+    int spacingVert = jsonGetInt(j, "spacingVert", 0);
+    int spacingHoriz = jsonGetInt(j, "spacingHoriz", 0);
+
+    std::cout << "paddingUp: " << paddingUp << std::endl;
+    std::cout << "paddingRight: " << paddingRight << std::endl;
+    std::cout << "paddingDown: " << paddingDown << std::endl;
+    std::cout << "paddingLeft: " << paddingLeft << std::endl;
+    std::cout << "spacingVert: " << spacingVert << std::endl;
+    std::cout << "spacingHoriz: " << spacingHoriz << std::endl;
 
     ///////////////////////////////////////
 
@@ -181,7 +212,7 @@ int main(int argc, char** argv) try {
 
     json colorJson = j["color"];
     if (!colorJson.is_array())
-        throw std::runtime_error("config color must be an array");
+        throw std::runtime_error("color must be an array");
     if (colorJson.size() != 3)
         throw std::runtime_error("invalid color value");
     std::array<Uint8, 3> glyphColorRgb;
@@ -190,7 +221,7 @@ int main(int argc, char** argv) try {
         json c = colorJson[i];
         if (!c.is_number_integer())
             throw std::runtime_error("invalid color value");
-        int ci = c;
+        int64_t ci = c;
         if ((ci < 0) || (ci > 255))
             throw std::runtime_error("invalid color value");
         glyphColorRgb[i] = static_cast<Uint8>(ci);
@@ -272,13 +303,15 @@ int main(int argc, char** argv) try {
     checkGlyphSize(glyphs, textureWidth, textureHeight);
 
     std::vector< rbp::RectSize > srcRects;
-    getSrcRects(glyphs, srcRects);
+    getSrcRects(glyphs, spacingHoriz + paddingLeft + paddingRight,
+                spacingVert + paddingUp + paddingDown, srcRects);
 
     rbp::MaxRectsBinPack mrbp;
     int pageCount = 0;
     for (;;)
     {
-        mrbp.Init(textureWidth, textureHeight);
+        //TODO: check if negatice dimension.
+        mrbp.Init(textureWidth - spacingHoriz, textureHeight - spacingVert);
 
         std::vector<rbp::Rect> readyRects;
         mrbp.Insert( srcRects, readyRects, rbp::MaxRectsBinPack::RectBestAreaFit );
@@ -291,8 +324,8 @@ int main(int argc, char** argv) try {
 
         for ( auto r: readyRects )
         {
-            glyphs[r.tag].x = r.x;
-            glyphs[r.tag].y = r.y;
+            glyphs[r.tag].x = r.x + spacingHoriz;
+            glyphs[r.tag].y = r.y + spacingVert;
             glyphs[r.tag].page = pageCount;
         }
 
@@ -323,6 +356,8 @@ int main(int argc, char** argv) try {
             bool empty = (glyph.w == 0) && (glyph.h == 0);
             if (!empty)
             {
+                x += paddingLeft;
+                y += paddingUp;
                 SDL2pp::Rect dstRect(x, y, glyph.w, glyph.h);
                 glyphSurface.Blit(SDL2pp::NullOpt, outputSurface, dstRect);
             }
@@ -369,9 +404,13 @@ int main(int argc, char** argv) try {
     for ( auto glyphIterator = glyphs.begin(); glyphIterator != glyphs.end(); ++glyphIterator )
     {
         const GlyphInfo &glyph = glyphIterator->second;
-        f.chars.emplace_back(Font::Char{glyph.code, glyph.x, glyph.y,
-                                        glyph.w, glyph.h,
-                                        glyph.minx, fontAscent - glyph.maxy,
+        f.chars.emplace_back(Font::Char{glyph.code,
+                                        glyph.x,
+                                        glyph.y,
+                                        glyph.w + paddingLeft + paddingRight,
+                                        glyph.h + paddingUp + paddingDown,
+                                        glyph.minx - paddingLeft,
+                                        fontAscent - glyph.maxy - paddingUp,
                                         glyph.advance,
                                         glyph.page,
                                         15});
