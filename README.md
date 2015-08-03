@@ -22,7 +22,7 @@ Another options:
 
 option  | default | comment
 ------|-----|---------------
-fontFile |  | path to ttf font file, can be relative of config file directory or absolute. Required option.
+fontFile |  | path to ttf font file, can be relative of config file directory or absolute. Required.
 chars | \[\[32, 127\]\] | array of characters, each item can be character code or array of min..max character codes (include max).
 color | \[255, 255, 255\] | array of R, G, B value, defines character color.
 backgroundColor | null | array of R, G, B value, defines background color. If not present, result texture has transparent background.
