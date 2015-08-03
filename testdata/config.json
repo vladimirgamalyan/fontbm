@@ -15,7 +15,7 @@
 	"_textureWidth": 256,
 	"_textureHeight": 256,
 	
-	"output": "tmp/vera",
+	"output": "vera",
 	
 	"_dataFormat": "xml",
 	"_includeKerningPairs": false

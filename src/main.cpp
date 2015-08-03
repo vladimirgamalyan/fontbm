@@ -240,12 +240,10 @@ int main(int argc, char** argv) try {
     const int textureWidth = jsonGetIntOptional(j, "textureWidth", 1).value_or(256);
     const int textureHeight = jsonGetIntOptional(j, "textureHeight", 1).value_or(256);
     const int fontSize = jsonGetIntOptional(j, "fontSize", 1).value_or(32);
-    //const std::string textureFile = j["textureFile"];
-    //const std::string dataFile = j["dataFile"];
 
-    const std::string output = j["output"];
-    std::string textureFile = output + ".png";
-    std::string dataFile = output + ".fnt";
+
+    const std::string output = j["output"].is_null() ? configPath.stem().generic_string() : j["output"].get<std::string>();
+
 
     //TODO: Check if other type.
     std::string dataFormat = j["dataFormat"].is_null() ? "xml" : j["dataFormat"];
@@ -256,14 +254,6 @@ int main(int argc, char** argv) try {
 
     //TODO: Check for unknown keys in config.
     //TODO: Make all options optional.
-
-//    std::cout << "fontFile: " << fontFile << std::endl;
-//    std::cout << "textureWidth: " << textureWidth << std::endl;
-//    std::cout << "textureHeight: " << textureHeight << std::endl;
-//    std::cout << "fontSize: " << fontSize << std::endl;
-//    std::cout << "textureFile: " << textureFile << std::endl;
-//    std::cout << "dataFile: " << dataFile << std::endl;
-//    std::cout << std::endl;
 
     //TODO: Check if other type.
     bool includeKerningPairs = j["dataFormat"].is_null() ? false : j["includeKerningPairs"].get<bool>();
@@ -277,13 +267,6 @@ int main(int argc, char** argv) try {
     int spacingVert = jsonGetIntOptional(j, "spacingVert", 0).value_or(0);
     int spacingHoriz = jsonGetIntOptional(j, "spacingHoriz", 0).value_or(0);
 
-//    std::cout << "paddingUp: " << paddingUp << std::endl;
-//    std::cout << "paddingRight: " << paddingRight << std::endl;
-//    std::cout << "paddingDown: " << paddingDown << std::endl;
-//    std::cout << "paddingLeft: " << paddingLeft << std::endl;
-//    std::cout << "spacingVert: " << spacingVert << std::endl;
-//    std::cout << "spacingHoriz: " << spacingHoriz << std::endl;
-
     ///////////////////////////////////////
 
 
@@ -295,25 +278,23 @@ int main(int argc, char** argv) try {
 
     ///////////////////////////////////////
 
+    fs::path outputPath(output);
+    if (!outputPath.is_absolute())
+        outputPath = fs::absolute(outputPath, configPath.parent_path());
+
+    fs::path outputDirPath = outputPath.parent_path();
+
     //TODO: create directory only if there is no problem (exceptions), good place is before write outputs.
+    fs::create_directory(outputDirPath);
+
+    std::string outputName = outputPath.stem().string();
+    fs::path dataFilePath = outputDirPath / (outputName + ".fnt");
+
     fs::path fontFilePath(fontFile);
     if (!fontFilePath.is_absolute())
-        fontFilePath = configPath.parent_path() / fontFilePath;
+        fontFilePath = fs::absolute(fontFilePath, configPath.parent_path());
     if (!fs::is_regular_file(fontFilePath))
         throw std::runtime_error("font file not found");
-    //std::cout << fontFilePath << std::endl;
-
-    fs::path textureFilePath(textureFile);
-    if (!textureFilePath.is_absolute())
-        textureFilePath = configPath.parent_path() / textureFilePath;
-    fs::create_directory(textureFilePath.parent_path());
-    //std::cout << textureFilePath << std::endl;
-
-    fs::path fntFilePath(dataFile);
-    if (!fntFilePath.is_absolute())
-        fntFilePath = configPath.parent_path() / fntFilePath;
-    fs::create_directory(fntFilePath.parent_path());
-    //std::cout << fntFilePath << std::endl;
 
     ///////////////////////////////////////
 
@@ -449,14 +430,14 @@ int main(int argc, char** argv) try {
             }
         }
 
-        std::string pageName = textureFilePath.stem().string() + "_" + std::to_string(page) + textureFilePath.extension().string();
+        std::string pageName = outputName + "_" + std::to_string(page) + ".png";
         pageNames.push_back(pageName);
 
         if (glyphBackgroundColorRgb)
             outputSurface = outputSurface.Convert(SDL_PIXELFORMAT_RGB24);
 
-        boost::filesystem::path newPath = textureFilePath.parent_path() / boost::filesystem::path(pageName);
-        SDL_SavePNG(outputSurface.Get(), newPath.generic_string().c_str());
+        boost::filesystem::path texturePath = outputDirPath / boost::filesystem::path(pageName);
+        SDL_SavePNG(outputSurface.Get(), texturePath.generic_string().c_str());
     }
 
     /////////////////////////////////////////////////////////////
@@ -515,9 +496,9 @@ int main(int argc, char** argv) try {
     f.common.scaleH = textureHeight;
 
     if (dataFormat == "xml")
-        f.writeToXmlFile(fntFilePath.generic_string());
+        f.writeToXmlFile(dataFilePath.generic_string());
     if (dataFormat == "txt")
-        f.writeToTextFile(fntFilePath.generic_string());
+        f.writeToTextFile(dataFilePath.generic_string());
 
 	return 0;
 
@@ -528,4 +509,3 @@ int main(int argc, char** argv) try {
 	std::cerr << "Unknown error" << std::endl;
 	return 1;
 }
-
