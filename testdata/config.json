@@ -1,22 +1,22 @@
 {
 	"fontFile": "Vera.ttf",
-	"chars": [[32, 127]],
-	"color": [255, 255, 255],
-	"backgroundColor": [0, 0, 0],
-	"fontSize": 41,
+	"_chars": [[32, 127]],
+	"_color": [255, 255, 255],
+	"_backgroundColor": [0, 0, 0],
+	"_fontSize": 41,
 
-	"paddingUp": 0,
-	"paddingRight": 0,
-	"paddingDown": 0,	
-	"paddingLeft": 0,
-	"spacingVert": 1,
-	"spacingHoriz": 1,
+	"_paddingUp": 0,
+	"_paddingRight": 0,
+	"_paddingDown": 0,	
+	"_paddingLeft": 0,
+	"_spacingVert": 1,
+	"_spacingHoriz": 1,
 	
-	"textureWidthOff": 256,
-	"textureHeightOff": 256,
+	"_textureWidth": 256,
+	"_textureHeight": 256,
 	
 	"output": "tmp/vera",
 	
-	"dataFileFormat": "xml",
-	"includeKerningPairs": false
+	"_dataFormat": "xml",
+	"_includeKerningPairs": false
 }

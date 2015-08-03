@@ -4,6 +4,7 @@
 #include <map>
 #include <boost/program_options.hpp>
 #include <boost/filesystem.hpp>
+//#include <boost/algorithm/string.hpp>
 #include "sdlSavePng/savepng.h"
 #include "Font.h"
 #include "maxRectsBinPack/MaxRectsBinPack.h"
@@ -21,6 +22,7 @@ using json = nlohmann::json;
 struct Color
 {
     Color() : r(0), g(0), b(0) {};
+    Color( Uint8 r, Uint8 g, Uint8 b ) : r(r), g(g), b(b) {}
     Color( const std::array<Uint8, 3>& rgb)
     {
         r = rgb[ 0 ];
@@ -243,9 +245,11 @@ int main(int argc, char** argv) try {
     std::string textureFile = output + ".png";
     std::string dataFile = output + ".fnt";
 
-    const std::string dataFileFormat = j["dataFileFormat"];
+    //TODO: Check if other type.
+    const std::string dataFormat = j["dataFormat"].is_null() ? "xml" : j["dataFormat"];
+    //boost::algorithm::to_lower(dataFormat);
 
-    if ((dataFileFormat != "xml") && (dataFileFormat != "txt"))
+    if ((dataFormat != "xml") && (dataFormat != "txt"))
         throw std::runtime_error("unknown data file format");
 
     //TODO: Check for unknown keys in config.
@@ -259,7 +263,8 @@ int main(int argc, char** argv) try {
 //    std::cout << "dataFile: " << dataFile << std::endl;
 //    std::cout << std::endl;
 
-    bool includeKerningPairs = j["includeKerningPairs"];
+    //TODO: Check if other type.
+    bool includeKerningPairs = j["dataFormat"].is_null() ? false : j["includeKerningPairs"].get<bool>();
 
     // Add padding to glyph, affect metrics (w/h, xoffset, yoffset).
     int paddingUp = jsonGetIntOptional(j, "paddingUp", 0).value_or(0);
@@ -283,7 +288,7 @@ int main(int argc, char** argv) try {
 
     ///////////////////////////////////////
 
-    Color glyphColorRgb = jsonGetColor(j, "color");
+    Color glyphColorRgb = jsonGetColorOptional(j, "color").value_or(Color(255, 255, 255));
     SDL2pp::Optional<Color> glyphBackgroundColorRgb = jsonGetColorOptional(j, "backgroundColor");
 
     ///////////////////////////////////////
@@ -311,6 +316,9 @@ int main(int argc, char** argv) try {
     ///////////////////////////////////////
 
     json charsJson = j["chars"];
+    if (charsJson.is_null())
+        charsJson = {{32, 127}};
+
     if (!charsJson.is_array())
         throw std::runtime_error("config chars list must be an array");
     std::set<Uint16> glyphCodes;
@@ -483,6 +491,7 @@ int main(int argc, char** argv) try {
     for ( auto glyphIterator = glyphs.begin(); glyphIterator != glyphs.end(); ++glyphIterator )
     {
         const GlyphInfo &glyph = glyphIterator->second;
+        //TODO: page = 0 for empty flyphs.
         f.chars.emplace_back(Font::Char{glyph.code,
                                         glyph.x,
                                         glyph.y,
@@ -503,9 +512,9 @@ int main(int argc, char** argv) try {
     f.common.scaleW = textureWidth;
     f.common.scaleH = textureHeight;
 
-    if (dataFileFormat == "xml")
+    if (dataFormat == "xml")
         f.writeToXmlFile(fntFilePath.generic_string());
-    if (dataFileFormat == "txt")
+    if (dataFormat == "txt")
         f.writeToTextFile(fntFilePath.generic_string());
 
 	return 0;
