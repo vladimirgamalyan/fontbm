@@ -1,18 +1,20 @@
+#include <string>
 #include <iostream>
+#include <fstream>
+#include <set>
+#include <map>
+#include <array>
+#include <limits>
+#include <algorithm>
 #include <SDL2/SDL.h>
 #include <SDL2pp/SDL2pp.hh>
-#include <map>
 #include <boost/program_options.hpp>
 #include <boost/filesystem.hpp>
-//#include <boost/algorithm/string.hpp>
 #include "sdlSavePng/savepng.h"
 #include "Font.h"
 #include "maxRectsBinPack/MaxRectsBinPack.h"
 #include "json.hpp"
-#include <fstream>
-#include <set>
-#include <array>
-#include <limits>
+
 
 namespace po = boost::program_options;
 namespace fs = boost::filesystem;
@@ -246,8 +248,8 @@ int main(int argc, char** argv) try {
     std::string dataFile = output + ".fnt";
 
     //TODO: Check if other type.
-    const std::string dataFormat = j["dataFormat"].is_null() ? "xml" : j["dataFormat"];
-    //boost::algorithm::to_lower(dataFormat);
+    std::string dataFormat = j["dataFormat"].is_null() ? "xml" : j["dataFormat"];
+    std::transform(dataFormat.begin(), dataFormat.end(), dataFormat.begin(), ::tolower);
 
     if ((dataFormat != "xml") && (dataFormat != "txt"))
         throw std::runtime_error("unknown data file format");
