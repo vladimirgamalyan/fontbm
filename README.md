@@ -3,7 +3,7 @@
 
 Command line bitmap font generator, compatible with [BMFont](http://www.angelcode.com/products/bmfont/).
 
-# Usage
+## Usage
 ```
 fontbm --config <config file>
 ```
@@ -16,6 +16,9 @@ simple config file:
 }
 ```
 will be produce vera.fnt and vera.png.
+
+Another options:
+
 
 option  | default | comment
 ------|-----|---------------
@@ -36,10 +39,14 @@ output | null | output files name without extension, if not present using config
 dataFormat | "xml" | "xml" or "txt"
 includeKerningPairs | false | include kerning pairs
 
-# Thanks to
+## Thanks to
 
 * [libSDL2pp](https://github.com/AMDmi3/libSDL2pp)
 * [RectangleBinPack](https://github.com/juj/RectangleBinPack)
 * [www.libpng.org](http://www.libpng.org/)
 * [SDL_SavePNG](https://github.com/driedfruit/SDL_SavePNG)
 * [nlohmann/json](https://github.com/nlohmann/json)
+
+## License
+
+[MIT License](http://opensource.org/licenses/MIT)
