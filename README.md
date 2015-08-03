@@ -1,7 +1,7 @@
 # fontbm
 [![Build Status](https://travis-ci.org/vladimirgamalian/fontbm.svg)](https://travis-ci.org/vladimirgamalian/fontbm)
 
-Command line bitmap font generator, compatible with BMFont.
+Command line bitmap font generator, compatible with [BMFont](http://www.angelcode.com/products/bmfont/).
 
 
 Thanks to
