@@ -3,7 +3,7 @@
 
 Command line bitmap font generator, compatible with [BMFont](http://www.angelcode.com/products/bmfont/).
 
-# usage
+# Usage
 ```
 fontbm --config <config file>
 ```
@@ -17,8 +17,8 @@ simple config file:
 ```
 will be produce vera.fnt and vera.png.
 
-option | default | comment
-----------------
+option  | default | comment
+------|-----|---------------
 fontFile |  | path to ttf font file, can be relative of config file directory or absolute. Required option.
 chars | \[\[32, 127\]\] | array of characters, each item can be character code or array of min..max character codes (include max).
 color | \[255, 255, 255\] | array of R, G, B value, defines character color.
