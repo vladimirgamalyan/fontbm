@@ -236,8 +236,13 @@ int main(int argc, char** argv) try {
     const int textureWidth = jsonGetIntOptional(j, "textureWidth", 1).value_or(256);
     const int textureHeight = jsonGetIntOptional(j, "textureHeight", 1).value_or(256);
     const int fontSize = jsonGetIntOptional(j, "fontSize", 1).value_or(32);
-    const std::string textureFile = j["textureFile"];
-    const std::string dataFile = j["dataFile"];
+    //const std::string textureFile = j["textureFile"];
+    //const std::string dataFile = j["dataFile"];
+
+    const std::string output = j["output"];
+    std::string textureFile = output + ".png";
+    std::string dataFile = output + ".fnt";
+
     const std::string dataFileFormat = j["dataFileFormat"];
 
     if ((dataFileFormat != "xml") && (dataFileFormat != "txt"))
@@ -246,13 +251,13 @@ int main(int argc, char** argv) try {
     //TODO: Check for unknown keys in config.
     //TODO: Make all options optional.
 
-    std::cout << "fontFile: " << fontFile << std::endl;
-    std::cout << "textureWidth: " << textureWidth << std::endl;
-    std::cout << "textureHeight: " << textureHeight << std::endl;
-    std::cout << "fontSize: " << fontSize << std::endl;
-    std::cout << "textureFile: " << textureFile << std::endl;
-    std::cout << "dataFile: " << dataFile << std::endl;
-    std::cout << std::endl;
+//    std::cout << "fontFile: " << fontFile << std::endl;
+//    std::cout << "textureWidth: " << textureWidth << std::endl;
+//    std::cout << "textureHeight: " << textureHeight << std::endl;
+//    std::cout << "fontSize: " << fontSize << std::endl;
+//    std::cout << "textureFile: " << textureFile << std::endl;
+//    std::cout << "dataFile: " << dataFile << std::endl;
+//    std::cout << std::endl;
 
     bool includeKerningPairs = j["includeKerningPairs"];
 
@@ -265,12 +270,12 @@ int main(int argc, char** argv) try {
     int spacingVert = jsonGetIntOptional(j, "spacingVert", 0).value_or(0);
     int spacingHoriz = jsonGetIntOptional(j, "spacingHoriz", 0).value_or(0);
 
-    std::cout << "paddingUp: " << paddingUp << std::endl;
-    std::cout << "paddingRight: " << paddingRight << std::endl;
-    std::cout << "paddingDown: " << paddingDown << std::endl;
-    std::cout << "paddingLeft: " << paddingLeft << std::endl;
-    std::cout << "spacingVert: " << spacingVert << std::endl;
-    std::cout << "spacingHoriz: " << spacingHoriz << std::endl;
+//    std::cout << "paddingUp: " << paddingUp << std::endl;
+//    std::cout << "paddingRight: " << paddingRight << std::endl;
+//    std::cout << "paddingDown: " << paddingDown << std::endl;
+//    std::cout << "paddingLeft: " << paddingLeft << std::endl;
+//    std::cout << "spacingVert: " << spacingVert << std::endl;
+//    std::cout << "spacingHoriz: " << spacingHoriz << std::endl;
 
     ///////////////////////////////////////
 
@@ -289,19 +294,19 @@ int main(int argc, char** argv) try {
         fontFilePath = configPath.parent_path() / fontFilePath;
     if (!fs::is_regular_file(fontFilePath))
         throw std::runtime_error("font file not found");
-    std::cout << fontFilePath << std::endl;
+    //std::cout << fontFilePath << std::endl;
 
     fs::path textureFilePath(textureFile);
     if (!textureFilePath.is_absolute())
         textureFilePath = configPath.parent_path() / textureFilePath;
     fs::create_directory(textureFilePath.parent_path());
-    std::cout << textureFilePath << std::endl;
+    //std::cout << textureFilePath << std::endl;
 
     fs::path fntFilePath(dataFile);
     if (!fntFilePath.is_absolute())
         fntFilePath = configPath.parent_path() / fntFilePath;
     fs::create_directory(fntFilePath.parent_path());
-    std::cout << fntFilePath << std::endl;
+    //std::cout << fntFilePath << std::endl;
 
     ///////////////////////////////////////
 

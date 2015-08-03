@@ -14,9 +14,9 @@
 	
 	"textureWidthOff": 256,
 	"textureHeightOff": 256,
-	"textureFile": "tmp/output.png",
 	
-	"dataFile": "tmp/output.fnt",
+	"output": "tmp/vera",
+	
 	"dataFileFormat": "xml",
 	"includeKerningPairs": false
 }
