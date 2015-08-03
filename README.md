@@ -3,6 +3,9 @@
 
 Command line bitmap font generator, compatible with [BMFont](http://www.angelcode.com/products/bmfont/).
 
+![sample](/assets/sample0.png?raw=true)
+![sample](/assets/sample1.png?raw=true)
+
 ## Usage
 ```
 fontbm --config <config file>
