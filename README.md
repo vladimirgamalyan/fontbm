@@ -18,7 +18,7 @@ simple config file:
     "output": "vera",
 }
 ```
-will be produce vera.fnt and vera.png.
+will produce vera.fnt and vera.png.
 
 Another options:
 
@@ -38,7 +38,7 @@ spacingVert | 0 | spacing vert
 spacingHorize | 0 | spacing horiz
 textureWidth | 256 | texture width
 textureHeight | 256 | texture height
-output | null | output files name without extension, if not present using config file name.
+output | null | output files name without extension, if not present using config file name. Can be absolute or relative to config file directory.
 dataFormat | "xml" | "xml" or "txt"
 includeKerningPairs | false | include kerning pairs
 
