@@ -4,7 +4,6 @@
 #include <map>
 #include <boost/program_options.hpp>
 #include <boost/filesystem.hpp>
-#include <boost/iostreams/filtering_stream.hpp>
 #include "sdlSavePng/savepng.h"
 #include "Font.h"
 #include "maxRectsBinPack/MaxRectsBinPack.h"
@@ -17,39 +16,6 @@
 namespace po = boost::program_options;
 namespace fs = boost::filesystem;
 using json = nlohmann::json;
-
-class shell_comments_input_filter : public boost::iostreams::input_filter {
-public:
-    explicit shell_comments_input_filter(char comment_char = '#')
-            : comment_char_(comment_char), skip_(false)
-    { }
-
-    template<typename Source>
-    int get(Source& src)
-    {
-        int c;
-        while (true)
-        {
-            c = boost::iostreams::get(src);
-            if (c == EOF || c == boost::iostreams::WOULD_BLOCK)
-                break;
-            skip_ = c == comment_char_ ?
-                    true :
-                    c == '\n' ?
-                    false :
-                    skip_;
-            if (!skip_)
-                break;
-        }
-        return c;
-    }
-
-    template<typename Source>
-    void close(Source&) { skip_ = false; }
-private:
-    char comment_char_;
-    bool skip_;
-};
 
 int getKerning(const SDL2pp::Font& font, Uint16 ch0, Uint16 ch1) {
     Uint16 text[ 3 ] = {ch0, ch1, 0};
@@ -197,13 +163,11 @@ int main(int argc, char** argv) try {
     if (!ifs)
         throw std::runtime_error("can't open config file");
 
-    boost::iostreams::filtering_istream strippingIfs;
-    strippingIfs.push(shell_comments_input_filter());
-    strippingIfs.push(ifs);
+    //TODO: move to https://github.com/open-source-parsers/jsoncpp (support comments).
 
     //TODO: output parse errors, check value's ranges.
     json j;
-    j << strippingIfs;
+    j << ifs;
     const std::string fontFile = j["fontFile"];
     const int textureWidth = jsonGetInt(j, "textureWidth", 1);
     const int textureHeight = jsonGetInt(j, "textureHeight", 1);
@@ -214,6 +178,8 @@ int main(int argc, char** argv) try {
 
     if ((dataFileFormat != "xml") && (dataFileFormat != "txt"))
         throw std::runtime_error("unknown data file format");
+
+    //TODO: Check for unknown keys in config.
 
     std::cout << "fontFile: " << fontFile << std::endl;
     std::cout << "textureWidth: " << textureWidth << std::endl;

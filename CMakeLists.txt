@@ -27,10 +27,6 @@ ENDIF(MINGW)
 
 set(BOOST_MIN_VERSION "1.46.0")
 
-#if (WIN32)
-#    set(BOOST_ROOT "c:\\boost_1_58_0")
-#endif()
-
 find_package(Boost ${BOOST_MIN_VERSION} REQUIRED COMPONENTS system filesystem program_options)
 include_directories(${Boost_INCLUDE_DIR})
 
