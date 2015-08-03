@@ -191,6 +191,13 @@ int jsonGetInt( const json& j, const std::string& key, int min = std::numeric_li
     return static_cast<int>(result);
 }
 
+SDL2pp::Optional<int> jsonGetIntOptional( const json& j, const std::string& key, int min = std::numeric_limits<int>::min(), int max = std::numeric_limits<int>::max() )
+{
+    if (j[key].is_null())
+        return SDL2pp::NullOpt;
+    return jsonGetInt(j, key, min, max);
+}
+
 int main(int argc, char** argv) try {
 
     po::options_description desc( "Allowed options" );
@@ -226,9 +233,9 @@ int main(int argc, char** argv) try {
     json j;
     j << ifs;
     const std::string fontFile = j["fontFile"];
-    const int textureWidth = jsonGetInt(j, "textureWidth", 1);
-    const int textureHeight = jsonGetInt(j, "textureHeight", 1);
-    const int fontSize = jsonGetInt(j, "fontSize", 1);
+    const int textureWidth = jsonGetIntOptional(j, "textureWidth", 1).value_or(256);
+    const int textureHeight = jsonGetIntOptional(j, "textureHeight", 1).value_or(256);
+    const int fontSize = jsonGetIntOptional(j, "fontSize", 1).value_or(32);
     const std::string textureFile = j["textureFile"];
     const std::string dataFile = j["dataFile"];
     const std::string dataFileFormat = j["dataFileFormat"];
@@ -237,6 +244,7 @@ int main(int argc, char** argv) try {
         throw std::runtime_error("unknown data file format");
 
     //TODO: Check for unknown keys in config.
+    //TODO: Make all options optional.
 
     std::cout << "fontFile: " << fontFile << std::endl;
     std::cout << "textureWidth: " << textureWidth << std::endl;
@@ -249,13 +257,13 @@ int main(int argc, char** argv) try {
     bool includeKerningPairs = j["includeKerningPairs"];
 
     // Add padding to glyph, affect metrics (w/h, xoffset, yoffset).
-    int paddingUp = jsonGetInt(j, "paddingUp", 0);
-    int paddingRight = jsonGetInt(j, "paddingRight", 0);
-    int paddingDown = jsonGetInt(j, "paddingDown", 0);
-    int paddingLeft = jsonGetInt(j, "paddingLeft", 0);
+    int paddingUp = jsonGetIntOptional(j, "paddingUp", 0).value_or(0);
+    int paddingRight = jsonGetIntOptional(j, "paddingRight", 0).value_or(0);
+    int paddingDown = jsonGetIntOptional(j, "paddingDown", 0).value_or(0);
+    int paddingLeft = jsonGetIntOptional(j, "paddingLeft", 0).value_or(0);
     // Add spaces on target texure, doesnt affect metrics.
-    int spacingVert = jsonGetInt(j, "spacingVert", 0);
-    int spacingHoriz = jsonGetInt(j, "spacingHoriz", 0);
+    int spacingVert = jsonGetIntOptional(j, "spacingVert", 0).value_or(0);
+    int spacingHoriz = jsonGetIntOptional(j, "spacingHoriz", 0).value_or(0);
 
     std::cout << "paddingUp: " << paddingUp << std::endl;
     std::cout << "paddingRight: " << paddingRight << std::endl;

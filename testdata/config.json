@@ -12,8 +12,8 @@
 	"spacingVert": 1,
 	"spacingHoriz": 1,
 	
-	"textureWidth": 256,
-	"textureHeight": 256,
+	"textureWidthOff": 256,
+	"textureHeightOff": 256,
 	"textureFile": "tmp/output.png",
 	
 	"dataFile": "tmp/output.fnt",
