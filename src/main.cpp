@@ -17,6 +17,32 @@ namespace po = boost::program_options;
 namespace fs = boost::filesystem;
 using json = nlohmann::json;
 
+
+struct Color
+{
+    Color() : r(0), g(0), b(0) {};
+    Color( const std::array<Uint8, 3>& rgb)
+    {
+        r = rgb[ 0 ];
+        g = rgb[ 1 ];
+        b = rgb[ 2 ];
+    }
+
+    Uint32 getUint32(Uint8 a = 255) const
+    {
+        return (r + (g << 8) + (b << 16) + (a << 24));
+    }
+
+    SDL_Color getSdlColor(Uint8 a = 255) const
+    {
+        return SDL_Color{r, g, b, a};
+    }
+
+    Uint8 r;
+    Uint8 g;
+    Uint8 b;
+};
+
 int getKerning(const SDL2pp::Font& font, Uint16 ch0, Uint16 ch1) {
     Uint16 text[ 3 ] = {ch0, ch1, 0};
     return font.GetSizeUNICODE(text).x - ( font.GetGlyphAdvance(ch0) + font.GetGlyphAdvance(ch1) );
@@ -119,6 +145,37 @@ void collectGlyphInfo(const SDL2pp::Font& font, const std::set<Uint16>& codes, s
     }
 }
 
+Color jsonGetColor( const json& j, const std::string& key )
+{
+    const json& k = j[key];
+    if (k.is_null())
+        throw std::runtime_error(key + " not found");
+    if (!k.is_array())
+        throw std::runtime_error("color must be an array");
+    if (k.size() != 3)
+        throw std::runtime_error("invalid color value");
+    std::array<Uint8, 3> rgb;
+    for (size_t i = 0; i < k.size(); ++i)
+    {
+        json c = k[i];
+        if (!c.is_number_integer())
+            throw std::runtime_error("invalid color value");
+        int64_t ci = c;
+        if ((ci < 0) || (ci > 255))
+            throw std::runtime_error("invalid color value");
+        rgb.at(i) = static_cast<Uint8>(ci);
+    }
+
+    return Color(rgb);
+}
+
+SDL2pp::Optional<Color> jsonGetColorOptional( const json& j, const std::string& key )
+{
+    if (j[key].is_null())
+        return SDL2pp::NullOpt;
+    return jsonGetColor(j, key);
+}
+
 int jsonGetInt( const json& j, const std::string& key, int min = std::numeric_limits<int>::min(), int max = std::numeric_limits<int>::max() )
 {
     const json& k = j[key];
@@ -213,23 +270,8 @@ int main(int argc, char** argv) try {
 
     ///////////////////////////////////////
 
-    json colorJson = j["color"];
-    if (!colorJson.is_array())
-        throw std::runtime_error("color must be an array");
-    if (colorJson.size() != 3)
-        throw std::runtime_error("invalid color value");
-    std::array<Uint8, 3> glyphColorRgb;
-    for (size_t i = 0; i < colorJson.size(); ++i)
-    {
-        json c = colorJson[i];
-        if (!c.is_number_integer())
-            throw std::runtime_error("invalid color value");
-        int64_t ci = c;
-        if ((ci < 0) || (ci > 255))
-            throw std::runtime_error("invalid color value");
-        glyphColorRgb[i] = static_cast<Uint8>(ci);
-    }
-    Uint32 glyphColor = glyphColorRgb[0] + (glyphColorRgb[1] << 8) + (glyphColorRgb[2] << 16);
+    Color glyphColorRgb = jsonGetColor(j, "color");
+    SDL2pp::Optional<Color> glyphBackgroundColorRgb = jsonGetColorOptional(j, "backgroundColor");
 
     ///////////////////////////////////////
 
@@ -313,7 +355,7 @@ int main(int argc, char** argv) try {
     int pageCount = 0;
     for (;;)
     {
-        //TODO: check if negatice dimension.
+        //TODO: check if negative dimension.
         mrbp.Init(textureWidth - spacingHoriz, textureHeight - spacingVert);
 
         std::vector<rbp::Rect> readyRects;
@@ -344,14 +386,31 @@ int main(int argc, char** argv) try {
         //TODO: use real texture size instead max.
         SDL2pp::Surface outputSurface(0, textureWidth, textureHeight, 32,
                                       0x000000FF, 0x0000FF00, 0x00FF0000, 0xFF000000);
-        outputSurface.FillRect(SDL2pp::NullOpt, glyphColor);
+        //std::cout << "outputSurface blend mode " << outputSurface.GetBlendMode() << std::endl;
+        // SDL_BLENDMODE_BLEND = 1 (alpha).
+
+        // If the color value contains an alpha component then the destination is simply
+        // filled with that alpha information, no blending takes place.
+        if (glyphBackgroundColorRgb)
+            outputSurface.FillRect(SDL2pp::NullOpt, glyphBackgroundColorRgb->getUint32(255));
+        else
+            outputSurface.FillRect(SDL2pp::NullOpt, glyphColorRgb.getUint32(0));
+
         for ( auto glyphIterator = glyphs.begin(); glyphIterator != glyphs.end(); ++glyphIterator )
         {
             const GlyphInfo& glyph = glyphIterator->second;
             if (glyph.page != page)
                 continue;
 
-            SDL2pp::Surface glyphSurface = font.RenderGlyph_Blended(glyph.code, SDL_Color {glyphColorRgb[0], glyphColorRgb[1], glyphColorRgb[2], 255} );
+            SDL2pp::Surface glyphSurface = font.RenderGlyph_Blended(glyph.code, glyphColorRgb.getSdlColor() );
+            //std::cout << "blend mode " << glyphSurface.GetBlendMode() << std::endl;
+            // SDL_BLENDMODE_BLEND = 1 (alpha):
+            //      dstRGB = (srcRGB * srcA) + (dstRGB * (1-srcA))
+            //      dstA = srcA + (dstA * (1-srcA))
+
+            //boost::filesystem::path glyphFilePath = textureFilePath.parent_path() / "glyphs" / ( std::to_string(glyph.code) + ".png" );
+            //SDL_SavePNG(glyphSurface.Get(), glyphFilePath.generic_string().c_str());
+
             int x = glyph.x - glyph.minx;
             if (glyph.minx < 0)
                 x = glyph.x;
@@ -362,12 +421,16 @@ int main(int argc, char** argv) try {
                 x += paddingLeft;
                 y += paddingUp;
                 SDL2pp::Rect dstRect(x, y, glyph.w, glyph.h);
+                // Blit with alpha blending.
                 glyphSurface.Blit(SDL2pp::NullOpt, outputSurface, dstRect);
             }
         }
 
         std::string pageName = textureFilePath.stem().string() + "_" + std::to_string(page) + textureFilePath.extension().string();
         pageNames.push_back(pageName);
+
+        if (glyphBackgroundColorRgb)
+            outputSurface = outputSurface.Convert(SDL_PIXELFORMAT_RGB24);
 
         boost::filesystem::path newPath = textureFilePath.parent_path() / boost::filesystem::path(pageName);
         SDL_SavePNG(outputSurface.Get(), newPath.generic_string().c_str());

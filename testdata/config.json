@@ -1,7 +1,8 @@
 {
 	"fontFile": "Vera.ttf",
 	"chars": [[32, 127]],
-	"color": [0, 0, 255],
+	"color": [255, 255, 255],
+	"backgroundColor": [0, 0, 0],
 	"fontSize": 41,
 
 	"paddingUp": 0,
