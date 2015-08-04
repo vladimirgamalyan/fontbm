@@ -35,7 +35,7 @@ paddingRight | 0 | padding right
 paddingDown | 0 | padding down
 paddingLeft | 0 | padding left
 spacingVert | 0 | spacing vert
-spacingHorize | 0 | spacing horiz
+spacingHoriz | 0 | spacing horiz
 textureWidth | 256 | texture width
 textureHeight | 256 | texture height
 output | null | output files name without extension, if not present using config file name. Can be absolute or relative to config file directory.
