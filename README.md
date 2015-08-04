@@ -1,3 +1,4 @@
+[![Stories in Ready](https://badge.waffle.io/vladimirgamalian/fontbm.png?label=ready&title=Ready)](https://waffle.io/vladimirgamalian/fontbm)
 # fontbm
 [![Build Status](https://travis-ci.org/vladimirgamalian/fontbm.svg)](https://travis-ci.org/vladimirgamalian/fontbm)
 
