@@ -18,14 +18,14 @@ simple config file:
     "output": "vera",
 }
 ```
-will be produce vera.fnt and vera.png.
+will produce vera.fnt and vera.png.
 
 Another options:
 
 
 option  | default | comment
 ------|-----|---------------
-fontFile |  | path to ttf font file, can be relative of config file directory or absolute. Required.
+fontFile |  | path to ttf font file, can be absolute or relative to config file directory. Required.
 chars | \[\[32, 127\]\] | array of characters, each item can be character code or array of min..max character codes (include max).
 color | \[255, 255, 255\] | array of R, G, B value, defines character color.
 backgroundColor | null | array of R, G, B value, defines background color. If not present, result texture has transparent background.
@@ -35,10 +35,10 @@ paddingRight | 0 | padding right
 paddingDown | 0 | padding down
 paddingLeft | 0 | padding left
 spacingVert | 0 | spacing vert
-spacingHorize | 0 | spacing horiz
+spacingHoriz | 0 | spacing horiz
 textureWidth | 256 | texture width
 textureHeight | 256 | texture height
-output | null | output files name without extension, if not present using config file name.
+output | null | output files name without extension, if not present using config file name. Can be absolute or relative to config file directory.
 dataFormat | "xml" | "xml" or "txt"
 includeKerningPairs | false | include kerning pairs
 
