@@ -4,6 +4,7 @@ SET(SOURCES
 	maxRectsBinPack/MaxRectsBinPack.cpp
 	sdlSavePng/savepng.c
 	tinyxml2/tinyxml2.cpp
+	ConfigFile.cpp
 )
 
 IF(MINGW)

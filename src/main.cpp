@@ -1,7 +1,6 @@
 #include <string>
 #include <iostream>
 #include <fstream>
-#include <set>
 #include <map>
 #include <array>
 #include <limits>
@@ -13,39 +12,10 @@
 #include "sdlSavePng/savepng.h"
 #include "Font.h"
 #include "maxRectsBinPack/MaxRectsBinPack.h"
-#include "json.hpp"
-
+#include "ConfigFile.h"
 
 namespace po = boost::program_options;
 namespace fs = boost::filesystem;
-using json = nlohmann::json;
-
-
-struct Color
-{
-    Color() : r(0), g(0), b(0) {};
-    Color( Uint8 r, Uint8 g, Uint8 b ) : r(r), g(g), b(b) {}
-    Color( const std::array<Uint8, 3>& rgb)
-    {
-        r = rgb[ 0 ];
-        g = rgb[ 1 ];
-        b = rgb[ 2 ];
-    }
-
-    Uint32 getUint32(Uint8 a = 255) const
-    {
-        return (r + (g << 8) + (b << 16) + (a << 24));
-    }
-
-    SDL_Color getSdlColor(Uint8 a = 255) const
-    {
-        return SDL_Color{r, g, b, a};
-    }
-
-    Uint8 r;
-    Uint8 g;
-    Uint8 b;
-};
 
 int getKerning(const SDL2pp::Font& font, Uint16 ch0, Uint16 ch1) {
     Uint16 text[ 3 ] = {ch0, ch1, 0};
@@ -149,66 +119,15 @@ void collectGlyphInfo(const SDL2pp::Font& font, const std::set<Uint16>& codes, s
     }
 }
 
-Color jsonGetColor( const json& j, const std::string& key )
-{
-    const json& k = j[key];
-    if (k.is_null())
-        throw std::runtime_error(key + " not found");
-    if (!k.is_array())
-        throw std::runtime_error("color must be an array");
-    if (k.size() != 3)
-        throw std::runtime_error("invalid color value");
-    std::array<Uint8, 3> rgb;
-    for (size_t i = 0; i < k.size(); ++i)
-    {
-        json c = k[i];
-        if (!c.is_number_integer())
-            throw std::runtime_error("invalid color value");
-        int64_t ci = c;
-        if ((ci < 0) || (ci > 255))
-            throw std::runtime_error("invalid color value");
-        rgb.at(i) = static_cast<Uint8>(ci);
-    }
 
-    return Color(rgb);
-}
-
-SDL2pp::Optional<Color> jsonGetColorOptional( const json& j, const std::string& key )
-{
-    if (j[key].is_null())
-        return SDL2pp::NullOpt;
-    return jsonGetColor(j, key);
-}
-
-int jsonGetInt( const json& j, const std::string& key, int min = std::numeric_limits<int>::min(), int max = std::numeric_limits<int>::max() )
-{
-    const json& k = j[key];
-    if (k.is_null())
-        throw std::runtime_error(key + " not found");
-    if (!k.is_number_integer())
-        throw std::runtime_error(std::string("invalid ") + key + ", required integer number");
-    int64_t result = k;
-    if (result < min)
-        throw std::runtime_error(std::string("invalid ") + key + " value, must be greater or equal " + std::to_string(min));
-    if (result > max)
-        throw std::runtime_error(std::string("invalid ") + key + " value, must be lower or equal " + std::to_string(max));
-    return static_cast<int>(result);
-}
-
-SDL2pp::Optional<int> jsonGetIntOptional( const json& j, const std::string& key, int min = std::numeric_limits<int>::min(), int max = std::numeric_limits<int>::max() )
-{
-    if (j[key].is_null())
-        return SDL2pp::NullOpt;
-    return jsonGetInt(j, key, min, max);
-}
 
 int main(int argc, char** argv) try {
 
     po::options_description desc( "Allowed options" );
-    fs::path configPath;
+    fs::path configFilePath;
     desc.add_options()
             ( "help", "produce help message" )
-            ( "config", po::value< fs::path >( &configPath)->required(), "config file" );
+            ( "config", po::value< fs::path >( &configFilePath)->required(), "config file" );
     po::variables_map vm;
     po::store( po::parse_command_line( argc, argv, desc ), vm );
 
@@ -222,145 +141,50 @@ int main(int argc, char** argv) try {
 
     ///////////////////////////////////////
 
-    // https://github.com/nlohmann/json
-
-    if (!fs::is_regular_file(configPath))
-        throw std::runtime_error("config not found");
-
-    std::ifstream ifs(configPath.generic_string(), std::ifstream::binary);
-    if (!ifs)
-        throw std::runtime_error("can't open config file");
-
-    //TODO: move to https://github.com/open-source-parsers/jsoncpp (support comments).
-
-    //TODO: output parse errors, check value's ranges.
-    json j;
-    j << ifs;
-    const std::string fontFile = j["fontFile"];
-    const int textureWidth = jsonGetIntOptional(j, "textureWidth", 1).value_or(256);
-    const int textureHeight = jsonGetIntOptional(j, "textureHeight", 1).value_or(256);
-    const int fontSize = jsonGetIntOptional(j, "fontSize", 1).value_or(32);
-
-
-    const std::string output = j["output"].is_null() ? configPath.stem().generic_string() : j["output"].get<std::string>();
-
-
-    //TODO: Check if other type.
-    std::string dataFormat = j["dataFormat"].is_null() ? "xml" : j["dataFormat"];
-    std::transform(dataFormat.begin(), dataFormat.end(), dataFormat.begin(), ::tolower);
-
-    if ((dataFormat != "xml") && (dataFormat != "txt"))
-        throw std::runtime_error("unknown data file format");
-
-    //TODO: Check for unknown keys in config.
-    //TODO: Make all options optional.
-
-    //TODO: Check if other type.
-    bool includeKerningPairs = j["dataFormat"].is_null() ? false : j["includeKerningPairs"].get<bool>();
-
-    // Add padding to glyph, affect metrics (w/h, xoffset, yoffset).
-    int paddingUp = jsonGetIntOptional(j, "paddingUp", 0).value_or(0);
-    int paddingRight = jsonGetIntOptional(j, "paddingRight", 0).value_or(0);
-    int paddingDown = jsonGetIntOptional(j, "paddingDown", 0).value_or(0);
-    int paddingLeft = jsonGetIntOptional(j, "paddingLeft", 0).value_or(0);
-    // Add spaces on target texure, doesnt affect metrics.
-    int spacingVert = jsonGetIntOptional(j, "spacingVert", 0).value_or(0);
-    int spacingHoriz = jsonGetIntOptional(j, "spacingHoriz", 0).value_or(0);
+    ConfigFile configFile(configFilePath);
+    const ConfigFile::Config config = configFile.getConfig();
 
     ///////////////////////////////////////
 
-
-
-    ///////////////////////////////////////
-
-    Color glyphColorRgb = jsonGetColorOptional(j, "color").value_or(Color(255, 255, 255));
-    SDL2pp::Optional<Color> glyphBackgroundColorRgb = jsonGetColorOptional(j, "backgroundColor");
-
-    ///////////////////////////////////////
-
-    fs::path outputPath(output);
+    fs::path outputPath(config.output);
     if (!outputPath.is_absolute())
-        outputPath = fs::absolute(outputPath, configPath.parent_path());
+        outputPath = fs::absolute(outputPath, configFilePath.parent_path());
 
     fs::path outputDirPath = outputPath.parent_path();
 
     //TODO: create directory only if there is no problem (exceptions), good place is before write outputs.
     fs::create_directory(outputDirPath);
 
-    std::string outputName = outputPath.stem().string();
+    const std::string outputName = outputPath.stem().string();
+
     fs::path dataFilePath = outputDirPath / (outputName + ".fnt");
 
-    fs::path fontFilePath(fontFile);
+    fs::path fontFilePath(config.fontFile);
     if (!fontFilePath.is_absolute())
-        fontFilePath = fs::absolute(fontFilePath, configPath.parent_path());
+        fontFilePath = fs::absolute(fontFilePath, configFilePath.parent_path());
     if (!fs::is_regular_file(fontFilePath))
         throw std::runtime_error("font file not found");
 
-    ///////////////////////////////////////
-
-    json charsJson = j["chars"];
-    if (charsJson.is_null())
-        charsJson = {{32, 127}};
-
-    if (!charsJson.is_array())
-        throw std::runtime_error("config chars list must be an array");
-    std::set<Uint16> glyphCodes;
-
-    for (auto el: charsJson) {
-        // Every element is number or array of two numbers.
-        if (el.is_number_integer())
-        {
-            //TODO: check if exists.
-            glyphCodes.insert(el.get<Uint16>());
-        }
-        else if (el.is_array())
-        {
-            //TODO: extended error report.
-            if (el.size() != 2)
-                throw std::runtime_error("invalid chars list");
-            if (!el[0].is_number_integer())
-                throw std::runtime_error("invalid chars list");
-            if (!el[1].is_number_integer())
-                throw std::runtime_error("invalid chars list");
-            int min = el[0];
-            int max = el[1];
-            if ((min < 0) || (min > 65535))
-                throw std::runtime_error("invalid chars list");
-            if ((max < 0) || (max > 65535))
-                throw std::runtime_error("invalid chars list");
-            for (Uint16 i = static_cast<Uint16>(min); i <= max; ++i)
-                //TODO: check if exists.
-                glyphCodes.insert(i);
-        }
-        else
-        {
-            throw std::runtime_error("invalid chars list");
-        }
-    }
-
-
-    ///////////////////////////////////////
-
     SDL2pp::SDLTTF ttf;
-    SDL2pp::Font font(fontFilePath.generic_string(), fontSize);
+    SDL2pp::Font font(fontFilePath.generic_string(), config.fontSize);
 
 
     int fontAscent = font.GetAscent();
 
     std::map<Uint16, GlyphInfo> glyphs;
-    collectGlyphInfo(font, glyphCodes, glyphs);
-    checkGlyphSize(glyphs, textureWidth, textureHeight);
+    collectGlyphInfo(font, config.glyphCodes, glyphs);
+    checkGlyphSize(glyphs, config.textureWidth, config.textureHeight);
 
     std::vector< rbp::RectSize > srcRects;
-    getSrcRects(glyphs, spacingHoriz + paddingLeft + paddingRight,
-                spacingVert + paddingUp + paddingDown, srcRects);
+    getSrcRects(glyphs, config.spacingHoriz + config.paddingLeft + config.paddingRight,
+                config.spacingVert + config.paddingUp + config.paddingDown, srcRects);
 
     rbp::MaxRectsBinPack mrbp;
     int pageCount = 0;
     for (;;)
     {
         //TODO: check if negative dimension.
-        mrbp.Init(textureWidth - spacingHoriz, textureHeight - spacingVert);
+        mrbp.Init(config.textureWidth - config.spacingHoriz, config.textureHeight - config.spacingVert);
 
         std::vector<rbp::Rect> readyRects;
         mrbp.Insert( srcRects, readyRects, rbp::MaxRectsBinPack::RectBestAreaFit );
@@ -373,8 +197,8 @@ int main(int argc, char** argv) try {
 
         for ( auto r: readyRects )
         {
-            glyphs[r.tag].x = r.x + spacingHoriz;
-            glyphs[r.tag].y = r.y + spacingVert;
+            glyphs[r.tag].x = r.x + config.spacingHoriz;
+            glyphs[r.tag].y = r.y + config.spacingVert;
             glyphs[r.tag].page = pageCount;
         }
 
@@ -388,17 +212,17 @@ int main(int argc, char** argv) try {
     for (int page = 0; page < pageCount; ++page)
     {
         //TODO: use real texture size instead max.
-        SDL2pp::Surface outputSurface(0, textureWidth, textureHeight, 32,
+        SDL2pp::Surface outputSurface(0, config.textureWidth, config.textureHeight, 32,
                                       0x000000FF, 0x0000FF00, 0x00FF0000, 0xFF000000);
         //std::cout << "outputSurface blend mode " << outputSurface.GetBlendMode() << std::endl;
         // SDL_BLENDMODE_BLEND = 1 (alpha).
 
         // If the color value contains an alpha component then the destination is simply
         // filled with that alpha information, no blending takes place.
-        if (glyphBackgroundColorRgb)
-            outputSurface.FillRect(SDL2pp::NullOpt, glyphBackgroundColorRgb->getUint32(255));
+        if (config.glyphBackgroundColorRgb)
+            outputSurface.FillRect(SDL2pp::NullOpt, config.glyphBackgroundColorRgb->getUint32(255));
         else
-            outputSurface.FillRect(SDL2pp::NullOpt, glyphColorRgb.getUint32(0));
+            outputSurface.FillRect(SDL2pp::NullOpt, config.glyphColorRgb.getUint32(0));
 
         for ( auto glyphIterator = glyphs.begin(); glyphIterator != glyphs.end(); ++glyphIterator )
         {
@@ -406,7 +230,7 @@ int main(int argc, char** argv) try {
             if (glyph.page != page)
                 continue;
 
-            SDL2pp::Surface glyphSurface = font.RenderGlyph_Blended(glyph.code, glyphColorRgb.getSdlColor() );
+            SDL2pp::Surface glyphSurface = font.RenderGlyph_Blended(glyph.code, config.glyphColorRgb.getSdlColor() );
             //std::cout << "blend mode " << glyphSurface.GetBlendMode() << std::endl;
             // SDL_BLENDMODE_BLEND = 1 (alpha):
             //      dstRGB = (srcRGB * srcA) + (dstRGB * (1-srcA))
@@ -422,8 +246,8 @@ int main(int argc, char** argv) try {
             bool empty = (glyph.w == 0) && (glyph.h == 0);
             if (!empty)
             {
-                x += paddingLeft;
-                y += paddingUp;
+                x += config.paddingLeft;
+                y += config.paddingUp;
                 SDL2pp::Rect dstRect(x, y, glyph.w, glyph.h);
                 // Blit with alpha blending.
                 glyphSurface.Blit(SDL2pp::NullOpt, outputSurface, dstRect);
@@ -433,7 +257,7 @@ int main(int argc, char** argv) try {
         std::string pageName = outputName + "_" + std::to_string(page) + ".png";
         pageNames.push_back(pageName);
 
-        if (glyphBackgroundColorRgb)
+        if (config.glyphBackgroundColorRgb)
             outputSurface = outputSurface.Convert(SDL_PIXELFORMAT_RGB24);
 
         boost::filesystem::path texturePath = outputDirPath / boost::filesystem::path(pageName);
@@ -451,10 +275,10 @@ int main(int argc, char** argv) try {
     f.kernings.clear();
     f.pages.clear();
 
-    if (includeKerningPairs)
+    if (config.includeKerningPairs)
     {
-        std::set<Uint16> glyphCodes2(glyphCodes);
-        for (auto& ch0 : glyphCodes)
+        std::set<Uint16> glyphCodes2(config.glyphCodes);
+        for (auto& ch0 : config.glyphCodes)
         {
             for (auto& ch1 : glyphCodes2)
             {
@@ -478,10 +302,10 @@ int main(int argc, char** argv) try {
         f.chars.emplace_back(Font::Char{glyph.code,
                                         glyph.x,
                                         glyph.y,
-                                        glyph.w + paddingLeft + paddingRight,
-                                        glyph.h + paddingUp + paddingDown,
-                                        glyph.minx - paddingLeft,
-                                        fontAscent - glyph.maxy - paddingUp,
+                                        glyph.w + config.paddingLeft + config.paddingRight,
+                                        glyph.h + config.paddingUp + config.paddingDown,
+                                        glyph.minx - config.paddingLeft,
+                                        fontAscent - glyph.maxy - config.paddingUp,
                                         glyph.advance,
                                         glyph.page,
                                         15});
@@ -492,12 +316,12 @@ int main(int argc, char** argv) try {
 
     f.common.lineHeight = font.GetLineSkip();
     f.common.base = font.GetAscent();
-    f.common.scaleW = textureWidth;
-    f.common.scaleH = textureHeight;
+    f.common.scaleW = config.textureWidth;
+    f.common.scaleH = config.textureHeight;
 
-    if (dataFormat == "xml")
+    if (config.dataFormat == "xml")
         f.writeToXmlFile(dataFilePath.generic_string());
-    if (dataFormat == "txt")
+    if (config.dataFormat == "txt")
         f.writeToTextFile(dataFilePath.generic_string());
 
 	return 0;
