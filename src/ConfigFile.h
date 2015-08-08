@@ -59,10 +59,8 @@ public:
     Config getConfig() const;
 
 private:
-    Color jsonGetColor( const nlohmann::json& j, const std::string& key );
-    SDL2pp::Optional<Color> jsonGetColorOptional( const nlohmann::json& j, const std::string& key );
-    int jsonGetInt( const nlohmann::json& j, const std::string& key, int min = std::numeric_limits<int>::min(), int max = std::numeric_limits<int>::max() );
-    SDL2pp::Optional<int> jsonGetIntOptional( const nlohmann::json& j, const std::string& key, int min = std::numeric_limits<int>::min(), int max = std::numeric_limits<int>::max() );
+    SDL2pp::Optional<Color> getColor( nlohmann::json& j, const std::string& key ) const;
+    template<class T> T get(nlohmann::json& j, const std::string& key, const SDL2pp::Optional<T>& defaultValue = SDL2pp::NullOpt) const;
 
     Config config;
 };

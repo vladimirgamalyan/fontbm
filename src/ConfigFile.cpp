@@ -1,6 +1,8 @@
 #include "ConfigFile.h"
 #include <set>
 #include <string>
+#include <fstream>
+#include "JsonCommentsInputFilter.h"
 
 namespace fs = boost::filesystem;
 using json = nlohmann::json;
@@ -16,57 +18,44 @@ ConfigFile::ConfigFile(const boost::filesystem::path &configFilePath)
     if (!ifs)
         throw std::runtime_error("can't open config file");
 
-    //TODO: move to https://github.com/open-source-parsers/jsoncpp (support comments).
 
     //TODO: output parse errors, check value's ranges.
+
+    boost::iostreams::filtering_istream strippingIfs;
+    strippingIfs.push(JsonCommentsInputFilter());
+    strippingIfs.push(ifs);
+
     json j;
-    j << ifs;
-    config.fontFile = j["fontFile"].get<std::string>();
-    config.textureWidth = jsonGetIntOptional(j, "textureWidth", 1).value_or(256);
-    config.textureHeight = jsonGetIntOptional(j, "textureHeight", 1).value_or(256);
-    config.fontSize = jsonGetIntOptional(j, "fontSize", 1).value_or(32);
+    j << strippingIfs;
 
+    config.fontFile = get<std::string>(j, "fontFile");
+    config.textureWidth = get<int>(j, "textureWidth", 256);  //TODO: Check range.
+    config.textureHeight = get<int>(j, "textureHeight", 256); //TODO: Check range.
+    config.fontSize = get<int>(j, "fontSize", 32); //TODO: Check range.
+    config.output = get<std::string>(j, "output", configFilePath.stem().generic_string());
 
-    config.output = j["output"].is_null() ? configFilePath.stem().generic_string() : j["output"].get<std::string>();
-
-
-    //TODO: Check if other type.
-    config.dataFormat = j["dataFormat"].is_null() ? "xml" : j["dataFormat"].get<std::string>();
+    config.dataFormat = get<std::string>(j, "dataFormat", std::string("xml"));
     std::transform(config.dataFormat.begin(), config.dataFormat.end(), config.dataFormat.begin(), ::tolower);
 
     if ((config.dataFormat != "xml") && (config.dataFormat != "txt"))
         throw std::runtime_error("unknown data file format");
 
-    //TODO: Check for unknown keys in config.
-    //TODO: Make all options optional.
 
-    //TODO: Check if other type.
-    config.includeKerningPairs = j["dataFormat"].is_null() ? false : j["includeKerningPairs"].get<bool>();
+    config.includeKerningPairs = get<bool>(j, "includeKerningPairs", false);
 
     // Add padding to glyph, affect metrics (w/h, xoffset, yoffset).
-    config.paddingUp = jsonGetIntOptional(j, "paddingUp", 0).value_or(0);
-    config.paddingRight = jsonGetIntOptional(j, "paddingRight", 0).value_or(0);
-    config.paddingDown = jsonGetIntOptional(j, "paddingDown", 0).value_or(0);
-    config.paddingLeft = jsonGetIntOptional(j, "paddingLeft", 0).value_or(0);
-    // Add spaces on target texure, doesnt affect metrics.
-    config.spacingVert = jsonGetIntOptional(j, "spacingVert", 0).value_or(0);
-    config.spacingHoriz = jsonGetIntOptional(j, "spacingHoriz", 0).value_or(0);
-
-    ///////////////////////////////////////
-
+    //TODO: Check range (padding and spacing).
+    config.paddingUp = get<int>(j, "paddingUp", 0);
+    config.paddingRight = get<int>(j, "paddingRight", 0);
+    config.paddingDown = get<int>(j, "paddingDown", 0);
+    config.paddingLeft = get<int>(j, "paddingLeft", 0);
+    // Add spaces on target texture, doesn't affect metrics.
+    config.spacingVert = get<int>(j, "spacingVert", 0);
+    config.spacingHoriz = get<int>(j, "spacingHoriz", 0);
 
 
-    ///////////////////////////////////////
-
-    config.glyphColorRgb = jsonGetColorOptional(j, "color").value_or(Color(255, 255, 255));
-    config.glyphBackgroundColorRgb = jsonGetColorOptional(j, "backgroundColor");
-
-    ///////////////////////////////////////
-
-
-
-
-
+    config.glyphColorRgb = getColor(j, "color").value_or(Color(255, 255, 255));
+    config.glyphBackgroundColorRgb = getColor(j, "backgroundColor");
 
     ///////////////////////////////////////
 
@@ -74,6 +63,7 @@ ConfigFile::ConfigFile(const boost::filesystem::path &configFilePath)
     if (charsJson.is_null())
         charsJson = {{32, 127}};
 
+    //TODO: Make message in same form as in get() method
     if (!charsJson.is_array())
         throw std::runtime_error("config chars list must be an array");
 
@@ -110,17 +100,39 @@ ConfigFile::ConfigFile(const boost::filesystem::path &configFilePath)
         }
     }
 
+    if (!j["chars"].is_null())
+        j.erase("chars");
+
+
+    for (json::iterator it = j.begin(); it != j.end(); ++it)
+        if (j[it.key()].is_null())
+            j.erase(it.key());
+
+
+    if (j.size())
+    {
+        for (json::iterator it = j.begin(); it != j.end(); ++it)
+        {
+            std::cout << "unknown option: " << it.key() << std::endl;
+        }
+
+        throw std::runtime_error("one or more unknown options found");
+    }
 }
 
-ConfigFile::Color ConfigFile::jsonGetColor( const json& j, const std::string& key )
+SDL2pp::Optional<ConfigFile::Color> ConfigFile::getColor( json& j, const std::string& key ) const
 {
     const json& k = j[key];
+
     if (k.is_null())
-        throw std::runtime_error(key + " not found");
+        return SDL2pp::NullOpt;
+
     if (!k.is_array())
         throw std::runtime_error("color must be an array");
+
     if (k.size() != 3)
         throw std::runtime_error("invalid color value");
+
     std::array<Uint8, 3> rgb;
     for (size_t i = 0; i < k.size(); ++i)
     {
@@ -133,36 +145,9 @@ ConfigFile::Color ConfigFile::jsonGetColor( const json& j, const std::string& ke
         rgb.at(i) = static_cast<Uint8>(ci);
     }
 
+    j.erase(key);
+
     return Color(rgb);
-}
-
-SDL2pp::Optional<ConfigFile::Color> ConfigFile::jsonGetColorOptional( const json& j, const std::string& key )
-{
-    if (j[key].is_null())
-        return SDL2pp::NullOpt;
-    return jsonGetColor(j, key);
-}
-
-int ConfigFile::jsonGetInt( const json& j, const std::string& key, int min, int max )
-{
-    const json& k = j[key];
-    if (k.is_null())
-        throw std::runtime_error(key + " not found");
-    if (!k.is_number_integer())
-        throw std::runtime_error(std::string("invalid ") + key + ", required integer number");
-    int64_t result = k;
-    if (result < min)
-        throw std::runtime_error(std::string("invalid ") + key + " value, must be greater or equal " + std::to_string(min));
-    if (result > max)
-        throw std::runtime_error(std::string("invalid ") + key + " value, must be lower or equal " + std::to_string(max));
-    return static_cast<int>(result);
-}
-
-SDL2pp::Optional<int> ConfigFile::jsonGetIntOptional( const json& j, const std::string& key, int min, int max )
-{
-    if (j[key].is_null())
-        return SDL2pp::NullOpt;
-    return jsonGetInt(j, key, min, max);
 }
 
 ConfigFile::Config ConfigFile::getConfig() const
@@ -170,3 +155,27 @@ ConfigFile::Config ConfigFile::getConfig() const
     return config;
 }
 
+template<class T>
+T ConfigFile::get(nlohmann::json &j, const std::string &key, const SDL2pp::Optional<T>& defaultValue) const
+{
+    json& k = j[key];
+    if (k.is_null())
+    {
+        if (defaultValue)
+            return *defaultValue;
+        else
+            throw std::runtime_error(std::string("required option \"") + key + "\" is not found");
+    }
+
+    try
+    {
+        T result = k.get<T>();
+        j.erase(key);
+        return result;
+    }
+    catch(std::domain_error& e)
+    {
+        // e.what() == type must be object, but is ...
+        throw std::runtime_error(std::string("invalid \"") + key + "\" option, " + e.what());
+    }
+}
