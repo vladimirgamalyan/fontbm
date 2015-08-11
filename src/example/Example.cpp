@@ -20,7 +20,7 @@ int main(int /*argc*/, char** /*argv*/) try {
     //renderer.Copy(sprites);
     renderer.Present();
 
-    BmFont bmFont;
+    BmFont bmFont("vera.fnt");
 
     BmFontPrinter bmFontPrinter(renderer);
     bmFontPrinter.print(SDL2pp::Point(0, 0), bmFont, "Hello, World!");
