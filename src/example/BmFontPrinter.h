@@ -5,8 +5,9 @@
 class BmFontPrinter
 {
 public:
-    void print(const SDL2pp::Point& pos, const std::string& text, const BmFontInterface& font);
+    BmFontPrinter(SDL2pp::Renderer& renderer);
+    void print(const SDL2pp::Point& pos, const BmFontInterface& font, const std::string& text);
 
 private:
-
+    SDL2pp::Renderer& renderer;
 };

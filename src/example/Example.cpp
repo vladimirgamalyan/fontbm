@@ -2,6 +2,8 @@
 #include <exception>
 #include <SDL2/SDL.h>
 #include <SDL2pp/SDL2pp.hh>
+#include "BmFontPrinter.h"
+#include "BmFont.h"
 
 using namespace SDL2pp;
 
@@ -17,6 +19,12 @@ int main(int /*argc*/, char** /*argv*/) try {
     renderer.Clear();
     //renderer.Copy(sprites);
     renderer.Present();
+
+    BmFont bmFont;
+
+    BmFontPrinter bmFontPrinter(renderer);
+    bmFontPrinter.print(SDL2pp::Point(0, 0), bmFont, "Hello, World!");
+
     SDL_Delay(5000);
 
     return 0;

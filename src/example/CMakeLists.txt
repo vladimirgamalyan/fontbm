@@ -1,6 +1,7 @@
 SET(SOURCES
 	Example.cpp
 	BmFontPrinter.cpp
+	BmFont.cpp
 )
 
 IF(MINGW)
