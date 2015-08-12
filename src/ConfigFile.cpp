@@ -60,10 +60,14 @@ ConfigFile::ConfigFile(const boost::filesystem::path &configFilePath)
 
     ///////////////////////////////////////
 
-    json charsJson = j["chars"];
-    if (charsJson.is_null())
+    json charsJson;
+    if (j.find("chars") == j.end())
         charsJson = {{32, 127}};
-
+    else
+    {
+        charsJson = j["chars"];
+        j.erase("chars");
+    }
 
 
     //TODO: Make message in same form as in get() method
@@ -114,17 +118,6 @@ ConfigFile::ConfigFile(const boost::filesystem::path &configFilePath)
         }
     }
 
-
-
-    if (!j["chars"].is_null())
-        j.erase("chars");
-
-
-    for (json::iterator it = j.begin(); it != j.end(); ++it)
-        if (j[it.key()].is_null())
-            j.erase(it.key());
-
-
     if (j.size())
     {
         for (json::iterator it = j.begin(); it != j.end(); ++it)
@@ -138,11 +131,10 @@ ConfigFile::ConfigFile(const boost::filesystem::path &configFilePath)
 
 SDL2pp::Optional<ConfigFile::Color> ConfigFile::getColor( json& j, const std::string& key ) const
 {
-    const json& k = j[key];
-
-    if (k.is_null())
+    if (j.find(key) == j.end())
         return SDL2pp::NullOpt;
 
+    const json& k = j[key];
     if (!k.is_array())
         throw std::runtime_error("color must be an array");
 
@@ -174,8 +166,7 @@ ConfigFile::Config ConfigFile::getConfig() const
 template<class T>
 T ConfigFile::get(nlohmann::json &j, const std::string &key, const SDL2pp::Optional<T>& defaultValue) const
 {
-    json& k = j[key];
-    if (k.is_null())
+    if (j.find(key) == j.end())
     {
         if (defaultValue)
             return *defaultValue;
@@ -185,7 +176,7 @@ T ConfigFile::get(nlohmann::json &j, const std::string &key, const SDL2pp::Optio
 
     try
     {
-        T result = k.get<T>();
+        T result = j[key].get<T>();
         j.erase(key);
         return result;
     }
