@@ -49,6 +49,7 @@ ConfigFile::ConfigFile(const boost::filesystem::path &configFilePath)
     config.paddingRight = get<int>(j, "paddingRight", 0);
     config.paddingDown = get<int>(j, "paddingDown", 0);
     config.paddingLeft = get<int>(j, "paddingLeft", 0);
+
     // Add spaces on target texture, doesn't affect metrics.
     config.spacingVert = get<int>(j, "spacingVert", 0);
     config.spacingHoriz = get<int>(j, "spacingHoriz", 0);
@@ -63,42 +64,57 @@ ConfigFile::ConfigFile(const boost::filesystem::path &configFilePath)
     if (charsJson.is_null())
         charsJson = {{32, 127}};
 
+
+
     //TODO: Make message in same form as in get() method
-    if (!charsJson.is_array())
-        throw std::runtime_error("config chars list must be an array");
+    if ((!charsJson.is_array()) && (!charsJson.is_string()))
+        throw std::runtime_error("config char list must be an array or string");
 
 
-    for (auto el: charsJson) {
-        // Every element is number or array of two numbers.
-        if (el.is_number_integer())
+    if (charsJson.is_string())
+    {
+        std::string charsStr = charsJson.get<std::string>();
+        for (const char& c: charsStr)
+            config.glyphCodes.insert(static_cast<Uint16>(c));
+    }
+
+    if (charsJson.is_array())
+    {
+        for (auto el: charsJson)
         {
-            //TODO: check if exists.
-            config.glyphCodes.insert(el.get<Uint16>());
-        }
-        else if (el.is_array())
-        {
-            //TODO: extended error report.
-            if (el.size() != 2)
-                throw std::runtime_error("invalid chars list");
-            if (!el[0].is_number_integer())
-                throw std::runtime_error("invalid chars list");
-            if (!el[1].is_number_integer())
-                throw std::runtime_error("invalid chars list");
-            int min = el[0];
-            int max = el[1];
-            if ((min < 0) || (min > 65535))
-                throw std::runtime_error("invalid chars list");
-            if ((max < 0) || (max > 65535))
-                throw std::runtime_error("invalid chars list");
-            for (Uint16 i = static_cast<Uint16>(min); i <= max; ++i)
+            // Every element is number or array of two numbers.
+            if (el.is_number_integer())
+            {
                 //TODO: check if exists.
-                config.glyphCodes.insert(i);
-        }
-        else
-        {
-            throw std::runtime_error("invalid chars list");
+                config.glyphCodes.insert(el.get<Uint16>());
+            }
+            else if (el.is_array())
+            {
+                //TODO: extended error report.
+                if (el.size() != 2)
+                    throw std::runtime_error("invalid chars list");
+                if (!el[0].is_number_integer())
+                    throw std::runtime_error("invalid chars list");
+                if (!el[1].is_number_integer())
+                    throw std::runtime_error("invalid chars list");
+                int min = el[0];
+                int max = el[1];
+                if ((min < 0) || (min > 65535))
+                    throw std::runtime_error("invalid chars list");
+                if ((max < 0) || (max > 65535))
+                    throw std::runtime_error("invalid chars list");
+                for (Uint16 i = static_cast<Uint16>(min); i <= max; ++i)
+                    //TODO: check if exists.
+                    config.glyphCodes.insert(i);
+            }
+            else
+            {
+                throw std::runtime_error("invalid chars list");
+            }
         }
     }
+
+
 
     if (!j["chars"].is_null())
         j.erase("chars");

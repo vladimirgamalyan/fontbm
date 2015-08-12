@@ -1,24 +1,25 @@
 {
-	"fontFile": "Vera.ttf",
-	"chars": [[32, 127]],
-	"color": [32, 32, 255],
-	//"backgroundColor": [76, 198, 30],
-	"fontSize": 43,
+  "fontFile": "Vera.ttf",
+  //"chars": [[32, 127]],
+  "chars": "0123456789.",
+  "color": [255, 0, 0],
+  //"backgroundColor": [76, 198, 30],
+  "fontSize": 163,
 
-  	//"unknownOption": "unknownValue",
+  //"unknownOption": "unknownValue",
 
-	//"paddingUp": 0,
-	//"paddingRight": 0,
-	//"paddingDown": 0,	
-	//"paddingLeft": 0,
-	"spacingVert": 1,
-	"spacingHoriz": 1,
-	
-	//"textureWidth": 256,
-	//"textureHeight": 256,
-	
-	"output": "tmp/vera"
-	
-	//"dataFormat": "xml",
-	//"includeKerningPairs": false
+  //"paddingUp": 0,
+  //"paddingRight": 0,
+  //"paddingDown": 0,
+  //"paddingLeft": 0,
+  "spacingVert": 1,
+  "spacingHoriz": 1,
+
+  //"textureWidth": 256,
+  //"textureHeight": 256,
+
+  "output": "tmp/vera"
+
+  //"dataFormat": "xml",
+  //"includeKerningPairs": false
 }

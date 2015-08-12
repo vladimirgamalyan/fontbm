@@ -27,7 +27,7 @@ Another options:
 option  | default | comment
 ------|-----|---------------
 fontFile |  | path to ttf font file, can be absolute or relative to config file directory. Required.
-chars | \[\[32, 127\]\] | array of characters, each item can be character code or array of min..max character codes (include max).
+chars | \[\[32, 127\]\] | array of characters, each item can be character code or array of min..max character codes (include max). Also can be a string of required characters.
 color | \[255, 255, 255\] | array of R, G, B value, defines character color.
 backgroundColor | null | array of R, G, B value, defines background color. If not present, result texture has transparent background.
 fontSize | 32 | font size

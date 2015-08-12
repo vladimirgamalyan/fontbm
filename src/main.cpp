@@ -266,9 +266,6 @@ int main(int argc, char** argv) try {
 
     /////////////////////////////////////////////////////////////
 
-
-    //TODO: add space character.
-
     Font f;
     f.debugFillValues();
     f.chars.clear();
