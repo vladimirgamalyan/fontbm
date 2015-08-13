@@ -10,5 +10,5 @@ void BmFontPrinter::print(const SDL2pp::Point& /*pos*/, const BmFontInterface& f
     if (!font.isValid())
         return;
 
-
+    renderer.Clear();
 }
