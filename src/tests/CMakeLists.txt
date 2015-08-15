@@ -1,11 +1,5 @@
 SET(SOURCES
-	main.cpp
-	Font.cpp
-	maxRectsBinPack/MaxRectsBinPack.cpp
-	sdlSavePng/savepng.c
-	tinyxml2/tinyxml2.cpp
-	ConfigFile.cpp
-	CharList.cpp
+	CharListTest.cpp
 )
 
 IF(MINGW)
@@ -15,7 +9,7 @@ IF(MINGW)
     SET(SDL2PP_LIBRARIES ${MINGW32_LIBRARY} ${SDL2MAIN_LIBRARY} ${SDL2PP_LIBRARIES})
 ENDIF(MINGW)
 
-ADD_EXECUTABLE(fontbm ${SOURCES})
+ADD_EXECUTABLE(tests ${SOURCES})
 
-TARGET_LINK_LIBRARIES(fontbm png ${SDL2PP_LIBRARIES} ${Boost_LIBRARIES})
+TARGET_LINK_LIBRARIES(tests ${SDL2PP_LIBRARIES} ${Boost_LIBRARIES})
 SET(EXECUTABLE_OUTPUT_PATH "${CMAKE_BINARY_DIR}/bin")
