@@ -1,4 +1,5 @@
 SET(SOURCES
+    ../CharList.cpp
 	CharListTest.cpp
 )
 

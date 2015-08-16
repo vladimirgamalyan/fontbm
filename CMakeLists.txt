@@ -27,7 +27,7 @@ ENDIF(MINGW)
 
 set(BOOST_MIN_VERSION "1.46.0")
 
-find_package(Boost ${BOOST_MIN_VERSION} REQUIRED COMPONENTS system filesystem program_options)
+find_package(Boost ${BOOST_MIN_VERSION} REQUIRED COMPONENTS system filesystem program_options regex)
 include_directories(${Boost_INCLUDE_DIR})
 
 SET(SDL2PP_WITH_IMAGE TRUE)
@@ -38,3 +38,4 @@ INCLUDE_DIRECTORIES(SYSTEM ${SDL2PP_INCLUDE_DIRS})
 
 ADD_SUBDIRECTORY(src)
 ADD_SUBDIRECTORY(src/example)
+ADD_SUBDIRECTORY(src/tests)

@@ -13,6 +13,7 @@
 #include "Font.h"
 #include "maxRectsBinPack/MaxRectsBinPack.h"
 #include "ConfigFile.h"
+#include "CharList.h"
 
 namespace po = boost::program_options;
 namespace fs = boost::filesystem;
@@ -182,6 +183,10 @@ int main(int argc, char** argv) try {
 
     if ( vm.count( "fontFile" ) )
         config.fontFile = args.fontFile;
+    if ( vm.count( "chars" ) )
+    {
+        CharList charList = parseCharListString(args.chars);
+    }
 //    config.chars = args.chars;
 //    config.color = args.color;
 //    config.backgroundColor = args.backgroundColor;
