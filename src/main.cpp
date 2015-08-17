@@ -184,12 +184,11 @@ int main(int argc, char** argv) try {
     if ( vm.count( "fontFile" ) )
         config.fontFile = args.fontFile;
     if ( vm.count( "chars" ) )
-    {
-        CharList charList = parseCharListString(args.chars);
-    }
-//    config.chars = args.chars;
-//    config.color = args.color;
-//    config.backgroundColor = args.backgroundColor;
+        parseCharListString(args.chars, config.glyphCodes);
+    if ( vm.count( "color" ) )
+        config.glyphColorRgb.fromString(args.color);
+    if ( vm.count( "color" ) )
+        config.glyphBackgroundColorRgb->fromString(args.backgroundColor);
     if ( vm.count( "fontSize" ) )
         config.fontSize = args.fontSize;
     if ( vm.count( "paddingUp" ) )

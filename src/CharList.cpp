@@ -36,15 +36,15 @@ CharList parseCharListString(std::string str)
         if (minMaxStr.size() == 1)
             minMaxStr.push_back(minMaxStr[0]);
 
-        int min = boost::lexical_cast<int>(minMaxStr[0]);
-        int max = boost::lexical_cast<int>(minMaxStr[1]);
-
-        if (min > 65535)
+        try
+        {
+            result.emplace_back(boost::lexical_cast<uint16_t>(minMaxStr[0]),
+                                boost::lexical_cast<uint16_t>(minMaxStr[1]));
+        }
+        catch(boost::bad_lexical_cast &)
+        {
             throw std::logic_error("incorrect chars value (out of range)");
-        if (max > 65535)
-            throw std::logic_error("incorrect chars value (out of range)");
-
-        result.emplace_back(min, max);
+        }
     }
 
     return result;
@@ -66,3 +66,16 @@ std::string charListToString(const CharList& charList)
     }
     return ss.str();
 }
+
+void parseCharListString(std::string str, std::set<uint16_t>& result)
+{
+    CharList charList = parseCharListString(str);
+    result.clear();
+    for (auto range: charList)
+    {
+        for (uint16_t v = range.first; v < range.second; ++v)
+            result.insert(v);
+        result.insert(range.second);
+    }
+}
+
