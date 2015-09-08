@@ -4,6 +4,7 @@
 #include <boost/regex.hpp>
 #include <boost/algorithm/string.hpp>
 #include <boost/lexical_cast.hpp>
+#include <boost/filesystem.hpp>
 #include <SDL2/SDL.h>
 #include <SDL2pp/SDL2pp.hh>
 #include "json.hpp"
@@ -86,5 +87,6 @@ private:
     SDL2pp::Optional<Color> getColor( nlohmann::json& j, const std::string& key ) const;
     template<class T> T get(nlohmann::json& j, const std::string& key, const SDL2pp::Optional<T>& defaultValue = SDL2pp::NullOpt) const;
 
+    boost::filesystem::path parentPath;
     Config config;
 };

@@ -3,6 +3,7 @@
 #include <string>
 #include <fstream>
 #include "JsonCommentsInputFilter.h"
+#include <boost/locale/encoding_utf.hpp>
 
 namespace fs = boost::filesystem;
 using json = nlohmann::json;
@@ -17,6 +18,8 @@ ConfigFile::ConfigFile(const boost::filesystem::path &configFilePath)
     std::ifstream ifs(configFilePath.generic_string(), std::ifstream::binary);
     if (!ifs)
         throw std::runtime_error("can't open config file");
+
+    parentPath = configFilePath.parent_path();
 
 
     //TODO: output parse errors, check value's ranges.
@@ -62,15 +65,43 @@ ConfigFile::ConfigFile(const boost::filesystem::path &configFilePath)
 
     json charsJson;
     if (j.find("chars") == j.end())
+    {
         charsJson = {{32, 127}};
+    }
     else
     {
         charsJson = j["chars"];
         j.erase("chars");
     }
 
+    if (j.find("charsFile") != j.end())
+    {
+        std::string charsFile = get<std::string>(j, "charsFile");
 
-    //TODO: Make message in same form as in get() method
+        fs::path charsFilePath(charsFile);
+        if (!charsFilePath.is_absolute())
+            charsFilePath = fs::absolute(charsFilePath, parentPath);
+
+        std::ifstream t(charsFilePath.generic_string(), std::ifstream::binary);
+        std::string str((std::istreambuf_iterator<char>(t)),
+                        std::istreambuf_iterator<char>());
+
+        std::wstring fileContent = boost::locale::conv::utf_to_utf<wchar_t>(str.c_str(), str.c_str() + str.size());
+
+        for (wchar_t wc: fileContent)
+        {
+            Uint16 c = static_cast<Uint16>(wc);
+            std::cout << (int) c << ",";
+            config.glyphCodes.insert(c);
+        }
+        std::cout << std::endl;
+
+        charsJson = "";
+    }
+
+
+
+    //TODO: Make message in same way as in get() method
     if ((!charsJson.is_array()) && (!charsJson.is_string()))
         throw std::runtime_error("config char list must be an array or string");
 
