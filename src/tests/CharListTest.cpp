@@ -1,5 +1,5 @@
-#include "testing.h"
 #include "../CharList.h"
+#include "testing.h"
 #include <stdexcept>
 
 BEGIN_TEST()
