@@ -89,12 +89,7 @@ ConfigFile::ConfigFile(const boost::filesystem::path &configFilePath)
         std::wstring fileContent = boost::locale::conv::utf_to_utf<wchar_t>(str.c_str(), str.c_str() + str.size());
 
         for (wchar_t wc: fileContent)
-        {
-            Uint16 c = static_cast<Uint16>(wc);
-            std::cout << (int) c << ",";
-            config.glyphCodes.insert(c);
-        }
-        std::cout << std::endl;
+            config.glyphCodes.insert(static_cast<Uint16>(wc));
 
         charsJson = "";
     }

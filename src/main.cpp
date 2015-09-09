@@ -92,7 +92,10 @@ void collectGlyphInfo(const SDL2pp::Font& font, const std::set<Uint16>& codes, s
     for (auto& id : codes)
     {
         if ( !font.IsGlyphProvided(id) )
+        {
+            std::cout << "warning: glyph " << id << " not found " << std::endl;
             continue;
+        }
 
         GlyphInfo glyphInfo(id);
         font.GetGlyphMetrics(id, glyphInfo.minx, glyphInfo.maxx, glyphInfo.miny, glyphInfo.maxy, glyphInfo.advance);
@@ -249,7 +252,7 @@ int main(int argc, char** argv) try {
     int pageCount = 0;
     for (;;)
     {
-        //TODO: check if negative dimension.
+        //TODO: check negative dimension.
         mrbp.Init(config.textureWidth - config.spacingHoriz, config.textureHeight - config.spacingVert);
 
         std::vector<rbp::Rect> readyRects;
@@ -297,13 +300,6 @@ int main(int argc, char** argv) try {
                 continue;
 
             SDL2pp::Surface glyphSurface = font.RenderGlyph_Blended(glyph.code, config.glyphColorRgb.getSdlColor() );
-            //std::cout << "blend mode " << glyphSurface.GetBlendMode() << std::endl;
-            // SDL_BLENDMODE_BLEND = 1 (alpha):
-            //      dstRGB = (srcRGB * srcA) + (dstRGB * (1-srcA))
-            //      dstA = srcA + (dstA * (1-srcA))
-
-            //boost::filesystem::path glyphFilePath = textureFilePath.parent_path() / "glyphs" / ( std::to_string(glyph.code) + ".png" );
-            //SDL_SavePNG(glyphSurface.Get(), glyphFilePath.generic_string().c_str());
 
             int x = glyph.x - glyph.minx;
             if (glyph.minx < 0)
