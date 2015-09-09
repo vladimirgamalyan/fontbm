@@ -11,6 +11,7 @@ before_build:
   - git submodule init && git submodule update
   - cd c:\projects\fontbm
   - dir C:\Libraries
+  - dir C:\Libraries\boost\stage\lib
   - dir C:\Libraries\boost_1_58_0
   - dir C:\Libraries\boost_1_58_0\stage
   - cmake -G "Visual Studio 14" -DBOOST_ROOT="C:\Libraries\boost"
