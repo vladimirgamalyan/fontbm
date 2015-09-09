@@ -78,4 +78,3 @@ void parseCharListString(std::string str, std::set<uint16_t>& result)
         result.insert(range.second);
     }
 }
-

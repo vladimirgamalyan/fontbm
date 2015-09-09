@@ -1,7 +1,8 @@
 {
   "fontFile": "Vera.ttf",
   //"chars": [[32, 127]],
-  "chars": "0123456789.",
+  //"chars": "0123456789.",
+  "charsFile": "charList.txt",
   "color": [255, 0, 0],
   //"backgroundColor": [76, 198, 30],
   "fontSize": 163,

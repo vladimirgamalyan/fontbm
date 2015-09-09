@@ -149,20 +149,20 @@ int main(int argc, char** argv) try {
     desc.add_options()
             ( "help", "produce help message" )
             ( "config", po::value< fs::path >( &configFilePath)->required(), "config file" )
-            ( "config", po::value< std::string >( &args.fontFile), "fontFile" )
-            ( "config", po::value< std::string >( &args.chars), "chars" )
-            ( "config", po::value< std::string >( &args.color), "color" )
-            ( "config", po::value< std::string >( &args.backgroundColor), "backgroundColor" )
-            ( "config", po::value< int >( &args.fontSize), "fontSize" )
-            ( "config", po::value< int >( &args.paddingUp), "paddingUp" )
-            ( "config", po::value< int >( &args.paddingRight), "paddingRight" )
-            ( "config", po::value< int >( &args.paddingDown), "paddingDown" )
-            ( "config", po::value< int >( &args.paddingLeft), "paddingLeft" )
-            ( "config", po::value< int >( &args.textureWidth), "textureWidth" )
-            ( "config", po::value< int >( &args.textureHeight), "textureHeight" )
-            ( "config", po::value< std::string >( &args.output), "output" )
-            ( "config", po::value< std::string >( &args.dataFormat), "dataFormat" )
-            ( "config", po::value< bool >( &args.includeKerningPairs), "includeKerningPairs" );
+            ( "fontFile", po::value< std::string >( &args.fontFile), "fontFile" )
+            ( "chars", po::value< std::string >( &args.chars), "chars" )
+            ( "color", po::value< std::string >( &args.color), "color" )
+            ( "backgroundColor", po::value< std::string >( &args.backgroundColor), "backgroundColor" )
+            ( "fontSize", po::value< int >( &args.fontSize), "fontSize" )
+            ( "paddingUp", po::value< int >( &args.paddingUp), "paddingUp" )
+            ( "paddingRight", po::value< int >( &args.paddingRight), "paddingRight" )
+            ( "paddingDown", po::value< int >( &args.paddingDown), "paddingDown" )
+            ( "paddingLeft", po::value< int >( &args.paddingLeft), "paddingLeft" )
+            ( "textureWidth", po::value< int >( &args.textureWidth), "textureWidth" )
+            ( "textureHeight", po::value< int >( &args.textureHeight), "textureHeight" )
+            ( "output", po::value< std::string >( &args.output), "output" )
+            ( "dataFormat", po::value< std::string >( &args.dataFormat), "dataFormat" )
+            ( "includeKerningPairs", po::value< bool >( &args.includeKerningPairs), "includeKerningPairs" );
 
 
     po::variables_map vm;
@@ -218,7 +218,7 @@ int main(int argc, char** argv) try {
 
     fs::path outputDirPath = outputPath.parent_path();
 
-    //TODO: create directory only if there is no problem (exceptions), good place is before write outputs.
+    //TODO: create directory only if there is no problem (exceptions), good place is right before write outputs.
     fs::create_directory(outputDirPath);
 
     const std::string outputName = outputPath.stem().string();
