@@ -1,4 +1,12 @@
+os:
+  - Visual Studio 2015
 
+configuration: 
+  - Debug
+  - Release
+  
+platform:
+  - x86
 
 before_build:
   - ps: git submodule update --init --recursive
