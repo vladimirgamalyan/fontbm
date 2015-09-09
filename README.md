@@ -28,8 +28,9 @@ option  | default | comment
 ------|-----|---------------
 fontFile |  | path to ttf font file, can be absolute or relative to config file directory. Required.
 chars | \[\[32, 127\]\] | array of characters, each item can be character code or array of min..max character codes (include max). Also can be a string of required characters.
+charsFile | | path to UTF-8 text file that contains required characters. Override chars option if exists.
 color | \[255, 255, 255\] | array of R, G, B value, defines character color.
-backgroundColor | null | array of R, G, B value, defines background color. If not present, result texture has transparent background.
+backgroundColor | | array of R, G, B value, defines background color. If not present, result texture has transparent background.
 fontSize | 32 | font size
 paddingUp | 0 | padding up
 paddingRight | 0 | padding right
@@ -39,7 +40,7 @@ spacingVert | 0 | spacing vert
 spacingHoriz | 0 | spacing horiz
 textureWidth | 256 | texture width
 textureHeight | 256 | texture height
-output | null | output files name without extension, if not present using config file name. Can be absolute or relative to config file directory.
+output | | output files name without extension, if not present using config file name. Can be absolute or relative to config file directory.
 dataFormat | "xml" | "xml" or "txt"
 includeKerningPairs | false | include kerning pairs
 
