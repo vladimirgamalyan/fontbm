@@ -9,8 +9,7 @@ platform:
   - x86
 
 before_build:
-  - ps: git submodule update --init --recursive
-  - echo Running cmake...
+  - git submodule init && git submodule update
   - cd c:\projects\fontbm
   - cmake -G "Visual Studio 14"
   - set PATH=C:\Program Files (x86)\MSBuild\14.0\Bin;%PATH%  
