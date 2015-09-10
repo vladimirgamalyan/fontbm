@@ -19,11 +19,11 @@ install:
   - mkdir C:\Libraries\SDL2
   - mkdir C:\Libraries\SDL2\include
   - mkdir C:\Libraries\SDL2\lib
-  - copy C:\temp\SDL2-2.0.3\include\*.* C:\Libraries\SDL2\include
+  - copy C:\temp\SDL2-2.0.3\include\*.* C:\Libraries\SDL2
   - copy C:\temp\SDL2-2.0.3\lib\x86\*.* C:\Libraries\SDL2\lib
-  - copy C:\temp\SDL2_image-2.0.0\include\*.* C:\Libraries\SDL2\include
+  - copy C:\temp\SDL2_image-2.0.0\include\*.* C:\Libraries\SDL2
   - copy C:\temp\SDL2_image-2.0.0\lib\x86\*.* C:\Libraries\SDL2\lib
-  - copy C:\temp\SDL2_ttf-2.0.12\include\*.* C:\Libraries\SDL2\include
+  - copy C:\temp\SDL2_ttf-2.0.12\include\*.* C:\Libraries\SDL2
   - copy C:\temp\SDL2_ttf-2.0.12\lib\x86\*.* C:\Libraries\SDL2\lib
 
 before_build:
@@ -35,7 +35,7 @@ before_build:
   - .\b2 variant=release --with-system --with-filesystem --with-program_options --with-regex
   - cd C:\projects\fontbm
   - git submodule init && git submodule update  
-  - cmake -G "Visual Studio 14 2015" -DBOOST_ROOT="C:\Libraries\boost_1_58_0" -DBoost_USE_STATIC_LIBS=ON -DBoost_USE_MULTITHREADED=ON -DCMAKE_PREFIX_PATH="C:\Libraries\include"
+  - cmake -G "Visual Studio 14 2015" -DBOOST_ROOT="C:\Libraries\boost_1_58_0" -DBoost_USE_STATIC_LIBS=ON -DBoost_USE_MULTITHREADED=ON -DCMAKE_PREFIX_PATH="C:\Libraries C:\Libraries\SDL2\lib"
   - set PATH=C:\Program Files (x86)\MSBuild\14.0\Bin;%PATH%  
 
 build:
