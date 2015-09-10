@@ -10,7 +10,8 @@ ENDIF(NOT EXISTS ${PROJECT_SOURCE_DIR}/extlibs/libSDL2pp/CMakeLists.txt)
 
 IF(MSVC)
 	SET(CMAKE_PREFIX_PATH
-		"C:/Libraries"
+		"C:/Libraries/include"
+		"C:/Libraries/lib/x86"
 		)
 ENDIF(MSVC)
 
