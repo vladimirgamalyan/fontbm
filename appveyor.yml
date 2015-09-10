@@ -1,4 +1,5 @@
-os: unstable
+os:
+  - Visual Studio 2015
 
 configuration: 
   - Debug
@@ -13,8 +14,6 @@ before_build:
   - dir C:\Libraries
   - dir C:\Libraries\boost\  
   - dir C:\Libraries\boost\stage\lib
-  - dir C:\Libraries\boost_1_58_0
-  - dir C:\Libraries\boost_1_58_0\stage
   - cmake -G "Visual Studio 14" -DBOOST_ROOT="C:\Libraries\boost"
   - set PATH=C:\Program Files (x86)\MSBuild\14.0\Bin;%PATH%  
 
