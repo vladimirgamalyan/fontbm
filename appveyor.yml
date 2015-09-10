@@ -3,12 +3,12 @@ os:
 
 configuration: 
   - Release
-  
+
 platform:
   - x86
-  
+
 install:
-  # Install SDL
+  # SDL
   - mkdir C:\temp
   - appveyor DownloadFile https://www.libsdl.org/release/SDL2-devel-2.0.3-VC.zip
   - 7z x SDL2-devel-2.0.3-VC.zip -oC:\temp
@@ -23,18 +23,19 @@ install:
   - copy C:\temp\SDL2_image-2.0.0\lib\x86\*.* C:\Libraries
   - copy C:\temp\SDL2_ttf-2.0.12\include\*.* C:\Libraries\SDL2
   - copy C:\temp\SDL2_ttf-2.0.12\lib\x86\*.* C:\Libraries
-
-before_build:
+  # boost
   # current appveyour workers don't have boost libraries for vs2015, so we need build them
   - cd C:\Libraries\boost_1_58_0
   # boost 1.58 doesn't know about vs2015, so we need a little patch here
   - ps: (gc C:\Libraries\boost_1_58_0\boost\config\compiler\visualc.hpp).replace('_MSC_FULL_VER > 190022310', '_MSC_FULL_VER > 190023026') | sc C:\Libraries\boost_1_58_0\boost\config\compiler\visualc.hpp
   - .\bootstrap
-  - .\b2 variant=release --with-system --with-filesystem --with-program_options --with-regex
+  - .\b2 variant=release --with-system --with-filesystem --with-program_options --with-regex  
+
+before_build:
   - cd C:\projects\fontbm
   - git submodule init && git submodule update  
   - cmake -G "Visual Studio 14 2015" -DBOOST_ROOT="C:\Libraries\boost_1_58_0" -DBoost_USE_STATIC_LIBS=ON -DBoost_USE_MULTITHREADED=ON -DCMAKE_PREFIX_PATH="C:\Libraries"
   - set PATH=C:\Program Files (x86)\MSBuild\14.0\Bin;%PATH%  
 
 build:
-  project: fontbm.vcxproj
+  project: fontbm.sln
