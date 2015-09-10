@@ -17,6 +17,8 @@ install:
   - appveyor DownloadFile https://www.libsdl.org/projects/SDL_ttf/release/SDL2_ttf-devel-2.0.12-VC.zip
   - 7z x SDL2_ttf-devel-2.0.12-VC.zip -oC:\temp
   - mkdir C:\Libraries\SDL2
+  - mkdir C:\Libraries\SDL2\include
+  - mkdir C:\Libraries\SDL2\lib
   - copy C:\temp\SDL2-2.0.3\include\*.* C:\Libraries\SDL2\include
   - copy C:\temp\SDL2-2.0.3\lib\*.* C:\Libraries\SDL2\lib
   - copy C:\temp\SDL2_image-2.0.0\include\*.* C:\Libraries\SDL2\include
