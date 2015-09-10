@@ -11,11 +11,11 @@ platform:
 install:
   - mkdir C:\temp
   - appveyor DownloadFile https://www.libsdl.org/release/SDL2-devel-2.0.3-VC.zip
-  - 7z x SDL2-devel-2.0.3-VC.zip -oC:\temp\SDL2
+  - 7z x SDL2-devel-2.0.3-VC.zip -oC:\temp
   - appveyor DownloadFile https://www.libsdl.org/projects/SDL_image/release/SDL2_image-devel-2.0.0-VC.zip
-  - 7z x SDL2_image-devel-2.0.0-VC.zip -oC:\temp\SDL2_image
+  - 7z x SDL2_image-devel-2.0.0-VC.zip -oC:\temp
   - appveyor DownloadFile https://www.libsdl.org/projects/SDL_ttf/release/SDL2_ttf-devel-2.0.12-VC.zip
-  - 7z x SDL2_ttf-devel-2.0.12-VC.zip -oC:\temp\SDL2_ttf
+  - 7z x SDL2_ttf-devel-2.0.12-VC.zip -oC:\temp
   - mkdir C:\Libraries\SDL2
   - dir C:\temp
   - cp C:\temp\SDL2-2.0.3\include\*.* C:\Libraries\SDL2
