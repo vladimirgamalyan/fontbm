@@ -14,21 +14,18 @@ install:
   - appveyor DownloadFile https://www.libsdl.org/release/SDL2-devel-2.0.3-VC.zip
   - 7z x SDL2-devel-2.0.3-VC.zip -oC:\Libraries\SDL2
   - cd c:\Libraries\SDL2
-  - rmdir SDL2 /s /q
   - ren SDL2-2.0.3 SDL2
   # Installing SDL2_image
   - mkdir C:\Libraries\SDL2_image
   - appveyor DownloadFile https://www.libsdl.org/projects/SDL_image/release/SDL2_image-devel-2.0.0-VC.zip
   - 7z x SDL2_image-devel-2.0.0-VC.zip -oC:\Libraries\SDL2_image
   - cd c:\Libraries\SDL2_image
-  - rmdir SDL2_image /s /q
   - ren SDL2_image-2.0.0 SDL2_image
   # Installing SDL2_ttf
   - mkdir C:\Libraries\SDL2_ttf
   - appveyor DownloadFile https://www.libsdl.org/projects/SDL_ttf/release/SDL2_ttf-devel-2.0.12-VC.zip
   - 7z x SDL2_ttf-devel-2.0.12-VC.zip -oC:\Libraries\SDL2_ttf
   - cd c:\Libraries\SDL2_ttf
-  - rmdir SDL2_ttf /s /q
   - ren SDL2_ttf-2.0.12 SDL2_ttf
   - dir C:\Libraries  
 
