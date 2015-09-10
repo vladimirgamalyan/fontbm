@@ -9,11 +9,11 @@ platform:
   - x86
 
 before_build:
-  - git submodule init && git submodule update
-  - cd c:\projects\fontbm
-  - dir C:\Libraries
-  - dir C:\Libraries\boost\  
-  - dir C:\Libraries\boost\stage\lib
+  - cd C:\Libraries\boost_1_58_0
+  - .\bootstrap
+  - .\b2 --with-system --with-filesystem
+  - cd C:\projects\fontbm
+  - git submodule init && git submodule update  
   - cmake -G "Visual Studio 14" -DBOOST_ROOT="C:\Libraries\boost"
   - set PATH=C:\Program Files (x86)\MSBuild\14.0\Bin;%PATH%  
 
