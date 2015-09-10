@@ -19,6 +19,7 @@ install:
   - mkdir C:\Libraries\SDL2
   - dir C:\temp
   - dir C:\temp\SDL2-2.0.3
+  - dir C:\temp\SDL2-2.0.3\include
   - cp C:\temp\SDL2-2.0.3\include\*.* C:\Libraries\SDL2
   - cp C:\temp\SDL2_image-2.0.0\include\*.* C:\Libraries\SDL2
   - cp C:\temp\SDL2_ttf-2.0.12\include\*.* C:\Libraries\SDL2
