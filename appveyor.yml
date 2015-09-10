@@ -17,9 +17,9 @@ install:
   - appveyor DownloadFile https://www.libsdl.org/projects/SDL_ttf/release/SDL2_ttf-devel-2.0.12-VC.zip
   - 7z x SDL2_ttf-devel-2.0.12-VC.zip -oC:\temp\SDL2_ttf
   - mkdir C:\Libraries\SDL2
-  - cp C:\temp\SDL2\include\*.* C:\Libraries\SDL2
-  - cp C:\temp\SDL2_image\include\*.* C:\Libraries\SDL2
-  - cp C:\temp\SDL2_ttf\include\*.* C:\Libraries\SDL2
+  - cp C:\temp\SDL2-2.0.3\include\*.* C:\Libraries\SDL2
+  - cp C:\temp\SDL2_image-2.0.0\include\*.* C:\Libraries\SDL2
+  - cp C:\temp\SDL2_ttf-2.0.12\include\*.* C:\Libraries\SDL2
 
 before_build:
   # current appveyour workers don't have boost libraries for vs2015, so we need build them
