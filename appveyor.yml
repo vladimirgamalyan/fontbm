@@ -9,25 +9,17 @@ platform:
   - x86
   
 install:
-  # Installing SDL2
-  - mkdir C:\Libraries\SDL2
+  - mkdir C:\temp
   - appveyor DownloadFile https://www.libsdl.org/release/SDL2-devel-2.0.3-VC.zip
-  - 7z x SDL2-devel-2.0.3-VC.zip -oC:\Libraries\SDL2
-  - cd c:\Libraries\SDL2
-  - ren SDL2-2.0.3 SDL2
-  # Installing SDL2_image
-  - mkdir C:\Libraries\SDL2_image
+  - 7z x SDL2-devel-2.0.3-VC.zip -oC:\temp\SDL2
   - appveyor DownloadFile https://www.libsdl.org/projects/SDL_image/release/SDL2_image-devel-2.0.0-VC.zip
-  - 7z x SDL2_image-devel-2.0.0-VC.zip -oC:\Libraries\SDL2_image
-  - cd c:\Libraries\SDL2_image
-  - ren SDL2_image-2.0.0 SDL2_image
-  # Installing SDL2_ttf
-  - mkdir C:\Libraries\SDL2_ttf
+  - 7z x SDL2_image-devel-2.0.0-VC.zip -oC:\temp\SDL2_image
   - appveyor DownloadFile https://www.libsdl.org/projects/SDL_ttf/release/SDL2_ttf-devel-2.0.12-VC.zip
-  - 7z x SDL2_ttf-devel-2.0.12-VC.zip -oC:\Libraries\SDL2_ttf
-  - cd c:\Libraries\SDL2_ttf
-  - ren SDL2_ttf-2.0.12 SDL2_ttf
-  - dir C:\Libraries  
+  - 7z x SDL2_ttf-devel-2.0.12-VC.zip -oC:\temp\SDL2_ttf
+  - mkdir C:\Libraries\SDL2
+  - cp C:\Libraries\SDL2\include C:\Libraries\SDL2
+  - cp C:\Libraries\SDL2_image\include C:\Libraries\SDL2
+  - cp C:\Libraries\SDL2_ttf\include C:\Libraries\SDL2
 
 before_build:
   # current appveyour workers don't have boost libraries for vs2015, so we need build them
