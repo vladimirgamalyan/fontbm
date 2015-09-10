@@ -35,7 +35,7 @@ before_build:
   - .\b2 variant=release --with-system --with-filesystem --with-program_options --with-regex
   - cd C:\projects\fontbm
   - git submodule init && git submodule update  
-  - cmake -G "Visual Studio 14 2015" -DBOOST_ROOT="C:\Libraries\boost_1_58_0" -DBoost_USE_STATIC_LIBS=ON -DBoost_USE_MULTITHREADED=ON -DCMAKE_PREFIX_PATH="C:\Libraries C:\Libraries\SDL2\lib"
+  - cmake -G "Visual Studio 14 2015" -DBOOST_ROOT="C:\Libraries\boost_1_58_0" -DBoost_USE_STATIC_LIBS=ON -DBoost_USE_MULTITHREADED=ON -DCMAKE_PREFIX_PATH="C:\Libraries"
   - set PATH=C:\Program Files (x86)\MSBuild\14.0\Bin;%PATH%  
 
 build:
