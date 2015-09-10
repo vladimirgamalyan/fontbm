@@ -8,8 +8,15 @@ platform:
   - Win32
 
 install:
-  # SDL
   - mkdir C:\temp
+  
+  # libpng
+  - appveyor DownloadFile http://sourceforge.net/projects/libpng/files/libpng16/1.6.18/lpng1618.7z/download/lpng1618.7z
+  - 7z x lpng1618.7z -oC:\temp
+  - cd C:\temp\lpng1618
+  - cmake
+  
+  # SDL
   - appveyor DownloadFile https://www.libsdl.org/release/SDL2-devel-2.0.3-VC.zip
   - 7z x SDL2-devel-2.0.3-VC.zip -oC:\temp
   - appveyor DownloadFile https://www.libsdl.org/projects/SDL_image/release/SDL2_image-devel-2.0.0-VC.zip
@@ -23,6 +30,7 @@ install:
   - copy C:\temp\SDL2_image-2.0.0\lib\x86\*.* C:\Libraries
   - copy C:\temp\SDL2_ttf-2.0.12\include\*.* C:\Libraries\SDL2
   - copy C:\temp\SDL2_ttf-2.0.12\lib\x86\*.* C:\Libraries
+  
   # boost
   # current appveyour workers don't have boost libraries for vs2015, so we need build them
   - cd C:\Libraries\boost_1_58_0
