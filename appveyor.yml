@@ -9,12 +9,15 @@ platform:
   - x86
 
 before_build:
+  # current appveyour workers don't have builded libraries for vs2015, so we need build them
   - cd C:\Libraries\boost_1_58_0
+  # boost 1.58 doesn't know about vs2015, so we need a little patch here
+  - ps: (gc C:\Libraries\boost_1_58_0\config\compiler\visualc.hpp).replace('_MSC_FULL_VER > 190022310', '_MSC_FULL_VER > 190023026') | sc C:\Libraries\boost_1_58_0\config\compiler\visualc.hpp
   - .\bootstrap
-  - .\b2 --with-system --with-filesystem
+  - .\b2 --with-system --with-filesystem --with-program_options --with-regex
   - cd C:\projects\fontbm
   - git submodule init && git submodule update  
-  - cmake -G "Visual Studio 14" -DBOOST_ROOT="C:\Libraries\boost"
+  - cmake -G "Visual Studio 14" -DBOOST_ROOT="C:\Libraries\boost_1_58_0"
   - set PATH=C:\Program Files (x86)\MSBuild\14.0\Bin;%PATH%  
 
 build:
