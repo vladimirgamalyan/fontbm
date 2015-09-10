@@ -20,11 +20,11 @@ install:
   - mkdir C:\Libraries\SDL2\include
   - mkdir C:\Libraries\SDL2\lib
   - copy C:\temp\SDL2-2.0.3\include\*.* C:\Libraries\SDL2\include
-  - copy C:\temp\SDL2-2.0.3\lib\*.* C:\Libraries\SDL2\lib
+  - copy C:\temp\SDL2-2.0.3\lib\x86\*.* C:\Libraries\SDL2\lib
   - copy C:\temp\SDL2_image-2.0.0\include\*.* C:\Libraries\SDL2\include
-  - copy C:\temp\SDL2_image-2.0.0\lib\*.* C:\Libraries\SDL2\lib
+  - copy C:\temp\SDL2_image-2.0.0\lib\x86\*.* C:\Libraries\SDL2\lib
   - copy C:\temp\SDL2_ttf-2.0.12\include\*.* C:\Libraries\SDL2\include
-  - copy C:\temp\SDL2_ttf-2.0.12\lib\*.* C:\Libraries\SDL2\lib
+  - copy C:\temp\SDL2_ttf-2.0.12\lib\x86\*.* C:\Libraries\SDL2\lib
 
 before_build:
   # current appveyour workers don't have boost libraries for vs2015, so we need build them
