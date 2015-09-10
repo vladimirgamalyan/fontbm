@@ -8,13 +8,6 @@ IF(NOT EXISTS ${PROJECT_SOURCE_DIR}/extlibs/libSDL2pp/CMakeLists.txt)
 	MESSAGE(FATAL_ERROR "The source directory\n  ${PROJECT_SOURCE_DIR}/extlibs/libSDL2pp\ndoes not contain a CMakeLists.txt file.\nIt is likely that you forgot to run\n  git submodule init && git submodule update")
 ENDIF(NOT EXISTS ${PROJECT_SOURCE_DIR}/extlibs/libSDL2pp/CMakeLists.txt)
 
-IF(MSVC)
-	SET(CMAKE_PREFIX_PATH
-		"C:/Libraries/include"
-		"C:/Libraries/lib"
-		)
-ENDIF(MSVC)
-
 IF(MINGW)
 	SET(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++11 -Wall -Wextra -pedantic")
 	SET(CMAKE_PREFIX_PATH
