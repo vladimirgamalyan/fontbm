@@ -9,3 +9,13 @@ ADD_EXECUTABLE(tests ../CharList.cpp CharListTest.cpp)
 
 TARGET_LINK_LIBRARIES(tests ${SDL2PP_LIBRARIES} ${Boost_LIBRARIES})
 SET(EXECUTABLE_OUTPUT_PATH "${CMAKE_BINARY_DIR}/bin")
+
+
+IF(WIN32)
+    set_target_properties(tests PROPERTIES LINK_FLAGS_DEBUG "/SUBSYSTEM:CONSOLE")
+    set_target_properties(tests PROPERTIES COMPILE_DEFINITIONS_DEBUG "_CONSOLE")
+    set_target_properties(tests PROPERTIES LINK_FLAGS_RELWITHDEBINFO "/SUBSYSTEM:CONSOLE")
+    set_target_properties(tests PROPERTIES COMPILE_DEFINITIONS_RELWITHDEBINFO "_CONSOLE")
+    set_target_properties(tests PROPERTIES LINK_FLAGS_RELEASE "/SUBSYSTEM:windows")
+    set_target_properties(tests PROPERTIES LINK_FLAGS_MINSIZEREL "/SUBSYSTEM:windows")
+ENDIF(WIN32)
