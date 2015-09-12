@@ -19,7 +19,7 @@ install:
   - bii init libpng -L
   - cd libpng
   - echo #include "leif/png/png.h" >> main.cpp
-  - echp void main(){} >> main.cpp
+  - echo void main(){} >> main.cpp
   - bii find
   - bii configure -G "Visual Studio 14"
   - bii build --config Release
