@@ -9,15 +9,19 @@ platform:
 
 install:
   - mkdir C:\temp
+  - cd C:\temp  
   
-  - choco install biicode
-  
-
   # libpng
-  - appveyor DownloadFile http://sourceforge.net/projects/libpng/files/libpng16/1.6.18/lpng1618.7z
-  - 7z x lpng1618.7z -oC:\temp
-  - cd C:\temp\lpng1618
-  - cmake
+  - choco install biicode
+  - bii init libpng -L
+  - cd libpng
+  - echo #include "leif/png/png.h" >> main.cpp
+  - echp void main(){} >> main.cpp
+  - bii find
+  - bii configure -G "Visual Studio 14"
+  - bii build --config Release
+  - copy .\bii\lib\leif_png.lib C:\Libraries\png.lib
+  - copy .\bii\lib\leif_zlib.lib C:\Libraries\zlib.lib
 
   # SDL
   - appveyor DownloadFile https://www.libsdl.org/release/SDL2-devel-2.0.3-VC.zip
