@@ -9,10 +9,13 @@ platform:
 
 install:
   - mkdir C:\temp
-  - cd C:\temp  
   
-  # libpng
+  # biicode
   - choco install biicode
+  - set PATH=%PATH%;C:\Program Files (x86)\BiiCode\bii
+
+  # libpng
+  - cd C:\temp
   - bii init libpng -L
   - cd libpng
   - echo #include "leif/png/png.h" >> main.cpp
