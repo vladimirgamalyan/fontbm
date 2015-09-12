@@ -25,6 +25,8 @@ install:
   - bii build --config Release
   - copy .\bii\lib\leif_png.lib C:\Libraries\png.lib
   - copy .\bii\lib\leif_zlib.lib C:\Libraries\zlib.lib
+  - copy .\bii\deps\leif\png\*.h C:\Libraries\
+  - copy .\bii\deps\leif\zlib\*.h C:\Libraries\
 
   # SDL
   - appveyor DownloadFile https://www.libsdl.org/release/SDL2-devel-2.0.3-VC.zip
