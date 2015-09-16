@@ -19,7 +19,7 @@
   //"textureWidth": 256,
   //"textureHeight": 256,
 
-  "output": "tmp/freeSans"
+  "output": "output/freeSans"
 
   //"dataFormat": "xml",
   //"includeKerningPairs": false
