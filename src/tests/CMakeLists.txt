@@ -1,21 +1,21 @@
-IF(MINGW)
+if(MINGW)
 	SET(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++11")
     SET(MINGW32_LIBRARY mingw32 CACHE STRING "mwindows for MinGW")
     FIND_LIBRARY(SDL2MAIN_LIBRARY NAMES SDL2main)
     SET(SDL2PP_LIBRARIES ${MINGW32_LIBRARY} ${SDL2MAIN_LIBRARY} ${SDL2PP_LIBRARIES})
-ENDIF(MINGW)
+endif(MINGW)
 
-ADD_EXECUTABLE(tests ../CharList.cpp CharListTest.cpp)
+add_executable(tests ../CharList.cpp CharListTest.cpp)
 
-TARGET_LINK_LIBRARIES(tests ${SDL2PP_LIBRARIES} ${Boost_LIBRARIES})
-SET(EXECUTABLE_OUTPUT_PATH "${CMAKE_BINARY_DIR}/bin")
+target_link_libraries(tests ${SDL2PP_LIBRARIES} ${Boost_LIBRARIES})
+set(EXECUTABLE_OUTPUT_PATH "${CMAKE_BINARY_DIR}/bin")
 
 
-IF(MSVC)
+if(MSVC)
     set_target_properties(tests PROPERTIES LINK_FLAGS_DEBUG "/SUBSYSTEM:CONSOLE")
     set_target_properties(tests PROPERTIES COMPILE_DEFINITIONS_DEBUG "_CONSOLE")
     set_target_properties(tests PROPERTIES LINK_FLAGS_RELWITHDEBINFO "/SUBSYSTEM:CONSOLE")
     set_target_properties(tests PROPERTIES COMPILE_DEFINITIONS_RELWITHDEBINFO "_CONSOLE")
     set_target_properties(tests PROPERTIES LINK_FLAGS_RELEASE "/SUBSYSTEM:windows")
     set_target_properties(tests PROPERTIES LINK_FLAGS_MINSIZEREL "/SUBSYSTEM:windows")
-ENDIF(MSVC)
+endif(MSVC)

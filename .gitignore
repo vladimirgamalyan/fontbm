@@ -27,3 +27,4 @@
 /src/fontbm.vcxproj
 /src/example/cmake_install.cmake
 /cmake_install.cmake
+/testdata/output
