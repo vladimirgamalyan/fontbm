@@ -26,14 +26,15 @@ install:
   - bii configure -G "Visual Studio 14"
   - bii build --config Release
   - copy .\bii\lib\leif_zlib.lib C:\Libraries\zlib.lib
+  - copy .\bii\deps\leif\zlib\*.h C:\Libraries\
   - copy .\bii\lib\leif_png.lib C:\Libraries\png.lib
   - copy .\bii\deps\leif\png\*.h C:\Libraries\
-  - copy .\bii\deps\leif\zlib\*.h C:\Libraries\
   - mkdir C:\Libraries\SDL2
   - copy .\bii\lib\latinga_sdl2.lib C:\Libraries\
-  - copy .\bii\deps\latinga\sdl2\include\*.h C:\Libraries\SDL2\
+  - copy .\bii\lib\latinga_SDL2main.lib C:\Libraries\
+  - copy .\bii\deps\latinga\sdl2\include\*.h C:\Libraries\include\SDL2\
   - copy .\bii\lib\latinga_sdl2_ttf.lib C:\Libraries\
-  - copy .\bii\deps\latinga\sdl2_ttf\*.h C:\Libraries\SDL2\
+  - copy .\bii\deps\latinga\sdl2_ttf\SDL_ttf.h C:\Libraries\include\SDL2\
 
   # current appveyour workers don't have boost libraries for vs2015, so we have to build them
   - cd C:\Libraries\boost_1_58_0
