@@ -20,30 +20,15 @@ install:
   - cd libs
   - ps: Add-Content main.cpp "#include `"latinga/sdl2/include/SDL.h`""
   - ps: Add-Content main.cpp "#include `"latinga/sdl2_ttf/SDL_ttf.h`""
-#  - ps: Add-Content main.cpp "#include `"latinga/sdl2_image/SDL_image.h`""
+  - ps: Add-Content main.cpp "#include `"leif/png.h`""
   - ps: Add-Content main.cpp "int main(int argc, char *args[]){return 0;}"
   - bii find
   - bii configure -G "Visual Studio 14"
   - bii build --config Release
-  - copy .\bii\lib\zlib_zlib.lib C:\Libraries\zlib.lib
-  - copy .\bii\lib\glenn_png.lib C:\Libraries\png.lib
-  - copy .\bii\deps\glenn\png\*.h C:\Libraries\
-  - copy .\bii\deps\zlib\zlib\*.h C:\Libraries\
-
-  # SDL
-#  - appveyor DownloadFile https://www.libsdl.org/release/SDL2-devel-2.0.3-VC.zip
-#  - 7z x SDL2-devel-2.0.3-VC.zip -oC:\temp
-#  - appveyor DownloadFile https://www.libsdl.org/projects/SDL_image/release/SDL2_image-devel-2.0.0-VC.zip
-#  - 7z x SDL2_image-devel-2.0.0-VC.zip -oC:\temp
-#  - appveyor DownloadFile https://www.libsdl.org/projects/SDL_ttf/release/SDL2_ttf-devel-2.0.12-VC.zip
-#  - 7z x SDL2_ttf-devel-2.0.12-VC.zip -oC:\temp
-#  - mkdir C:\Libraries\SDL2
-#  - copy C:\temp\SDL2-2.0.3\include\*.* C:\Libraries\SDL2
-#  - copy C:\temp\SDL2-2.0.3\lib\x86\*.* C:\Libraries
-#  - copy C:\temp\SDL2_image-2.0.0\include\*.* C:\Libraries\SDL2
-#  - copy C:\temp\SDL2_image-2.0.0\lib\x86\*.* C:\Libraries
-#  - copy C:\temp\SDL2_ttf-2.0.12\include\*.* C:\Libraries\SDL2
-#  - copy C:\temp\SDL2_ttf-2.0.12\lib\x86\*.* C:\Libraries
+  - copy .\bii\lib\leif_zlib.lib C:\Libraries\zlib.lib
+  - copy .\bii\lib\leif_png.lib C:\Libraries\png.lib
+  - copy .\bii\deps\leif\png\*.h C:\Libraries\
+  - copy .\bii\deps\leif\zlib\*.h C:\Libraries\
 
   # boost
   # current appveyour workers don't have boost libraries for vs2015, so we have to build them
