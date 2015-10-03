@@ -14,7 +14,7 @@ install:
   - choco install biicode
   - set PATH=%PATH%;C:\Program Files (x86)\BiiCode\bii
 
-  # build libraries
+  # build libraries with biicode
   - cd C:\temp
   - bii init libs -L
   - cd libs
@@ -31,7 +31,8 @@ install:
   - copy .\bii\deps\leif\png\*.h C:\Libraries\
   - mkdir C:\Libraries\SDL2
   - copy .\bii\lib\latinga_sdl2.lib C:\Libraries\
-  - copy .\bii\lib\latinga_SDL2main.lib C:\Libraries\
+  #- copy .\bii\lib\latinga_SDL2main.lib C:\Libraries\
+  - dir .\bii\lib
   - copy .\bii\deps\latinga\sdl2\include\*.h C:\Libraries\include\SDL2\
   - copy .\bii\lib\latinga_sdl2_ttf.lib C:\Libraries\
   - copy .\bii\deps\latinga\sdl2_ttf\SDL_ttf.h C:\Libraries\include\SDL2\
