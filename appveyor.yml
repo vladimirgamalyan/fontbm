@@ -29,8 +29,12 @@ install:
   - copy .\bii\lib\leif_png.lib C:\Libraries\png.lib
   - copy .\bii\deps\leif\png\*.h C:\Libraries\
   - copy .\bii\deps\leif\zlib\*.h C:\Libraries\
+  - mkdir C:\Libraries\SDL2
+  - copy .\bii\lib\latinga_sdl2.lib C:\Libraries\
+  - copy .\bii\deps\latinga\sdl2\include\*.h C:\Libraries\SDL2\
+  - copy .\bii\lib\latinga_sdl2_ttf.lib C:\Libraries\
+  - copy .\bii\deps\latinga\sdl2_ttf\*.h C:\Libraries\SDL2\
 
-  # boost
   # current appveyour workers don't have boost libraries for vs2015, so we have to build them
   - cd C:\Libraries\boost_1_58_0
   # boost 1.58 doesn't know about vs2015, so we need a little patch here
