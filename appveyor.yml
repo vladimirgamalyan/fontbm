@@ -35,6 +35,7 @@ install:
   - copy .\bii\deps\latinga\sdl2\include\*.h C:\Libraries\include\SDL2\
   - copy .\bii\lib\latinga_sdl2_ttf.lib C:\Libraries\SDL2_ttf.lib
   - copy .\bii\deps\latinga\sdl2_ttf\SDL_ttf.h C:\Libraries\include\SDL2\
+  - ps: (gc C:\Libraries\include\SDL2\SDL_ttf.h).replace('latinga/sdl2/include/', '') | sc C:\Libraries\include\SDL2\SDL_ttf.h
 
   # current appveyour workers don't have boost libraries for vs2015, so we have to build them
   - cd C:\Libraries\boost_1_58_0
