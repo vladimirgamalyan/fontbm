@@ -14,14 +14,13 @@ install:
   - choco install biicode
   - set PATH=%PATH%;C:\Program Files (x86)\BiiCode\bii
 
-  # libpng
+  # build libraries
   - cd C:\temp
-  - bii init libpng -L
-  - cd libpng
-  #- ps: Add-Content main.cpp "#include `"glenn/png/png.h`""
+  - bii init libs -L
+  - cd libs
   - ps: Add-Content main.cpp "#include `"latinga/sdl2/include/SDL.h`""
   - ps: Add-Content main.cpp "#include `"latinga/sdl2_ttf/SDL_ttf.h`""
-  - ps: Add-Content main.cpp "#include `"latinga/sdl2_image/SDL_image.h`""
+#  - ps: Add-Content main.cpp "#include `"latinga/sdl2_image/SDL_image.h`""
   - ps: Add-Content main.cpp "void main(){}"
   - bii find
   - bii configure -G "Visual Studio 14"
@@ -29,7 +28,7 @@ install:
   - copy .\bii\lib\zlib_zlib.lib C:\Libraries\zlib.lib
   - copy .\bii\lib\glenn_png.lib C:\Libraries\png.lib
   - copy .\bii\deps\glenn\png\*.h C:\Libraries\
-  - copy .\bii\deps\glenn\zlib\*.h C:\Libraries\
+  - copy .\bii\deps\zlib\zlib\*.h C:\Libraries\
 
   # SDL
 #  - appveyor DownloadFile https://www.libsdl.org/release/SDL2-devel-2.0.3-VC.zip
@@ -47,7 +46,7 @@ install:
 #  - copy C:\temp\SDL2_ttf-2.0.12\lib\x86\*.* C:\Libraries
 
   # boost
-  # current appveyour workers don't have boost libraries for vs2015, so we need build them
+  # current appveyour workers don't have boost libraries for vs2015, so we have to build them
   - cd C:\Libraries\boost_1_58_0
   # boost 1.58 doesn't know about vs2015, so we need a little patch here
   - ps: (gc C:\Libraries\boost_1_58_0\boost\config\compiler\visualc.hpp).replace('_MSC_FULL_VER > 190022310', '_MSC_FULL_VER > 190023026') | sc C:\Libraries\boost_1_58_0\boost\config\compiler\visualc.hpp
