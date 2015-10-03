@@ -21,7 +21,7 @@ install:
   - ps: Add-Content main.cpp "#include `"latinga/sdl2/include/SDL.h`""
   - ps: Add-Content main.cpp "#include `"latinga/sdl2_ttf/SDL_ttf.h`""
 #  - ps: Add-Content main.cpp "#include `"latinga/sdl2_image/SDL_image.h`""
-  - ps: Add-Content main.cpp "void main(){}"
+  - ps: Add-Content main.cpp "int main(int argc, char *args[]){return 0;}"
   - bii find
   - bii configure -G "Visual Studio 14"
   - bii build --config Release
