@@ -25,5 +25,5 @@ add_subdirectory(extlibs/libSDL2pp)
 include_directories(SYSTEM ${SDL2PP_INCLUDE_DIRS})
 
 add_subdirectory(src)
-add_subdirectory(src/example)
-add_subdirectory(src/tests)
+#add_subdirectory(src/example)
+#add_subdirectory(src/tests)
