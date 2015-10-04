@@ -18,7 +18,7 @@ install:
   - cd C:\temp
   - bii init libs -L
   - cd libs
-  - ps: Add-Content main.cpp "#include `"latinga/sdl2/include/SDL.h`""
+  #- ps: Add-Content main.cpp "#include `"latinga/sdl2/include/SDL.h`""
   - ps: Add-Content main.cpp "#include `"latinga/sdl2_ttf/SDL_ttf.h`""
   - ps: Add-Content main.cpp "#include `"leif/png/png.h`""
   - ps: Add-Content main.cpp "int main(int argc, char *args[]){return 0;}"

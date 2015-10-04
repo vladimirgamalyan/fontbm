@@ -17,8 +17,8 @@ endif(MINGW)
 
 if(MSVC)
 	FIND_LIBRARY(SDL2MAIN_LIBRARY NAMES SDL2main)
-	SET(SDL2PP_LIBRARIES winmm.lib freetype.lib ${SDL2MAIN_LIBRARY} ${SDL2PP_LIBRARIES})
+	SET(SDL2PP_LIBRARIES winmm.lib ${SDL2MAIN_LIBRARY} ${SDL2PP_LIBRARIES})
 endif(MSVC)
 
 add_executable(fontbm ${SOURCES})
-target_link_libraries(fontbm ${PNG_LIBRARIES} ${SDL2PP_LIBRARIES} ${Boost_LIBRARIES})
+target_link_libraries(fontbm ${PNG_LIBRARIES} ${FREETYPE_LIBRARIES} ${SDL2PP_LIBRARIES} ${Boost_LIBRARIES})
