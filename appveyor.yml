@@ -18,7 +18,6 @@ install:
   - cd C:\temp
   - bii init libs -L
   - cd libs
-  #- ps: Add-Content main.cpp "#include `"latinga/sdl2/include/SDL.h`""
   - ps: Add-Content main.cpp "#include `"latinga/sdl2_ttf/SDL_ttf.h`""
   - ps: Add-Content main.cpp "#include `"leif/png/png.h`""
   - ps: Add-Content main.cpp "int main(int argc, char *args[]){return 0;}"
@@ -30,8 +29,9 @@ install:
   - copy .\bii\lib\leif_png.lib C:\Libraries\png.lib
   - copy .\bii\deps\leif\png\*.h C:\Libraries\
   - copy .\bii\lib\lemberg_freetype.lib C:\Libraries\freetype.lib
-  - mkdir C:\Libraries\include\freetype  
-  - copy .\bii\deps\lemberg\freetype\include\*.* C:\Libraries\include\freetype\
+  - mkdir C:\Libraries\include\freetype2
+  - mkdir C:\Libraries\include\freetype2\freetype
+  - copy .\bii\deps\lemberg\freetype\include\*.* C:\Libraries\include\freetype2\freetype\
   - mkdir C:\Libraries\include\SDL2
   - copy .\bii\lib\latinga_sdl2.lib C:\Libraries\SDL2.lib
   - copy .\bii\lib\SDL2main.lib C:\Libraries\SDL2main.lib
