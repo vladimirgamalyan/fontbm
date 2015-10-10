@@ -15,15 +15,18 @@ include_directories(${Boost_INCLUDE_DIR})
 find_package(PNG REQUIRED)
 include_directories(${PNG_INCLUDE_DIRS})
 
+# freetype
+find_package(Freetype REQUIRED)
+include_directories(${FREETYPE_INCLUDE_DIRS})
+
 # libsdl2pp
 if(NOT EXISTS ${PROJECT_SOURCE_DIR}/extlibs/libSDL2pp/CMakeLists.txt)
     message(FATAL_ERROR "The source directory\n  ${PROJECT_SOURCE_DIR}/extlibs/libSDL2pp\ndoes not contain a CMakeLists.txt file.\nIt is likely that you forgot to run\n  git submodule init && git submodule update")
 endif(NOT EXISTS ${PROJECT_SOURCE_DIR}/extlibs/libSDL2pp/CMakeLists.txt)
-set(SDL2PP_WITH_IMAGE TRUE)
 set(SDL2PP_WITH_TTF TRUE)
 add_subdirectory(extlibs/libSDL2pp)
 include_directories(SYSTEM ${SDL2PP_INCLUDE_DIRS})
 
 add_subdirectory(src)
-add_subdirectory(src/example)
-add_subdirectory(src/tests)
+#add_subdirectory(src/example)
+#add_subdirectory(src/tests)

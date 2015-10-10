@@ -1,7 +1,7 @@
 os:
   - Visual Studio 2015
 
-configuration: 
+configuration:
   - Release
 
 platform:
@@ -9,53 +9,48 @@ platform:
 
 install:
   - mkdir C:\temp
-  
+
   # biicode
   - choco install biicode
   - set PATH=%PATH%;C:\Program Files (x86)\BiiCode\bii
 
-  # libpng
+  # build libraries with biicode
   - cd C:\temp
-  - bii init libpng -L
-  - cd libpng
+  - bii init libs -L
+  - cd libs
+  - ps: Add-Content main.cpp "#include `"latinga/sdl2_ttf/SDL_ttf.h`""
   - ps: Add-Content main.cpp "#include `"leif/png/png.h`""
-  - echo void main(){} >> main.cpp
+  - ps: Add-Content main.cpp "int main(int argc, char *args[]){return 0;}"
   - bii find
   - bii configure -G "Visual Studio 14"
   - bii build --config Release
-  - copy .\bii\lib\leif_png.lib C:\Libraries\png.lib
   - copy .\bii\lib\leif_zlib.lib C:\Libraries\zlib.lib
-  - copy .\bii\deps\leif\png\*.h C:\Libraries\
   - copy .\bii\deps\leif\zlib\*.h C:\Libraries\
+  - copy .\bii\lib\leif_png.lib C:\Libraries\png.lib
+  - copy .\bii\deps\leif\png\*.h C:\Libraries\
+  - copy .\bii\lib\lemberg_freetype.lib C:\Libraries\freetype.lib
+  - mkdir C:\Libraries\include\freetype2
+  - copy .\bii\deps\lemberg\freetype\include\*.* C:\Libraries\include\freetype2
+  - mkdir C:\Libraries\include\SDL2
+  - copy .\bii\lib\latinga_sdl2.lib C:\Libraries\SDL2.lib
+  - copy .\bii\lib\SDL2main.lib C:\Libraries\SDL2main.lib
+  - copy .\bii\deps\latinga\sdl2\include\*.h C:\Libraries\include\SDL2\
+  - copy .\bii\lib\latinga_sdl2_ttf.lib C:\Libraries\SDL2_ttf.lib
+  - copy .\bii\deps\latinga\sdl2_ttf\SDL_ttf.h C:\Libraries\include\SDL2\
+  - ps: (gc C:\Libraries\include\SDL2\SDL_ttf.h).replace('latinga/sdl2/include/', '') | sc C:\Libraries\include\SDL2\SDL_ttf.h
 
-  # SDL
-  - appveyor DownloadFile https://www.libsdl.org/release/SDL2-devel-2.0.3-VC.zip
-  - 7z x SDL2-devel-2.0.3-VC.zip -oC:\temp
-  - appveyor DownloadFile https://www.libsdl.org/projects/SDL_image/release/SDL2_image-devel-2.0.0-VC.zip
-  - 7z x SDL2_image-devel-2.0.0-VC.zip -oC:\temp
-  - appveyor DownloadFile https://www.libsdl.org/projects/SDL_ttf/release/SDL2_ttf-devel-2.0.12-VC.zip
-  - 7z x SDL2_ttf-devel-2.0.12-VC.zip -oC:\temp
-  - mkdir C:\Libraries\SDL2
-  - copy C:\temp\SDL2-2.0.3\include\*.* C:\Libraries\SDL2
-  - copy C:\temp\SDL2-2.0.3\lib\x86\*.* C:\Libraries
-  - copy C:\temp\SDL2_image-2.0.0\include\*.* C:\Libraries\SDL2
-  - copy C:\temp\SDL2_image-2.0.0\lib\x86\*.* C:\Libraries
-  - copy C:\temp\SDL2_ttf-2.0.12\include\*.* C:\Libraries\SDL2
-  - copy C:\temp\SDL2_ttf-2.0.12\lib\x86\*.* C:\Libraries
-
-  # boost
-  # current appveyour workers don't have boost libraries for vs2015, so we need build them
+  # current appveyour workers don't have boost libraries for vs2015, so we have to build them
   - cd C:\Libraries\boost_1_58_0
   # boost 1.58 doesn't know about vs2015, so we need a little patch here
   - ps: (gc C:\Libraries\boost_1_58_0\boost\config\compiler\visualc.hpp).replace('_MSC_FULL_VER > 190022310', '_MSC_FULL_VER > 190023026') | sc C:\Libraries\boost_1_58_0\boost\config\compiler\visualc.hpp
   - .\bootstrap
-  - .\b2 variant=release --with-system --with-filesystem --with-program_options --with-regex  
+  - .\b2 variant=release --with-system --with-filesystem --with-program_options --with-regex
 
 before_build:
   - cd C:\projects\fontbm
-  - git submodule init && git submodule update  
+  - git submodule init && git submodule update
   - cmake -G "Visual Studio 14 2015" -DBOOST_ROOT="C:\Libraries\boost_1_58_0" -DBoost_USE_STATIC_LIBS=ON -DBoost_USE_MULTITHREADED=ON -DCMAKE_PREFIX_PATH="C:\Libraries"
-  - set PATH=C:\Program Files (x86)\MSBuild\14.0\Bin;%PATH%  
+  - set PATH=C:\Program Files (x86)\MSBuild\14.0\Bin;%PATH%
 
 build:
   project: fontbm.sln
