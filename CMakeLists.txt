@@ -3,7 +3,7 @@ project(fontbm)
 
 # c++11 standard
 if(NOT MSVC)
-    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++11 -Wall -Wextra -pedantic")
+    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++11 -Wall -Wextra -pedantic -Wno-deprecated")
 endif(NOT MSVC)
 
 # boost
@@ -28,5 +28,5 @@ add_subdirectory(extlibs/libSDL2pp)
 include_directories(SYSTEM ${SDL2PP_INCLUDE_DIRS})
 
 add_subdirectory(src)
-#add_subdirectory(src/example)
-#add_subdirectory(src/tests)
+add_subdirectory(src/example)
+add_subdirectory(src/tests)
