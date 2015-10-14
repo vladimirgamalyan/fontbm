@@ -8,6 +8,7 @@
 #include <limits>
 #include <cstring>
 #include <cmath>
+#include <algorithm>
 #include "MaxRectsBinPack.h"
 
 //#define CAN_FLIP
@@ -109,8 +110,8 @@ void MaxRectsBinPack::Insert(std::vector<RectSize> &rects, std::vector<Rect> &ds
 			return;
 
 		PlaceRect(bestNode);
-        bestNode.tag = rects[bestRectIndex].tag;
-        dst.push_back(bestNode);
+		bestNode.tag = rects[bestRectIndex].tag;
+		dst.push_back(bestNode);
 		rects.erase(rects.begin() + bestRectIndex);
 	}
 }
@@ -229,8 +230,8 @@ Rect MaxRectsBinPack::FindPositionForNewNodeBestShortSideFit(int width, int heig
 		{
 			int leftoverHoriz = abs(freeRectangles[i].width - width);
 			int leftoverVert = abs(freeRectangles[i].height - height);
-			int shortSideFit = min(leftoverHoriz, leftoverVert);
-			int longSideFit = max(leftoverHoriz, leftoverVert);
+			int shortSideFit = std::min(leftoverHoriz, leftoverVert);
+			int longSideFit = std::max(leftoverHoriz, leftoverVert);
 
 			if (shortSideFit < bestShortSideFit || (shortSideFit == bestShortSideFit && longSideFit < bestLongSideFit))
 			{
@@ -469,7 +470,7 @@ bool MaxRectsBinPack::SplitFreeNode(Rect freeNode, const Rect &usedNode)
 		}
 	}
 
-    if (usedNode.y < freeNode.y + freeNode.height && usedNode.y + usedNode.height > freeNode.y)
+	if (usedNode.y < freeNode.y + freeNode.height && usedNode.y + usedNode.height > freeNode.y)
 	{
 		// New node at the left side of the used node.
 		if (usedNode.x > freeNode.x && usedNode.x < freeNode.x + freeNode.width)
