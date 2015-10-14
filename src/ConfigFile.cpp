@@ -155,10 +155,10 @@ ConfigFile::ConfigFile(const boost::filesystem::path &configFilePath)
     }
 }
 
-SDL2pp::Optional<ConfigFile::Color> ConfigFile::getColor( json& j, const std::string& key ) const
+boost::optional<ConfigFile::Color> ConfigFile::getColor( json& j, const std::string& key ) const
 {
     if (j.find(key) == j.end())
-        return SDL2pp::NullOpt;
+        return boost::none;
 
     const json& k = j[key];
     if (!k.is_array())
@@ -190,7 +190,7 @@ ConfigFile::Config ConfigFile::getConfig() const
 }
 
 template<class T>
-T ConfigFile::get(nlohmann::json &j, const std::string &key, const SDL2pp::Optional<T>& defaultValue) const
+T ConfigFile::get(nlohmann::json &j, const std::string &key, const boost::optional<T>& defaultValue) const
 {
     if (j.find(key) == j.end())
     {

@@ -5,6 +5,7 @@
 #include <boost/algorithm/string.hpp>
 #include <boost/lexical_cast.hpp>
 #include <boost/filesystem.hpp>
+#include <boost/optional.hpp>
 #include <SDL2/SDL.h>
 #include <SDL2pp/SDL2pp.hh>
 #include "json.hpp"
@@ -74,7 +75,7 @@ public:
         int spacingVert;
         int spacingHoriz;
         Color glyphColorRgb;
-        SDL2pp::Optional<Color> glyphBackgroundColorRgb;
+        boost::optional<Color> glyphBackgroundColorRgb;
         std::set<Uint16> glyphCodes;
         std::string output;
         std::string dataFormat;
@@ -84,8 +85,8 @@ public:
     Config getConfig() const;
 
 private:
-    SDL2pp::Optional<Color> getColor( nlohmann::json& j, const std::string& key ) const;
-    template<class T> T get(nlohmann::json& j, const std::string& key, const SDL2pp::Optional<T>& defaultValue = SDL2pp::NullOpt) const;
+    boost::optional<Color> getColor( nlohmann::json& j, const std::string& key ) const;
+    template<class T> T get(nlohmann::json& j, const std::string& key, const boost::optional<T>& defaultValue = boost::none) const;
 
     boost::filesystem::path parentPath;
     Config config;
