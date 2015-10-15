@@ -12,18 +12,24 @@
 #include "sdlSavePng/savepng.h"
 #include "Font.h"
 #include "maxRectsBinPack/MaxRectsBinPack.h"
-#include "ConfigFile.h"
-#include "CharList.h"
+#include "Config.h"
+#include "ProgramOptions.h"
 
-namespace po = boost::program_options;
+
 namespace fs = boost::filesystem;
 
-int getKerning(const SDL2pp::Font& font, Uint16 ch0, Uint16 ch1) {
+int getKerning(const SDL2pp::Font& font, uint32_t char0, uint32_t char1)
+{
+    if ((char0 > 0xFFFF)|| (char1 > 0xFFFF))
+        return 0;
+    Uint16 ch0 = static_cast<Uint16>(char0);
+    Uint16 ch1 = static_cast<Uint16>(char1);
     Uint16 text[ 3 ] = {ch0, ch1, 0};
     return font.GetSizeUNICODE(text).x - ( font.GetGlyphAdvance(ch0) + font.GetGlyphAdvance(ch1) );
 }
 
-void printGlyphData(const SDL2pp::Font& font, Uint16 ch) {
+void printGlyphData(const SDL2pp::Font& font, Uint16 ch)
+{
     int minx, maxx, miny, maxy, advance;
     font.GetGlyphMetrics(ch, minx, maxx, miny, maxy, advance);
     std::cout << "minx=" << minx
@@ -83,7 +89,7 @@ void checkGlyphSize(const std::map<Uint16, GlyphInfo>& glyphs, int maxTextureSiz
     }
 }
 
-void collectGlyphInfo(const SDL2pp::Font& font, const std::set<Uint16>& codes, std::map<Uint16, GlyphInfo>& glyphs )
+void collectGlyphInfo(const SDL2pp::Font& font, const std::set<uint32_t>& codes, std::map<Uint16, GlyphInfo>& glyphs )
 {
     int fontAscent = font.GetAscent();
 
@@ -123,137 +129,46 @@ void collectGlyphInfo(const SDL2pp::Font& font, const std::set<Uint16>& codes, s
     }
 }
 
+SDL_Color makeSdlColor(Config::Color c, uint8_t a = 255)
+{
+    return SDL_Color{c.r, c.g, c.b, a};
+}
+
 int main(int argc, char** argv)
 {
     try {
+        Config config = ProgramOptions::parseCommandLine(argc, argv);
 
-        po::options_description desc( "Allowed options" );
-        fs::path configFilePath;
-
-        struct Args
-        {
-            std::string fontFile;
-            std::string chars;
-            std::string color;
-            std::string backgroundColor;
-            int fontSize;
-            int paddingUp;
-            int paddingRight;
-            int paddingDown;
-            int paddingLeft;
-            int textureWidth;
-            int textureHeight;
-            std::string output;
-            std::string dataFormat;
-            bool includeKerningPairs;
-        };
-        Args args;
-
-        desc.add_options()
-                ( "help", "produce help message" )
-                ( "config", po::value< fs::path >( &configFilePath)->required(), "config file" )
-                ( "fontFile", po::value< std::string >( &args.fontFile), "fontFile" )
-                ( "chars", po::value< std::string >( &args.chars), "chars" )
-                ( "color", po::value< std::string >( &args.color), "color" )
-                ( "backgroundColor", po::value< std::string >( &args.backgroundColor), "backgroundColor" )
-                ( "fontSize", po::value< int >( &args.fontSize), "fontSize" )
-                ( "paddingUp", po::value< int >( &args.paddingUp), "paddingUp" )
-                ( "paddingRight", po::value< int >( &args.paddingRight), "paddingRight" )
-                ( "paddingDown", po::value< int >( &args.paddingDown), "paddingDown" )
-                ( "paddingLeft", po::value< int >( &args.paddingLeft), "paddingLeft" )
-                ( "textureWidth", po::value< int >( &args.textureWidth), "textureWidth" )
-                ( "textureHeight", po::value< int >( &args.textureHeight), "textureHeight" )
-                ( "output", po::value< std::string >( &args.output), "output" )
-                ( "dataFormat", po::value< std::string >( &args.dataFormat), "dataFormat" )
-                ( "includeKerningPairs", po::value< bool >( &args.includeKerningPairs), "includeKerningPairs" );
-
-
-        po::variables_map vm;
-        po::store( po::parse_command_line( argc, argv, desc ), vm );
-
-        if ( vm.count( "help" ) )
-        {
-            std::cout << desc << std::endl;
-            return 1;
-        }
-
-        po::notify( vm );
-
-        ///////////////////////////////////////
-
-        ConfigFile configFile(configFilePath);
-        ConfigFile::Config config = configFile.getConfig();
-
-        if ( vm.count( "fontFile" ) )
-            config.fontFile = args.fontFile;
-        if ( vm.count( "chars" ) )
-            parseCharListString(args.chars, config.glyphCodes);
-        if ( vm.count( "color" ) )
-            config.glyphColorRgb.fromString(args.color);
-        if ( vm.count( "color" ) )
-            config.glyphBackgroundColorRgb->fromString(args.backgroundColor);
-        if ( vm.count( "fontSize" ) )
-            config.fontSize = args.fontSize;
-        if ( vm.count( "paddingUp" ) )
-            config.paddingUp = args.paddingUp;
-        if ( vm.count( "paddingRight" ) )
-            config.paddingRight = args.paddingRight;
-        if ( vm.count( "paddingDown" ) )
-            config.paddingDown = args.paddingDown;
-        if ( vm.count( "paddingLeft" ) )
-            config.paddingLeft = args.paddingLeft;
-        if ( vm.count( "textureWidth" ) )
-            config.textureWidth = args.textureWidth;
-        if ( vm.count( "textureHeight" ) )
-            config.textureHeight = args.textureHeight;
-        if ( vm.count( "output" ) )
-            config.output = args.output;
-        if ( vm.count( "dataFormat" ) )
-            config.dataFormat = args.dataFormat;
-        if ( vm.count( "includeKerningPairs" ) )
-            config.includeKerningPairs = args.includeKerningPairs;
-
-        ///////////////////////////////////////
-
-        fs::path outputPath(config.output);
-        if (!outputPath.is_absolute())
-            outputPath = fs::absolute(outputPath, configFilePath.parent_path());
-
-        fs::path outputDirPath = outputPath.parent_path();
+        fs::path dataFilePath = fs::absolute(fs::path(config.output + ".fnt"));
+        fs::path outputDirPath = dataFilePath.parent_path();
+        const std::string outputName = dataFilePath.stem().string();
 
         //TODO: create directory only if there is no problem (exceptions), good place is right before write outputs.
+
         fs::create_directory(outputDirPath);
 
-        const std::string outputName = outputPath.stem().string();
-
-        fs::path dataFilePath = outputDirPath / (outputName + ".fnt");
-
-        fs::path fontFilePath(config.fontFile);
-        if (!fontFilePath.is_absolute())
-            fontFilePath = fs::absolute(fontFilePath, configFilePath.parent_path());
-        if (!fs::is_regular_file(fontFilePath))
+        if (!fs::is_regular_file(config.fontFile))
             throw std::runtime_error("font file not found");
 
         SDL2pp::SDLTTF ttf;
-        SDL2pp::Font font(fontFilePath.generic_string(), config.fontSize);
-
+        SDL2pp::Font font(config.fontFile.generic_string(), config.fontSize);
 
         int fontAscent = font.GetAscent();
 
         std::map<Uint16, GlyphInfo> glyphs;
-        collectGlyphInfo(font, config.glyphCodes, glyphs);
-        checkGlyphSize(glyphs, config.textureWidth, config.textureHeight);
+        collectGlyphInfo(font, config.chars, glyphs);
+        checkGlyphSize(glyphs, config.textureSize.w, config.textureSize.h);
 
         std::vector< rbp::RectSize > srcRects;
-        getSrcRects(glyphs, config.spacingHoriz + config.paddingLeft + config.paddingRight,
-                    config.spacingVert + config.paddingUp + config.paddingDown, srcRects);
+        getSrcRects(glyphs, config.spacing.hor + config.padding.left + config.padding.right,
+                    config.spacing.ver + config.padding.up + config.padding.down, srcRects);
 
         rbp::MaxRectsBinPack mrbp;
         int pageCount = 0;
         for (;;)
         {
             //TODO: check negative dimension.
-            mrbp.Init(config.textureWidth - config.spacingHoriz, config.textureHeight - config.spacingVert);
+            mrbp.Init(config.textureSize.w - config.spacing.hor, config.textureSize.h - config.spacing.ver);
 
             std::vector<rbp::Rect> readyRects;
             mrbp.Insert( srcRects, readyRects, rbp::MaxRectsBinPack::RectBestAreaFit );
@@ -266,8 +181,8 @@ int main(int argc, char** argv)
 
             for ( auto r: readyRects )
             {
-                glyphs[r.tag].x = r.x + config.spacingHoriz;
-                glyphs[r.tag].y = r.y + config.spacingVert;
+                glyphs[r.tag].x = r.x + config.spacing.hor;
+                glyphs[r.tag].y = r.y + config.spacing.ver;
                 glyphs[r.tag].page = pageCount;
             }
 
@@ -281,17 +196,17 @@ int main(int argc, char** argv)
         for (int page = 0; page < pageCount; ++page)
         {
             //TODO: use real texture size instead max.
-            SDL2pp::Surface outputSurface(0, config.textureWidth, config.textureHeight, 32,
+            SDL2pp::Surface outputSurface(0, config.textureSize.w, config.textureSize.h, 32,
                                           0x000000FF, 0x0000FF00, 0x00FF0000, 0xFF000000);
             //std::cout << "outputSurface blend mode " << outputSurface.GetBlendMode() << std::endl;
             // SDL_BLENDMODE_BLEND = 1 (alpha).
 
             // If the color value contains an alpha component then the destination is simply
             // filled with that alpha information, no blending takes place.
-            if (config.glyphBackgroundColorRgb)
-                outputSurface.FillRect(SDL2pp::NullOpt, config.glyphBackgroundColorRgb->getUint32(255));
+            if (config.backgroundColor)
+                outputSurface.FillRect(SDL2pp::NullOpt, config.backgroundColor->getUint32(255));
             else
-                outputSurface.FillRect(SDL2pp::NullOpt, config.glyphColorRgb.getUint32(0));
+                outputSurface.FillRect(SDL2pp::NullOpt, config.color.getUint32(0));
 
             for ( auto glyphIterator = glyphs.begin(); glyphIterator != glyphs.end(); ++glyphIterator )
             {
@@ -299,7 +214,7 @@ int main(int argc, char** argv)
                 if (glyph.page != page)
                     continue;
 
-                SDL2pp::Surface glyphSurface = font.RenderGlyph_Blended(glyph.code, config.glyphColorRgb.getSdlColor() );
+                SDL2pp::Surface glyphSurface = font.RenderGlyph_Blended(glyph.code, makeSdlColor(config.color));
 
                 int x = glyph.x - glyph.minx;
                 if (glyph.minx < 0)
@@ -308,8 +223,8 @@ int main(int argc, char** argv)
                 bool empty = (glyph.w == 0) && (glyph.h == 0);
                 if (!empty)
                 {
-                    x += config.paddingLeft;
-                    y += config.paddingUp;
+                    x += config.padding.left;
+                    y += config.padding.up;
                     SDL2pp::Rect dstRect(x, y, glyph.w, glyph.h);
                     // Blit with alpha blending.
                     glyphSurface.Blit(SDL2pp::NullOpt, outputSurface, dstRect);
@@ -319,7 +234,7 @@ int main(int argc, char** argv)
             std::string pageName = outputName + "_" + std::to_string(page) + ".png";
             pageNames.push_back(pageName);
 
-            if (config.glyphBackgroundColorRgb)
+            if (config.backgroundColor)
                 outputSurface = outputSurface.Convert(SDL_PIXELFORMAT_RGB24);
 
             boost::filesystem::path texturePath = outputDirPath / boost::filesystem::path(pageName);
@@ -336,8 +251,8 @@ int main(int argc, char** argv)
 
         if (config.includeKerningPairs)
         {
-            std::set<Uint16> glyphCodes2(config.glyphCodes);
-            for (auto& ch0 : config.glyphCodes)
+            std::set<uint32_t> glyphCodes2(config.chars);
+            for (auto& ch0 : config.chars)
             {
                 for (auto& ch1 : glyphCodes2)
                 {
@@ -361,10 +276,10 @@ int main(int argc, char** argv)
             f.chars.emplace_back(Font::Char{glyph.code,
                                             glyph.x,
                                             glyph.y,
-                                            glyph.w + config.paddingLeft + config.paddingRight,
-                                            glyph.h + config.paddingUp + config.paddingDown,
-                                            glyph.minx - config.paddingLeft,
-                                            fontAscent - glyph.maxy - config.paddingUp,
+                                            glyph.w + config.padding.left + config.padding.right,
+                                            glyph.h + config.padding.up + config.padding.down,
+                                            glyph.minx - config.padding.left,
+                                            fontAscent - glyph.maxy - config.padding.up,
                                             glyph.advance,
                                             glyph.page,
                                             15});
@@ -375,12 +290,12 @@ int main(int argc, char** argv)
 
         f.common.lineHeight = font.GetLineSkip();
         f.common.base = font.GetAscent();
-        f.common.scaleW = config.textureWidth;
-        f.common.scaleH = config.textureHeight;
+        f.common.scaleW = config.textureSize.w;
+        f.common.scaleH = config.textureSize.h;
 
-        if (config.dataFormat == "xml")
+        if (config.dataFormat == Config::DataFormat::Xml)
             f.writeToXmlFile(dataFilePath.generic_string());
-        if (config.dataFormat == "txt")
+        if (config.dataFormat == Config::DataFormat::Text)
             f.writeToTextFile(dataFilePath.generic_string());
 
         return 0;

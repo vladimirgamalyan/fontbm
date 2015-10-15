@@ -128,7 +128,7 @@ struct Font
             return ss.str();
         }
 
-        int id;
+        uint32_t id;
         int x;
         int y;
         int width;
@@ -149,8 +149,8 @@ struct Font
             return ss.str();
         }
 
-        int first;
-        int second;
+        uint32_t first;
+        uint32_t second;
         int amount;
     };
 

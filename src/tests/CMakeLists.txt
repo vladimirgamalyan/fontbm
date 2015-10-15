@@ -5,7 +5,7 @@ if(MINGW)
     SET(SDL2PP_LIBRARIES ${MINGW32_LIBRARY} ${SDL2MAIN_LIBRARY} ${SDL2PP_LIBRARIES})
 endif(MINGW)
 
-add_executable(tests ../CharList.cpp CharListTest.cpp)
+add_executable(tests FooTest.cpp)
 
 target_link_libraries(tests ${SDL2PP_LIBRARIES} ${Boost_LIBRARIES})
 set(EXECUTABLE_OUTPUT_PATH "${CMAKE_BINARY_DIR}/bin")
