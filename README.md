@@ -18,23 +18,23 @@ Another options:
 
 option  | default | comment
 ------|-----|---------------
-font-file |  | path to ttf file, required
-chars | 32-128 | required character, for example 32-64,92,120-126
-chars-file | | path to UTF-8 text file with required characters, override 'chars' option if exists
-color | 255,255,255 | foreground RGB color, for example: 32,255,255
-background-color | | background color RGB color, for example: 0,0,128, transparent, if not exists
-font-size | 32 | font size
-padding-up | 0 | padding up
-padding-right | 0 | padding right
-padding-down | 0 | padding down
-padding-left | 0 | padding left
-spacing-vert | 0 | spacing vertical
-spacing-horiz | 0 | spacing horizontal
-texture-width | 256 | texture width
-texture-height | 256 | texture height
-output | | output files name without extension, required
-data-format | xml | output data file format, "xml" or "txt"
-include-kerning-pairs | false | include kerning pairs to output file
+--font-file |  | path to ttf file, required
+--chars | 32-128 | required character, for example 32-64,92,120-126
+--chars-file | | path to UTF-8 text file with required characters, override 'chars' option if exists
+--color | 255,255,255 | foreground RGB color, for example: 32,255,255
+--background-color | | background color RGB color, for example: 0,0,128, transparent, if not exists
+--font-size | 32 | font size
+--padding-up | 0 | padding up
+--padding-right | 0 | padding right
+--padding-down | 0 | padding down
+--padding-left | 0 | padding left
+--spacing-vert | 0 | spacing vertical
+--spacing-horiz | 0 | spacing horizontal
+--texture-width | 256 | texture width
+--texture-height | 256 | texture height
+--output | | output files name without extension, required
+--data-format | xml | output data file format, "xml" or "txt"
+--include-kerning-pairs | false | include kerning pairs to output file
 
 ## Thanks
 
