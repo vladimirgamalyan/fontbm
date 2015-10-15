@@ -1,5 +1,6 @@
 #include "ProgramOptions.h"
 #include <iostream>
+#include <fstream>
 #include <stdexcept>
 #include <boost/filesystem.hpp>
 #include <boost/program_options.hpp>

@@ -7,9 +7,9 @@ set(SOURCES
     ProgramOptions.cpp
 )
 
-if(NOT MSVC)
+if(CMAKE_COMPILER_IS_GNUCC)
     set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wno-unused-local-typedefs")
-endif(NOT MSVC)
+endif(CMAKE_COMPILER_IS_GNUCC)
 
 if(MINGW)
 	SET(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++11")

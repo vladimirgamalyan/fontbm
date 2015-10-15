@@ -10,7 +10,7 @@ Command line bitmap font generator, compatible with [BMFont](http://www.angelcod
 ```
 fontbm --font-file Vera.ttf --output vera --font-size 24
 ```
-will produce vera.fnt and vera.png.
+will produce vera.fnt and vera.png
 
 
 Another options:
