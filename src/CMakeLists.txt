@@ -4,9 +4,12 @@ set(SOURCES
 	maxRectsBinPack/MaxRectsBinPack.cpp
 	sdlSavePng/savepng.c
 	tinyxml2/tinyxml2.cpp
-	ConfigFile.cpp
-	CharList.cpp
+    ProgramOptions.cpp
 )
+
+if(NOT MSVC)
+    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wno-unused-local-typedefs")
+endif(NOT MSVC)
 
 if(MINGW)
 	SET(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++11")
