@@ -13,7 +13,7 @@ fontbm --font-file Vera.ttf --output vera --font-size 24
 will produce vera.fnt and vera.png
 
 
-Another options:
+Available options:
 
 
 option  | default | comment
