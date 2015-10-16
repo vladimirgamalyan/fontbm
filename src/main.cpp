@@ -264,8 +264,6 @@ int main(int argc, char** argv)
             }
         }
 
-
-
         for (int i = 0; i < pageCount; ++i )
             f.pages.emplace_back(Font::Page{i, pageNames.at(i)});
 

@@ -9,8 +9,8 @@ void Font::debugFillValues()
     info.size = 48;
     info.bold = 0;
     info.italic = 0;
-    info.charset = "ANSI";
-    info.unicode = 0;
+    info.charset = 0;
+    info.unicode = 1;
     info.stretchH = 100;
     info.smooth = 1;
     info.aa = 1;
@@ -367,7 +367,7 @@ void Font::writeToXmlFile(const std::string &fileName) const
     infoElement->SetAttribute("size", info.size);
     infoElement->SetAttribute("bold", info.bold);
     infoElement->SetAttribute("italic", info.italic);
-    infoElement->SetAttribute("charset", info.charset.c_str());
+    infoElement->SetAttribute("charset", info.charset);
     infoElement->SetAttribute("unicode", info.unicode);
     infoElement->SetAttribute("stretchH", info.stretchH);
     infoElement->SetAttribute("smooth", info.smooth);
@@ -454,7 +454,87 @@ void Font::writeToTextFile(const std::string &fileName) const
         f << "kerning " << k.toString() << std::endl;
 }
 
-void Font::writeToBinFile(const std::string &/*fileName*/) const
+void Font::writeToBinFile(const std::string &fileName) const
 {
-    //TODO:
+    std::fstream f(fileName, std::ios::binary);
+
+#pragma pack(push)
+#pragma pack(1)
+    struct InfoBlock
+    {
+        int            blockSize;
+        unsigned short fontSize;
+        char           reserved    :4;
+        char           bold        :1;
+        char           italic      :1;
+        char           unicode     :1;
+        char           smooth      :1;
+        unsigned char  charSet;
+        unsigned short stretchH;
+        char           aa;
+        unsigned char  paddingUp;
+        unsigned char  paddingRight;
+        unsigned char  paddingDown;
+        unsigned char  paddingLeft;
+        unsigned char  spacingHoriz;
+        unsigned char  spacingVert;
+        unsigned char  outline;
+        char           fontName[1];
+    };
+
+    struct CommonBlock
+    {
+        int blockSize;
+        unsigned short lineHeight;
+        unsigned short base;
+        unsigned short scaleW;
+        unsigned short scaleH;
+        unsigned short pages;
+        unsigned char  packed:1;
+        unsigned char  reserved:7;
+        unsigned char  alphaChnl;
+        unsigned char  redChnl;
+        unsigned char  greenChnl;
+        unsigned char  blueChnl;
+    };
+#pragma pack(pop)
+
+    InfoBlock infoBlock;
+    infoBlock.blockSize = sizeof(InfoBlock) - sizeof(InfoBlock::blockSize) + info.face.length() + sizeof('\0');
+    infoBlock.fontSize = info.size;
+    infoBlock.bold = info.bold;
+    infoBlock.italic = info.italic;
+    infoBlock.unicode = info.unicode;
+    infoBlock.smooth = info.smooth;
+    infoBlock.charSet = info.charset;
+    infoBlock.stretchH = info.stretchH;
+    infoBlock.aa = info.aa;
+    infoBlock.paddingUp = info.padding.up;
+    infoBlock.paddingRight = info.padding.right;
+    infoBlock.paddingDown = info.padding.down;
+    infoBlock.paddingLeft = info.padding.left;
+    infoBlock.spacingHoriz = info.spacing.horizontal;
+    infoBlock.spacingVert = info.spacing.vertical;
+    infoBlock.outline = info.outline;
+
+    f << '\1';
+    f.write((const char*)&infoBlock, sizeof(infoBlock);
+    f.write(info.face.c_str(), info.face.length() + 1);
+
+
+    CommonBlock commonBlock;
+    commonBlock.blockSize = sizeof(CommonBlock);
+    commonBlock.lineHeight = common.lineHeight;
+    commonBlock.base = common.base;
+    commonBlock.scaleW = common.scaleW;
+    commonBlock.scaleH = common.scaleH;
+    commonBlock.pages = common.pages;
+    commonBlock.packed = common.packed;
+    commonBlock.alphaChnl = common.alphaChnl;
+    commonBlock.redChnl = common.redChnl;
+    commonBlock.greenChnl = common.greenChnl;
+    commonBlock.blueChnl = common.blueChnl;
+
+    
+
 }

@@ -14,13 +14,17 @@ struct Font
             std::string toString() const
             {
                 std::stringstream ss;
-                ss << up << "," << right << "," << down << "," << left;
+                ss << static_cast<int>(up)
+                    << "," << static_cast<int>(right)
+                    << "," << static_cast<int>(down)
+                    << "," << static_cast<int>(left);
                 return ss.str();
             }
-            int up;
-            int right;
-            int down;
-            int left;
+
+            uint8_t up;
+            uint8_t right;
+            uint8_t down;
+            uint8_t left;
         };
 
         struct Spacing
@@ -28,43 +32,44 @@ struct Font
             std::string toString() const
             {
                 std::stringstream ss;
-                ss << horizontal << "," << vertical;
+                ss << static_cast<int>(horizontal) << "," << static_cast<int>(vertical);
                 return ss.str();
             }
-            int horizontal;
-            int vertical;
+            uint8_t horizontal;
+            uint8_t vertical;
         };
 
         std::string toString() const
         {
             std::stringstream ss;
             ss << "face=\"" << face << "\""
-                << " size=" << size
+                << " size=" << static_cast<int>(size)
                 << " bold=" << bold
                 << " italic=" << italic
-                << " charset=\"" << charset << "\""
+                << " charset=\"" << static_cast<int>(charset) << "\""
                 << " unicode=" << unicode
-                << " stretchH=" << stretchH
+                << " stretchH=" << static_cast<int>(stretchH)
                 << " smooth=" << smooth
-                << " aa=" << aa
+                << " aa=" << static_cast<int>(aa)
                 << " padding=" << padding.toString()
                 << " spacing=" << spacing.toString()
-                << " outline=" << outline;
+                << " outline=" << static_cast<int>(outline);
             return ss.str();
         }
 
-        std::string face;
-        int size;
-        int bold;
-        int italic;
-        std::string charset;
-        int unicode;
-        int stretchH;
-        int smooth;
-        int aa;
+        uint16_t size;
+        bool smooth;
+        bool unicode;
+        bool italic;
+        bool bold;
+        bool fixedHeigth;
+        uint8_t charset;
+        uint16_t stretchH;
+        uint8_t aa;
         Padding padding;
         Spacing spacing;
-        int outline;
+        uint8_t outline;
+        std::string face;
     };
 
     struct Common
@@ -89,7 +94,7 @@ struct Font
         int base;
         int scaleW;
         int scaleH;
-        int pages;
+        int pages;      //TODO: duplicate std::vector<Page> pages
         int packed;
         int alphaChnl;
         int redChnl;
