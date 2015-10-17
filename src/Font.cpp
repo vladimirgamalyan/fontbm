@@ -33,7 +33,7 @@ void Font::debugFillValues()
     common.greenChnl = 4;
     common.blueChnl = 4;
 
-    pages.emplace_back(Page{0, "sample_0.png"});
+    pages.emplace_back("sample_0.png");
 
     chars.emplace_back(Char{32, 3, 40, 3, 1, -1, 47, 13, 0, 15});
     chars.emplace_back(Char{33, 246, 62, 4, 30, 6, 8, 16, 0, 15});
@@ -401,11 +401,11 @@ void Font::writeToXmlFile(const std::string &fileName) const
     kerningsElement->SetAttribute("count", static_cast<int>(kernings.size()));
     root->InsertEndChild(kerningsElement);
 
-    for(auto p: pages )
+    for (size_t i = 0; i < pages.size(); ++i)
     {
         tinyxml2::XMLElement* pageElement = doc.NewElement("page");
-        pageElement->SetAttribute("id", p.id);
-        pageElement->SetAttribute("file", p.file.c_str());
+        pageElement->SetAttribute("id", i);
+        pageElement->SetAttribute("file", pages[i].c_str());
         pagesElement->InsertEndChild(pageElement);
     }
 
@@ -444,8 +444,8 @@ void Font::writeToTextFile(const std::string &fileName) const
     std::ofstream f(fileName);
     f << "info " << info.toString() << std::endl;
     f << "common " << common.toString() << std::endl;
-    for(auto p: pages)
-        f << "page " << p.toString() << std::endl;
+    for (size_t i = 0; i < pages.size(); ++i)
+        f << "page id=" << i << " file=\"" << pages[i] << "\"" << std::endl;
     f << "chars count=" << chars.size() << std::endl;
     for(auto c: chars)
         f << "char " << c.toString() << std::endl;
@@ -456,51 +456,85 @@ void Font::writeToTextFile(const std::string &fileName) const
 
 void Font::writeToBinFile(const std::string &fileName) const
 {
+    if (!pages.empty())
+    {
+        size_t l = pages[0].length();
+        if (!l)
+            throw std::runtime_error("page name is empty");
+        for (size_t i = 1; i < pages.size(); ++i)
+            if (l != pages[i].length())
+                throw std::runtime_error("page names have different length");
+    }
+
     std::fstream f(fileName, std::ios::binary);
 
 #pragma pack(push)
 #pragma pack(1)
     struct InfoBlock
     {
-        int            blockSize;
-        unsigned short fontSize;
-        char           reserved    :4;
-        char           bold        :1;
-        char           italic      :1;
-        char           unicode     :1;
-        char           smooth      :1;
-        unsigned char  charSet;
-        unsigned short stretchH;
-        char           aa;
-        unsigned char  paddingUp;
-        unsigned char  paddingRight;
-        unsigned char  paddingDown;
-        unsigned char  paddingLeft;
-        unsigned char  spacingHoriz;
-        unsigned char  spacingVert;
-        unsigned char  outline;
-        char           fontName[1];
+        int32_t blockSize;
+        uint16_t fontSize;
+        int8_t reserved:4;
+        int8_t bold:1;
+        int8_t italic:1;
+        int8_t unicode:1;
+        int8_t smooth:1;
+        uint8_t charSet;
+        uint16_t stretchH;
+        int8_t aa;
+        uint8_t paddingUp;
+        uint8_t paddingRight;
+        uint8_t paddingDown;
+        uint8_t paddingLeft;
+        uint8_t spacingHoriz;
+        uint8_t spacingVert;
+        uint8_t outline;
+        int8_t fontName[1];
     };
 
     struct CommonBlock
     {
-        int blockSize;
-        unsigned short lineHeight;
-        unsigned short base;
-        unsigned short scaleW;
-        unsigned short scaleH;
-        unsigned short pages;
-        unsigned char  packed:1;
-        unsigned char  reserved:7;
-        unsigned char  alphaChnl;
-        unsigned char  redChnl;
-        unsigned char  greenChnl;
-        unsigned char  blueChnl;
+        int32_t blockSize;
+        uint16_t lineHeight;
+        uint16_t base;
+        uint16_t scaleW;
+        uint16_t scaleH;
+        uint16_t pages;
+        uint8_t packed:1;
+        uint8_t reserved:7;
+        uint8_t alphaChnl;
+        uint8_t redChnl;
+        uint8_t greenChnl;
+        uint8_t blueChnl;
+    };
+
+    struct CharBlock
+    {
+        uint32_t id;
+        uint16_t x;
+        uint16_t y;
+        uint16_t width;
+        uint16_t height;
+        int16_t xoffset;
+        int16_t yoffset;
+        int16_t xadvance;
+        int8_t page;
+        int8_t channel;
+    };
+
+    struct KerningPairsBlock
+    {
+        uint32_t first;
+        uint32_t second;
+        int16_t amount;
     };
 #pragma pack(pop)
 
+    f << "BMF";
+    f << '\3';
+
     InfoBlock infoBlock;
-    infoBlock.blockSize = sizeof(InfoBlock) - sizeof(InfoBlock::blockSize) + info.face.length() + sizeof('\0');
+    infoBlock.blockSize = sizeof(InfoBlock) - sizeof(InfoBlock::blockSize) + info.face.length();
     infoBlock.fontSize = info.size;
     infoBlock.bold = info.bold;
     infoBlock.italic = info.italic;
@@ -518,12 +552,11 @@ void Font::writeToBinFile(const std::string &fileName) const
     infoBlock.outline = info.outline;
 
     f << '\1';
-    f.write((const char*)&infoBlock, sizeof(infoBlock);
+    f.write((const char*)&infoBlock, sizeof(infoBlock));
     f.write(info.face.c_str(), info.face.length() + 1);
 
-
     CommonBlock commonBlock;
-    commonBlock.blockSize = sizeof(CommonBlock);
+    commonBlock.blockSize = sizeof(CommonBlock) - sizeof(CommonBlock::blockSize);
     commonBlock.lineHeight = common.lineHeight;
     commonBlock.base = common.base;
     commonBlock.scaleW = common.scaleW;
@@ -535,6 +568,50 @@ void Font::writeToBinFile(const std::string &fileName) const
     commonBlock.greenChnl = common.greenChnl;
     commonBlock.blueChnl = common.blueChnl;
 
-    
+    f << '\2';
+    f.write((const char*)&commonBlock, sizeof(commonBlock));
+
+    f << '\3';
+    int32_t pageBlockSize = pages.empty() ? 0 : pages[0].length() * pages.size();
+    f << pageBlockSize;
+    for (auto s: pages)
+        f << s;
+
+    f << '\4';
+    int32_t charsBlockSize = chars.size() * sizeof(CharBlock);
+    f << charsBlockSize;
+    for (auto c: chars)
+    {
+        CharBlock charBlock;
+        charBlock.id = c.id;
+        charBlock.x = c.x;
+        charBlock.y = c.y;
+        charBlock.width = c.width;
+        charBlock.height = c.height;
+        charBlock.xoffset = c.xoffset;
+        charBlock.yoffset = c.yoffset;
+        charBlock.xadvance = c.xadvance;
+        charBlock.page = c.page;
+        charBlock.channel = c.chnl;
+
+        f.write((const char*)&charBlock, sizeof(charBlock));
+    }
+
+    if (!kernings.empty())
+    {
+        f << '\5';
+        int32_t kerningPairsBlockSize = kernings.size() * sizeof(KerningPairsBlock);
+        f << kerningPairsBlockSize;
+
+        for (auto k: kernings)
+        {
+            KerningPairsBlock kerningPairsBlock;
+            kerningPairsBlock.first = k.first;
+            kerningPairsBlock.second = k.second;
+            kerningPairsBlock.amount = k.amount;
+
+            f.write((const char*)&kerningPairsBlock, sizeof(kerningPairsBlock));
+        }
+    }
 
 }

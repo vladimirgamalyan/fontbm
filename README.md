@@ -33,7 +33,7 @@ option  | default | comment
 --texture-width | 256 | texture width
 --texture-height | 256 | texture height
 --output | | output files name without extension, required
---data-format | xml | output data file format, "xml" or "txt"
+--data-format | txt | output data file format, "txt", "xml" or "bin"
 --include-kerning-pairs | false | include kerning pairs to output file
 
 ## Thanks

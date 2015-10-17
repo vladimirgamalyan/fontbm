@@ -8,7 +8,8 @@ struct Config
 {
     enum class DataFormat {
         Xml,
-        Text
+        Text,
+        Bin
     };
 
     struct Color

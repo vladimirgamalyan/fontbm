@@ -90,29 +90,16 @@ struct Font
             return ss.str();
         }
 
-        int lineHeight;
-        int base;
-        int scaleW;
-        int scaleH;
-        int pages;      //TODO: duplicate std::vector<Page> pages
-        int packed;
-        int alphaChnl;
-        int redChnl;
-        int greenChnl;
-        int blueChnl;
-    };
-
-    struct Page
-    {
-        std::string toString() const
-        {
-            std::stringstream ss;
-            ss << "id=" << id << " file=\"" << file << "\"";
-            return ss.str();
-        }
-
-        int id;
-        std::string file;
+        uint16_t lineHeight;
+        uint16_t base;
+        uint16_t scaleW;
+        uint16_t scaleH;
+        uint16_t pages;      //TODO: duplicate std::vector<Page> pages
+        bool packed;
+        uint8_t alphaChnl;
+        uint8_t redChnl;
+        uint8_t greenChnl;
+        uint8_t blueChnl;
     };
 
     struct Char
@@ -134,15 +121,15 @@ struct Font
         }
 
         uint32_t id;
-        int x;
-        int y;
-        int width;
-        int height;
-        int xoffset;
-        int yoffset;
-        int xadvance;
-        int page;
-        int chnl;
+        uint16_t x;
+        uint16_t y;
+        uint16_t width;
+        uint16_t height;
+        int16_t xoffset;
+        int16_t yoffset;
+        int16_t xadvance;
+        uint8_t page;
+        uint8_t chnl;
     };
 
     struct Kerning
@@ -156,12 +143,12 @@ struct Font
 
         uint32_t first;
         uint32_t second;
-        int amount;
+        int16_t amount;
     };
 
     Info info;
     Common common;
-    std::vector<Page> pages;
+    std::vector<std::string> pages;
     std::vector<Char> chars;
     std::vector<Kerning> kernings;
 
