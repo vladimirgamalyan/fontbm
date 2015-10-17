@@ -466,6 +466,9 @@ void Font::writeToBinFile(const std::string &fileName) const
                 throw std::runtime_error("page names have different length");
     }
 
+    if (common.pages != pages.size())
+        throw std::runtime_error("common.pages != pages.size()");
+
     std::fstream f(fileName, std::ios::binary);
 
 #pragma pack(push)

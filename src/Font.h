@@ -62,7 +62,6 @@ struct Font
         bool unicode;
         bool italic;
         bool bold;
-        bool fixedHeigth;
         uint8_t charset;
         uint16_t stretchH;
         uint8_t aa;
@@ -128,8 +127,8 @@ struct Font
         int16_t xoffset;
         int16_t yoffset;
         int16_t xadvance;
-        uint8_t page;
-        uint8_t chnl;
+        int8_t page;
+        int8_t chnl;
     };
 
     struct Kerning
