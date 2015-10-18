@@ -22,7 +22,7 @@ option  | default | comment
 --chars | 32-128 | required character, for example 32-64,92,120-126
 --chars-file | | path to UTF-8 text file with required characters, override 'chars' option if exists
 --color | 255,255,255 | foreground RGB color, for example: 32,255,255
---background-color | | background color RGB color, for example: 0,0,128, transparent, if not exists
+--background-color | | background RGB color, for example: 0,0,128, transparent, if not exists
 --font-size | 32 | font size
 --padding-up | 0 | padding up
 --padding-right | 0 | padding right
