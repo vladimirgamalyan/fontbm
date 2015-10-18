@@ -10,7 +10,7 @@
 #include <boost/program_options.hpp>
 #include <boost/filesystem.hpp>
 #include "sdlSavePng/savepng.h"
-#include "Font.h"
+#include "FontInfo.h"
 #include "maxRectsBinPack/MaxRectsBinPack.h"
 #include "Config.h"
 #include "ProgramOptions.h"
@@ -164,7 +164,7 @@ int main(int argc, char** argv)
                     config.spacing.ver + config.padding.up + config.padding.down, srcRects);
 
         rbp::MaxRectsBinPack mrbp;
-        int pageCount = 0;
+        size_t pageCount = 0;
         for (;;)
         {
             //TODO: check negative dimension.
@@ -193,7 +193,7 @@ int main(int argc, char** argv)
 
         std::vector<std::string> pageNames;
 
-        for (int page = 0; page < pageCount; ++page)
+        for (size_t page = 0; page < pageCount; ++page)
         {
             //TODO: use real texture size instead max.
             SDL2pp::Surface outputSurface(0, config.textureSize.w, config.textureSize.h, 32,
@@ -211,7 +211,7 @@ int main(int argc, char** argv)
             for ( auto glyphIterator = glyphs.begin(); glyphIterator != glyphs.end(); ++glyphIterator )
             {
                 const GlyphInfo& glyph = glyphIterator->second;
-                if (glyph.page != page)
+                if (glyph.page != static_cast<int>(page))
                     continue;
 
                 SDL2pp::Surface glyphSurface = font.RenderGlyph_Blended(glyph.code, makeSdlColor(config.color));
@@ -231,6 +231,7 @@ int main(int argc, char** argv)
                 }
             }
 
+            //TODO: make all page names eq size
             std::string pageName = outputName + "_" + std::to_string(page) + ".png";
             pageNames.push_back(pageName);
 
@@ -243,11 +244,7 @@ int main(int argc, char** argv)
 
         /////////////////////////////////////////////////////////////
 
-        Font f;
-        f.debugFillValues();
-        f.chars.clear();
-        f.kernings.clear();
-        f.pages.clear();
+        FontInfo f;
 
         if (config.includeKerningPairs)
         {
@@ -256,47 +253,56 @@ int main(int argc, char** argv)
             {
                 for (auto& ch1 : glyphCodes2)
                 {
-                    int k = getKerning(font, ch0, ch1);
+                    int16_t k = static_cast<int16_t>(getKerning(font, ch0, ch1));
                     if (k)
-                        f.kernings.emplace_back(Font::Kerning{ch0, ch1, k});
+                    {
+                        FontInfo::Kerning kerning;
+                        kerning.first = ch0;
+                        kerning.second = ch1;
+                        kerning.amount = k;
+                        f.kernings.push_back(kerning);
+                    }
                 }
                 glyphCodes2.erase(ch0);
             }
         }
 
-
-
-        for (int i = 0; i < pageCount; ++i )
-            f.pages.emplace_back(Font::Page{i, pageNames.at(i)});
+        for (size_t i = 0; i < pageCount; ++i )
+            f.pages.push_back(pageNames.at(i));
 
         for ( auto glyphIterator = glyphs.begin(); glyphIterator != glyphs.end(); ++glyphIterator )
         {
-            const GlyphInfo &glyph = glyphIterator->second;
             //TODO: page = 0 for empty flyphs.
-            f.chars.emplace_back(Font::Char{glyph.code,
-                                            glyph.x,
-                                            glyph.y,
-                                            glyph.w + config.padding.left + config.padding.right,
-                                            glyph.h + config.padding.up + config.padding.down,
-                                            glyph.minx - config.padding.left,
-                                            fontAscent - glyph.maxy - config.padding.up,
-                                            glyph.advance,
-                                            glyph.page,
-                                            15});
+            const GlyphInfo &glyph = glyphIterator->second;
+            FontInfo::Char c;
+            c.id = glyph.code;
+            c.x = static_cast<uint16_t>(glyph.x);
+            c.y = static_cast<uint16_t>(glyph.y);
+            c.width = static_cast<uint16_t>(glyph.w + config.padding.left + config.padding.right);
+            c.height = static_cast<uint16_t>(glyph.h + config.padding.up + config.padding.down);
+            c.xoffset = static_cast<int16_t>(glyph.minx - config.padding.left);
+            c.yoffset = static_cast<int16_t>(fontAscent - glyph.maxy - config.padding.up);
+            c.xadvance = static_cast<int16_t>(glyph.advance);
+            c.page = static_cast<uint8_t>(glyph.page);
+            c.chnl = 15;
+
+            f.chars.push_back(c);
         }
 
         //f.info.size = 48;
         f.info.face = font.GetFamilyName().value_or("unknown");
 
-        f.common.lineHeight = font.GetLineSkip();
-        f.common.base = font.GetAscent();
-        f.common.scaleW = config.textureSize.w;
-        f.common.scaleH = config.textureSize.h;
+        f.common.lineHeight = static_cast<uint16_t>(font.GetLineSkip());
+        f.common.base = static_cast<uint16_t>(font.GetAscent());
+        f.common.scaleW = static_cast<uint16_t>(config.textureSize.w);
+        f.common.scaleH = static_cast<uint16_t>(config.textureSize.h);
 
         if (config.dataFormat == Config::DataFormat::Xml)
             f.writeToXmlFile(dataFilePath.generic_string());
         if (config.dataFormat == Config::DataFormat::Text)
             f.writeToTextFile(dataFilePath.generic_string());
+        if (config.dataFormat == Config::DataFormat::Bin)
+            f.writeToBinFile(dataFilePath.generic_string());
 
         return 0;
 

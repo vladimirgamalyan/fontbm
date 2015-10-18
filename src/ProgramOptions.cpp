@@ -40,7 +40,7 @@ Config ProgramOptions::parseCommandLine(int argc, char **argv)
         ("texture-width", po::value<uint32_t>(&config.textureSize.w)->default_value(256), "texture width, default valie is 256")
         ("texture-height", po::value<uint32_t>(&config.textureSize.h)->default_value(256), "texture height, default valie is 256")
         ("output,O", po::value<std::string>(&config.output)->required(), "output files name without extension, required")
-        ("data-format", po::value<std::string>(&dataFormat)->default_value("xml"), "output data file format, \"xml\" or \"txt\", default \"xml\"")
+        ("data-format", po::value<std::string>(&dataFormat)->default_value("txt"), "output data file format, \"xml\" or \"txt\", default \"xml\"")
         ("include-kerning-pairs", po::value<bool>( &config.includeKerningPairs), "include kerning pairs to output file, default false");
 
     po::variables_map vm;
@@ -69,6 +69,8 @@ Config ProgramOptions::parseCommandLine(int argc, char **argv)
         config.dataFormat = Config::DataFormat::Text;
     else if (dataFormat == "xml")
         config.dataFormat = Config::DataFormat::Xml;
+    else if (dataFormat == "bin")
+        config.dataFormat = Config::DataFormat::Bin;
     else
         throw std::runtime_error("invalid data format");
 
