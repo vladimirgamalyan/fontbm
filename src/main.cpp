@@ -10,7 +10,7 @@
 #include <boost/program_options.hpp>
 #include <boost/filesystem.hpp>
 #include "sdlSavePng/savepng.h"
-#include "Font.h"
+#include "FontInfo.h"
 #include "maxRectsBinPack/MaxRectsBinPack.h"
 #include "Config.h"
 #include "ProgramOptions.h"
@@ -244,11 +244,7 @@ int main(int argc, char** argv)
 
         /////////////////////////////////////////////////////////////
 
-        Font f;
-        f.debugFillValues();
-        f.chars.clear();
-        f.kernings.clear();
-        f.pages.clear();
+        FontInfo f;
 
         if (config.includeKerningPairs)
         {
@@ -259,7 +255,13 @@ int main(int argc, char** argv)
                 {
                     int16_t k = static_cast<int16_t>(getKerning(font, ch0, ch1));
                     if (k)
-                        f.kernings.emplace_back(Font::Kerning{ch0, ch1, k});
+                    {
+                        FontInfo::Kerning kerning;
+                        kerning.first = ch0;
+                        kerning.second = ch1;
+                        kerning.amount = k;
+                        f.kernings.push_back(kerning);
+                    }
                 }
                 glyphCodes2.erase(ch0);
             }
@@ -272,7 +274,7 @@ int main(int argc, char** argv)
         {
             //TODO: page = 0 for empty flyphs.
             const GlyphInfo &glyph = glyphIterator->second;
-            Font::Char c;
+            FontInfo::Char c;
             c.id = glyph.code;
             c.x = static_cast<uint16_t>(glyph.x);
             c.y = static_cast<uint16_t>(glyph.y);

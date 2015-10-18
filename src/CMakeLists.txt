@@ -1,6 +1,6 @@
 set(SOURCES
 	main.cpp
-	Font.cpp
+	FontInfo.cpp
 	maxRectsBinPack/MaxRectsBinPack.cpp
 	sdlSavePng/savepng.c
 	tinyxml2/tinyxml2.cpp
