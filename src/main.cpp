@@ -20,7 +20,7 @@ namespace fs = boost::filesystem;
 
 int getKerning(const SDL2pp::Font& font, uint32_t char0, uint32_t char1)
 {
-    if ((char0 > 0xFFFF)|| (char1 > 0xFFFF))
+    if ((char0 > 0xFFFF) || (char1 > 0xFFFF))
         return 0;
     Uint16 ch0 = static_cast<Uint16>(char0);
     Uint16 ch1 = static_cast<Uint16>(char1);
@@ -42,12 +42,7 @@ void printGlyphData(const SDL2pp::Font& font, Uint16 ch)
 
 struct GlyphInfo
 {
-    GlyphInfo() {}
-    GlyphInfo(uint32_t code) : code(code) {}
-
-    uint32_t code;
-
-    int page;
+    uint16_t page;
 
     int x;
     int y;
@@ -61,7 +56,9 @@ struct GlyphInfo
     int advance;
 };
 
-void getSrcRects(const std::map<uint32_t, GlyphInfo> &glyphs, int additionalWidth, int additionalHeight, std::vector<rbp::RectSize> &srcRects)
+typedef std::map<uint32_t, GlyphInfo> Glyphs;
+
+void getSrcRects(const Glyphs &glyphs, int additionalWidth, int additionalHeight, std::vector<rbp::RectSize> &srcRects)
 {
     srcRects.clear();
     for (auto& kv : glyphs)
@@ -73,20 +70,20 @@ void getSrcRects(const std::map<uint32_t, GlyphInfo> &glyphs, int additionalWidt
             rbp::RectSize rs;
             rs.width = glyphInfo.w + additionalHeight;
             rs.height = glyphInfo.h + additionalWidth;
-            rs.tag = glyphInfo.code;
+            rs.tag = kv.first;
             srcRects.push_back(rs);
         }
     }
 }
 
-std::map<uint32_t, GlyphInfo> getGlyphInfo(const SDL2pp::Font& font,
+Glyphs getGlyphInfo(const SDL2pp::Font& font,
                                            const std::set<uint32_t>& codes,
                                            uint32_t maxTextureSizeX,
                                            uint32_t maxTextureSizeY)
 {
     int fontAscent = font.GetAscent();
 
-    std::map<uint32_t, GlyphInfo> glyphs;
+    Glyphs glyphs;
 
     for (auto& id : codes)
     {
@@ -96,7 +93,7 @@ std::map<uint32_t, GlyphInfo> getGlyphInfo(const SDL2pp::Font& font,
             continue;
         }
 
-        GlyphInfo glyphInfo(id);
+        GlyphInfo glyphInfo;
         font.GetGlyphMetrics(static_cast<Uint16>(id),
                              glyphInfo.minx,
                              glyphInfo.maxx,
@@ -133,7 +130,7 @@ SDL_Color makeSdlColor(Config::Color c, uint8_t a = 255)
     return SDL_Color{c.r, c.g, c.b, a};
 }
 
-uint16_t arrangeGlyphs(std::map<uint32_t, GlyphInfo>& glyphs, const Config& config)
+uint16_t arrangeGlyphs(Glyphs& glyphs, const Config& config)
 {
     std::vector< rbp::RectSize > srcRects;
     getSrcRects(glyphs, config.spacing.hor + config.padding.left + config.padding.right,
@@ -171,10 +168,10 @@ uint16_t arrangeGlyphs(std::map<uint32_t, GlyphInfo>& glyphs, const Config& conf
 int main(int argc, char** argv)
 {
     try {
-        Config config = ProgramOptions::parseCommandLine(argc, argv);
+        const Config config = ProgramOptions::parseCommandLine(argc, argv);
 
-        fs::path dataFilePath = fs::absolute(fs::path(config.output + ".fnt"));
-        fs::path outputDirPath = dataFilePath.parent_path();
+        const fs::path dataFilePath = fs::absolute(fs::path(config.output + ".fnt"));
+        const fs::path outputDirPath = dataFilePath.parent_path();
         const std::string outputName = dataFilePath.stem().string();
 
         //TODO: create directory only if there is no problem (exceptions), good place is right before write outputs.
@@ -187,11 +184,11 @@ int main(int argc, char** argv)
         SDL2pp::SDLTTF ttf;
         SDL2pp::Font font(config.fontFile.generic_string(), config.fontSize);
 
-        std::map<uint32_t, GlyphInfo> glyphs = getGlyphInfo(font, config.chars, config.textureSize.w, config.textureSize.h);
+        Glyphs glyphs = getGlyphInfo(font, config.chars, config.textureSize.w, config.textureSize.h);
 
-        uint16_t pageCount = arrangeGlyphs(glyphs, config);
+        const uint16_t pageCount = arrangeGlyphs(glyphs, config);
 
-        int fontAscent = font.GetAscent();
+        const int fontAscent = font.GetAscent();
 
         /////////////////////////////////////////////////////////////
 
@@ -212,13 +209,13 @@ int main(int argc, char** argv)
             else
                 outputSurface.FillRect(SDL2pp::NullOpt, config.color.getUint32(0));
 
-            for ( auto glyphIterator = glyphs.begin(); glyphIterator != glyphs.end(); ++glyphIterator )
+            for (auto kv: glyphs)
             {
-                const GlyphInfo& glyph = glyphIterator->second;
+                const GlyphInfo& glyph = kv.second;
                 if (glyph.page != static_cast<int>(page))
                     continue;
 
-                SDL2pp::Surface glyphSurface = font.RenderGlyph_Blended(glyph.code, makeSdlColor(config.color));
+                SDL2pp::Surface glyphSurface = font.RenderGlyph_Blended(kv.first, makeSdlColor(config.color));
 
                 int x = glyph.x - glyph.minx;
                 if (glyph.minx < 0)
@@ -274,12 +271,12 @@ int main(int argc, char** argv)
         for (size_t i = 0; i < pageCount; ++i )
             f.pages.push_back(pageNames.at(i));
 
-        for ( auto glyphIterator = glyphs.begin(); glyphIterator != glyphs.end(); ++glyphIterator )
+        for (auto kv: glyphs)
         {
             //TODO: page = 0 for empty flyphs.
-            const GlyphInfo &glyph = glyphIterator->second;
+            const GlyphInfo &glyph = kv.second;
             FontInfo::Char c;
-            c.id = glyph.code;
+            c.id = kv.first;
             c.x = static_cast<uint16_t>(glyph.x);
             c.y = static_cast<uint16_t>(glyph.y);
             c.width = static_cast<uint16_t>(glyph.w + config.padding.left + config.padding.right);
