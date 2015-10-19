@@ -43,9 +43,9 @@ void printGlyphData(const SDL2pp::Font& font, Uint16 ch)
 struct GlyphInfo
 {
     GlyphInfo() {}
-    GlyphInfo(Uint16 code) : code(code) {}
+    GlyphInfo(uint32_t code) : code(code) {}
 
-    Uint16 code;
+    uint32_t code;
 
     int page;
 
@@ -61,7 +61,7 @@ struct GlyphInfo
     int advance;
 };
 
-void getSrcRects(const std::map<Uint16, GlyphInfo> &glyphs, int additionalWidth, int additionalHeight, std::vector<rbp::RectSize> &srcRects)
+void getSrcRects(const std::map<uint32_t, GlyphInfo> &glyphs, int additionalWidth, int additionalHeight, std::vector<rbp::RectSize> &srcRects)
 {
     srcRects.clear();
     for (auto& kv : glyphs)
@@ -79,34 +79,30 @@ void getSrcRects(const std::map<Uint16, GlyphInfo> &glyphs, int additionalWidth,
     }
 }
 
-void checkGlyphSize(const std::map<Uint16, GlyphInfo>& glyphs, int maxTextureSizeX, int maxTextureSizeY)
-{
-    for (auto& kv : glyphs)
-    {
-        const GlyphInfo &glyphInfo = kv.second;
-        if ( (glyphInfo.w > maxTextureSizeX) || (glyphInfo.h > maxTextureSizeY))
-            throw std::runtime_error("no room for glyph");
-    }
-}
-
-void collectGlyphInfo(const SDL2pp::Font& font, const std::set<uint32_t>& codes, std::map<Uint16, GlyphInfo>& glyphs )
+std::map<uint32_t, GlyphInfo> getGlyphInfo(const SDL2pp::Font& font,
+                                           const std::set<uint32_t>& codes,
+                                           uint32_t maxTextureSizeX,
+                                           uint32_t maxTextureSizeY)
 {
     int fontAscent = font.GetAscent();
 
-    glyphs.clear();
+    std::map<uint32_t, GlyphInfo> glyphs;
 
     for (auto& id : codes)
     {
-        if ( !font.IsGlyphProvided(id) )
+        if ((id > 0xFFFF) || (!font.IsGlyphProvided(static_cast<Uint16>(id))))
         {
             std::cout << "warning: glyph " << id << " not found " << std::endl;
             continue;
         }
 
         GlyphInfo glyphInfo(id);
-        font.GetGlyphMetrics(id, glyphInfo.minx, glyphInfo.maxx, glyphInfo.miny, glyphInfo.maxy, glyphInfo.advance);
-
-        //glyphInfo.id = id;
+        font.GetGlyphMetrics(static_cast<Uint16>(id),
+                             glyphInfo.minx,
+                             glyphInfo.maxx,
+                             glyphInfo.miny,
+                             glyphInfo.maxy,
+                             glyphInfo.advance);
         glyphInfo.x = 0;
         glyphInfo.y = 0;
         glyphInfo.w = glyphInfo.maxx - glyphInfo.minx;
@@ -115,9 +111,10 @@ void collectGlyphInfo(const SDL2pp::Font& font, const std::set<uint32_t>& codes,
         if (fontAscent < glyphInfo.maxy)
             throw std::runtime_error("invalid glyph (maxy > ascent)");
 
-        //TODO: add more cheks for glyph.
+        if ( (glyphInfo.w > static_cast<int>(maxTextureSizeX)) || (glyphInfo.h > static_cast<int>(maxTextureSizeY)))
+            throw std::runtime_error("no room for glyph");
 
-
+        //TODO: add more checks for glyph.
 
         bool empty = (glyphInfo.w == 0) && (glyphInfo.h == 0);
         if (!empty)
@@ -127,11 +124,48 @@ void collectGlyphInfo(const SDL2pp::Font& font, const std::set<uint32_t>& codes,
         //TODO: emplace.
         glyphs[id] = glyphInfo;
     }
+
+    return glyphs;
 }
 
 SDL_Color makeSdlColor(Config::Color c, uint8_t a = 255)
 {
     return SDL_Color{c.r, c.g, c.b, a};
+}
+
+uint16_t arrangeGlyphs(std::map<uint32_t, GlyphInfo>& glyphs, const Config& config)
+{
+    std::vector< rbp::RectSize > srcRects;
+    getSrcRects(glyphs, config.spacing.hor + config.padding.left + config.padding.right,
+                config.spacing.ver + config.padding.up + config.padding.down, srcRects);
+
+    rbp::MaxRectsBinPack mrbp;
+    uint16_t pageCount = 0;
+    for (;;)
+    {
+        //TODO: check negative dimension.
+        mrbp.Init(config.textureSize.w - config.spacing.hor, config.textureSize.h - config.spacing.ver);
+
+        std::vector<rbp::Rect> readyRects;
+        mrbp.Insert( srcRects, readyRects, rbp::MaxRectsBinPack::RectBestAreaFit );
+        if ( readyRects.empty() )
+        {
+            if ( !srcRects.empty() )
+                throw std::runtime_error("can not fit glyphs to texture");
+            break;
+        }
+
+        for ( auto r: readyRects )
+        {
+            glyphs[r.tag].x = r.x + config.spacing.hor;
+            glyphs[r.tag].y = r.y + config.spacing.ver;
+            glyphs[r.tag].page = pageCount;
+        }
+
+        pageCount++;
+    }
+
+    return pageCount;
 }
 
 int main(int argc, char** argv)
@@ -153,41 +187,11 @@ int main(int argc, char** argv)
         SDL2pp::SDLTTF ttf;
         SDL2pp::Font font(config.fontFile.generic_string(), config.fontSize);
 
+        std::map<uint32_t, GlyphInfo> glyphs = getGlyphInfo(font, config.chars, config.textureSize.w, config.textureSize.h);
+
+        uint16_t pageCount = arrangeGlyphs(glyphs, config);
+
         int fontAscent = font.GetAscent();
-
-        std::map<Uint16, GlyphInfo> glyphs;
-        collectGlyphInfo(font, config.chars, glyphs);
-        checkGlyphSize(glyphs, config.textureSize.w, config.textureSize.h);
-
-        std::vector< rbp::RectSize > srcRects;
-        getSrcRects(glyphs, config.spacing.hor + config.padding.left + config.padding.right,
-                    config.spacing.ver + config.padding.up + config.padding.down, srcRects);
-
-        rbp::MaxRectsBinPack mrbp;
-        size_t pageCount = 0;
-        for (;;)
-        {
-            //TODO: check negative dimension.
-            mrbp.Init(config.textureSize.w - config.spacing.hor, config.textureSize.h - config.spacing.ver);
-
-            std::vector<rbp::Rect> readyRects;
-            mrbp.Insert( srcRects, readyRects, rbp::MaxRectsBinPack::RectBestAreaFit );
-            if ( readyRects.empty() )
-            {
-                if ( !srcRects.empty() )
-                    throw std::runtime_error("can not fit glyphs to texture");
-                break;
-            }
-
-            for ( auto r: readyRects )
-            {
-                glyphs[r.tag].x = r.x + config.spacing.hor;
-                glyphs[r.tag].y = r.y + config.spacing.ver;
-                glyphs[r.tag].page = pageCount;
-            }
-
-            pageCount++;
-        }
 
         /////////////////////////////////////////////////////////////
 
