@@ -1,25 +1,16 @@
 language: cpp
-sudo: false
 compiler:
   - gcc
   - clang
-addons:
-  apt:
-    sources:
-    - ubuntu-toolchain-r-test
-    - boost-latest
-    packages:
-    - g++-4.8
-    - libboost-system1.55-dev
-    - libboost-filesystem1.55-dev
-    - libboost-program-options1.55-dev
-    - libboost-regex1.55-dev
-    - libsdl2-dev
-    - libsdl2-ttf-dev
 before_install:
-  - ls -l /usr/include/c++
-  - sed -i -e 's|friend class hash|friend struct hash|' /usr/include/c++/4.8/bits/stl_bvector.h
-  - sed -i -e 's|friend class hash|friend struct hash|' /usr/include/c++/4.8/bitset
+  - sudo add-apt-repository --yes ppa:zoogie/sdl2-snapshots
+  - sudo add-apt-repository --yes ppa:ubuntu-toolchain-r/test
+  - sudo add-apt-repository --yes ppa:boost-latest/ppa
+  - sudo apt-get update -qq
+  - sudo apt-get install -qq libboost-system1.55-dev libboost-filesystem1.55-dev libboost-program-options1.55-dev libboost-regex1.55-dev
+  - sudo apt-get install -qq cmake libsdl2-dev libsdl2-image-dev libsdl2-ttf-dev g++-4.8
+  - sudo sed -i -e 's|friend class hash|friend struct hash|' /usr/include/c++/4.8/bits/stl_bvector.h
+  - sudo sed -i -e 's|friend class hash|friend struct hash|' /usr/include/c++/4.8/bitset
   - if [ "$CXX" = "g++" ]; then export CXX="g++-4.8" CC="gcc-4.8"; fi
 script:
   - cmake -DCMAKE_CXX_FLAGS=-Werror .
