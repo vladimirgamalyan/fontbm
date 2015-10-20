@@ -63,7 +63,7 @@ void FontInfo::writeToXmlFile(const std::string &fileName) const
     for (size_t i = 0; i < pages.size(); ++i)
     {
         tinyxml2::XMLElement* pageElement = doc.NewElement("page");
-        pageElement->SetAttribute("id", i);
+        pageElement->SetAttribute("id", static_cast<unsigned int>(i));
         pageElement->SetAttribute("file", pages[i].c_str());
         pagesElement->InsertEndChild(pageElement);
     }
@@ -151,8 +151,8 @@ void FontInfo::writeToTextFile(const std::string &fileName) const
             << " xoffset=" << c.xoffset
             << " yoffset=" << c.yoffset
             << " xadvance=" << c.xadvance
-            << " page=" << c.page
-            << " chnl=" << c.chnl
+            << " page=" << static_cast<int>(c.page)
+            << " chnl=" << static_cast<int>(c.chnl)
             << std::endl;
     }
 
