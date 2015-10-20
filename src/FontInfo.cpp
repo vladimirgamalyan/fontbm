@@ -151,8 +151,8 @@ void FontInfo::writeToTextFile(const std::string &fileName) const
             << " xoffset=" << c.xoffset
             << " yoffset=" << c.yoffset
             << " xadvance=" << c.xadvance
-            << " page=" << c.page
-            << " chnl=" << c.chnl
+            << " page=" << static_cast<int>(c.page)
+            << " chnl=" << static_cast<int>(c.chnl)
             << std::endl;
     }
 
