@@ -35,8 +35,11 @@ if(MINGW)
     SET(COMMON_LIBRARIES mingw32 ${COMMON_LIBRARIES})
 endif(MINGW)
 
-if(CMAKE_COMPILER_IS_GNUCC)
+if(NOT MSVC)
     set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++11 -Wall -Wextra -pedantic")
+endif(NOT MSVC)
+
+if(CMAKE_COMPILER_IS_GNUCC)
     set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wno-deprecated -Wno-unused-local-typedefs")
 endif(CMAKE_COMPILER_IS_GNUCC)
 
