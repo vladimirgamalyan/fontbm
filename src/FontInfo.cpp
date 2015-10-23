@@ -1,10 +1,13 @@
 #include <stdexcept>
 #include <fstream>
+#include <iostream>
 #include "FontInfo.h"
 #include "tinyxml2/tinyxml2.h"
 
 void FontInfo::writeToXmlFile(const std::string &fileName) const
 {
+    testPages();
+
     tinyxml2::XMLDocument doc;
     tinyxml2::XMLDeclaration* declaration = doc.NewDeclaration("xml version=\"1.0\"");
     doc.InsertFirstChild(declaration);
@@ -100,6 +103,8 @@ void FontInfo::writeToXmlFile(const std::string &fileName) const
 
 void FontInfo::writeToTextFile(const std::string &fileName) const
 {
+    testPages();
+
     std::ofstream f(fileName);
 
     f << "info"
@@ -169,20 +174,9 @@ void FontInfo::writeToTextFile(const std::string &fileName) const
 
 void FontInfo::writeToBinFile(const std::string &fileName) const
 {
-    if (!pages.empty())
-    {
-        size_t l = pages[0].length();
-        if (!l)
-            throw std::runtime_error("page name is empty");
-        for (size_t i = 1; i < pages.size(); ++i)
-            if (l != pages[i].length())
-                throw std::runtime_error("page names have different length");
-    }
+    testPages();
 
-    if (common.pages != pages.size())
-        throw std::runtime_error("common.pages != pages.size()");
-
-    std::fstream f(fileName, std::ios::binary);
+    std::ofstream f(fileName, std::ios::binary);
 
 #pragma pack(push)
 #pragma pack(1)
@@ -329,4 +323,20 @@ void FontInfo::writeToBinFile(const std::string &fileName) const
             f.write((const char*)&kerningPairsBlock, sizeof(kerningPairsBlock));
         }
     }
+}
+
+void FontInfo::testPages() const
+{
+    if (!pages.empty())
+    {
+        size_t l = pages[0].length();
+        if (!l)
+            throw std::runtime_error("page name is empty");
+        for (size_t i = 1; i < pages.size(); ++i)
+            if (l != pages[i].length())
+                throw std::runtime_error("page names have different length");
+    }
+
+    if (common.pages != pages.size())
+        throw std::runtime_error("common.pages != pages.size()");
 }

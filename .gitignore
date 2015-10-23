@@ -28,3 +28,5 @@
 /src/example/cmake_install.cmake
 /cmake_install.cmake
 /testdata/output
+/build
+/tests/generated
