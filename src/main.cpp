@@ -270,6 +270,7 @@ int main(int argc, char** argv)
 
         for (size_t i = 0; i < pageCount; ++i )
             f.pages.push_back(pageNames.at(i));
+        f.common.pages = pageCount;
 
         for (auto kv: glyphs)
         {
@@ -308,10 +309,10 @@ int main(int argc, char** argv)
         return 0;
 
     } catch (std::exception& e) {
-        std::cerr << "Error: " << e.what() << std::endl;
+        std::cerr << "error: " << e.what() << std::endl;
         return 1;
     } catch (...) {
-        std::cerr << "Unknown error" << std::endl;
+        std::cerr << "unknown error" << std::endl;
         return 1;
     }
 }
