@@ -20,7 +20,7 @@ option  | default | comment
 ------|-----|---------------
 --font-file |  | path to ttf file, required
 --chars | 32-128 | required character, for example 32-64,92,120-126
---chars-file | | path to UTF-8 text file with required characters, override 'chars' option if exists
+--chars-file | | optional path to UTF-8 text file with additional required characters
 --color | 255,255,255 | foreground RGB color, for example: 32,255,255
 --background-color | | background RGB color, for example: 0,0,128, transparent, if not exists
 --font-size | 32 | font size
@@ -34,7 +34,7 @@ option  | default | comment
 --texture-height | 256 | texture height
 --output | | output files name without extension, required
 --data-format | txt | output data file format, "txt", "xml" or "bin"
---include-kerning-pairs | false | include kerning pairs to output file
+--include-kerning-pairs | | include kerning pairs to output file
 
 ## Thanks
 

@@ -5,6 +5,7 @@
 #include <array>
 #include <limits>
 #include <algorithm>
+#include <iomanip>
 #include <SDL2/SDL.h>
 #include <SDL2pp/SDL2pp.hh>
 #include <boost/program_options.hpp>
@@ -100,6 +101,8 @@ Glyphs getGlyphInfo(const SDL2pp::Font& font,
                              glyphInfo.miny,
                              glyphInfo.maxy,
                              glyphInfo.advance);
+
+        glyphInfo.page = 0;
         glyphInfo.x = 0;
         glyphInfo.y = 0;
         glyphInfo.w = glyphInfo.maxx - glyphInfo.minx;
@@ -165,6 +168,15 @@ uint16_t arrangeGlyphs(Glyphs& glyphs, const Config& config)
     return pageCount;
 }
 
+int getDigitCount(uint16_t x)
+{
+    return (x < 10 ? 1 :
+            (x < 100 ? 2 :
+             (x < 1000 ? 3 :
+              (x < 10000 ? 4 :
+               5))));
+}
+
 int main(int argc, char** argv)
 {
     try {
@@ -193,6 +205,8 @@ int main(int argc, char** argv)
         /////////////////////////////////////////////////////////////
 
         std::vector<std::string> pageNames;
+
+        int pageNameDigits = getDigitCount(pageCount);
 
         for (size_t page = 0; page < pageCount; ++page)
         {
@@ -232,8 +246,9 @@ int main(int argc, char** argv)
                 }
             }
 
-            //TODO: make all page names eq size
-            std::string pageName = outputName + "_" + std::to_string(page) + ".png";
+            std::stringstream ss;
+            ss << outputName << "_" << std::setfill ('0') << std::setw(pageNameDigits) << page << ".png";
+            std::string pageName = ss.str();
             pageNames.push_back(pageName);
 
             if (config.backgroundColor)
