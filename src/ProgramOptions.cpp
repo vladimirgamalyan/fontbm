@@ -41,7 +41,7 @@ Config ProgramOptions::parseCommandLine(int argc, char **argv)
         ("texture-height", po::value<uint32_t>(&config.textureSize.h)->default_value(256), "texture height, default valie is 256")
         ("output,O", po::value<std::string>(&config.output)->required(), "output files name without extension, required")
         ("data-format", po::value<std::string>(&dataFormat)->default_value("txt"), "output data file format, \"xml\" or \"txt\", default \"xml\"")
-        ("include-kerning-pairs", po::value<bool>( &config.includeKerningPairs), "include kerning pairs to output file, default false");
+        ("include-kerning-pairs", "include kerning pairs to output file");
 
     po::variables_map vm;
     po::store(po::parse_command_line(argc, argv, desc), vm);
@@ -76,6 +76,8 @@ Config ProgramOptions::parseCommandLine(int argc, char **argv)
         config.dataFormat = Config::DataFormat::Bin;
     else
         throw std::runtime_error("invalid data format");
+
+    config.includeKerningPairs = (vm.count("include-kerning-pairs") > 0);
 
     //TODO: check values range
 
