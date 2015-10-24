@@ -100,6 +100,8 @@ Glyphs getGlyphInfo(const SDL2pp::Font& font,
                              glyphInfo.miny,
                              glyphInfo.maxy,
                              glyphInfo.advance);
+
+        glyphInfo.page = 0;
         glyphInfo.x = 0;
         glyphInfo.y = 0;
         glyphInfo.w = glyphInfo.maxx - glyphInfo.minx;
