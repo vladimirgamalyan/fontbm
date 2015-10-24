@@ -27,7 +27,7 @@ Config ProgramOptions::parseCommandLine(int argc, char **argv)
         ("help", "produce help message" )
         ("font-file,F", po::value<fs::path>(&config.fontFile)->required(), "path to ttf file, required")
         ("chars", po::value<std::string>(&chars)->default_value("32-128"), "required characters, for example: 32-64,92,120-126\ndefault value is 32-128")
-        ("chars-file", po::value<fs::path>(&charsFile), "path to UTF-8 text file with required characters, override 'chars' option if exists")
+        ("chars-file", po::value<fs::path>(&charsFile), "optional path to UTF-8 text file with additional required characters")
         ("color", po::value<std::string>(&color)->default_value("255,255,255"), "foreground RGB color, for example: 32,255,255, default value is 255,255,255")
         ("background-color", po::value<std::string>(&backgroundColor), "background color RGB color, for example: 0,0,128, transparent, if not exists")
         ("font-size,S", po::value<uint32_t>(&config.fontSize)->default_value(32), "font size, default value is 32")
@@ -56,7 +56,10 @@ Config ProgramOptions::parseCommandLine(int argc, char **argv)
 
     config.chars = parseCharsString(chars);
     if (!charsFile.empty())
-        config.chars = getCharsFromFile(charsFile);
+    {
+        auto c = getCharsFromFile(charsFile);
+        config.chars.insert(c.begin(), c.end());
+    }
 
     config.color = parseColor(color);
     if (backgroundColor.empty())
