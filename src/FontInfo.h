@@ -84,4 +84,5 @@ struct FontInfo
 
 private:
     void testPages() const;
+    static std::string getCharSetName(uint8_t charSet);
 };

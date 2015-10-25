@@ -4,6 +4,77 @@
 #include "FontInfo.h"
 #include "tinyxml2/tinyxml2.h"
 
+std::string FontInfo::getCharSetName(uint8_t charSet)
+{
+    std::string str;
+
+    switch(charSet)
+    {
+        case 0: // ANSI_CHARSET
+            str = "ANSI";
+            break;
+        case 1: // DEFAULT_CHARSET
+            str = "DEFAULT";
+            break;
+        case 2: // SYMBOL_CHARSET
+            str = "SYMBOL";
+            break;
+        case 128: // SHIFTJIS_CHARSET
+            str = "SHIFTJIS";
+            break;
+        case 129: // HANGUL_CHARSET
+            str = "HANGUL";
+            break;
+        case 134: // GB2312_CHARSET
+            str = "GB2312";
+            break;
+        case 136: // CHINESEBIG5_CHARSET
+            str = "CHINESEBIG5";
+            break;
+        case 255: // OEM_CHARSET
+            str = "OEM";
+            break;
+        case 130: // JOHAB_CHARSET
+            str = "JOHAB";
+            break;
+        case 177: // HEBREW_CHARSET
+            str = "HEBREW";
+            break;
+        case 178: // ARABIC_CHARSET
+            str = "ARABIC";
+            break;
+        case 161: // GREEK_CHARSET
+            str = "GREEK";
+            break;
+        case 162: // TURKISH_CHARSET
+            str = "TURKISH";
+            break;
+        case 163: // VIETNAMESE_CHARSET
+            str = "VIETNAMESE";
+            break;
+        case 222: // THAI_CHARSET
+            str = "THAI";
+            break;
+        case 238: // EASTEUROPE_CHARSET
+            str = "EASTEUROPE";
+            break;
+        case 204: // RUSSIAN_CHARSET
+            str = "RUSSIAN";
+            break;
+        case 77:  // MAC_CHARSET
+            str = "MAC";
+            break;
+        case 186: // BALTIC_CHARSET
+            str = "BALTIC";
+            break;
+
+        default:
+            str = std::to_string(charSet);
+    }
+
+    return str;
+}
+
 void FontInfo::writeToXmlFile(const std::string &fileName) const
 {
     testPages();
@@ -29,7 +100,7 @@ void FontInfo::writeToXmlFile(const std::string &fileName) const
     infoElement->SetAttribute("size", info.size);
     infoElement->SetAttribute("bold", info.bold);
     infoElement->SetAttribute("italic", info.italic);
-    infoElement->SetAttribute("charset", info.charset);
+    infoElement->SetAttribute("charset", info.unicode ? "" : getCharSetName(info.charset).c_str());
     infoElement->SetAttribute("unicode", info.unicode);
     infoElement->SetAttribute("stretchH", info.stretchH);
     infoElement->SetAttribute("smooth", info.smooth);
@@ -112,7 +183,7 @@ void FontInfo::writeToTextFile(const std::string &fileName) const
         << " size=" << info.size
         << " bold=" << info.bold
         << " italic=" << info.italic
-        << " charset=\"" << static_cast<int>(info.charset) << "\""
+        << " charset=\"" << (info.unicode ? "" : getCharSetName(info.charset)) << "\""
         << " unicode=" << info.unicode
         << " stretchH=" << info.stretchH
         << " smooth=" << info.smooth
@@ -250,7 +321,7 @@ void FontInfo::writeToBinFile(const std::string &fileName) const
     infoBlock.italic = info.italic;
     infoBlock.unicode = info.unicode;
     infoBlock.smooth = info.smooth;
-    infoBlock.charSet = info.charset;
+    infoBlock.charSet = info.unicode ? 0 : info.charset;
     infoBlock.stretchH = info.stretchH;
     infoBlock.aa = info.aa;
     infoBlock.paddingUp = info.padding.up;
