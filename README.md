@@ -42,7 +42,6 @@ option  | default | comment
 * [RectangleBinPack](https://github.com/juj/RectangleBinPack)
 * [www.libpng.org](http://www.libpng.org/)
 * [SDL_SavePNG](https://github.com/driedfruit/SDL_SavePNG)
-* [nlohmann/json](https://github.com/nlohmann/json)
 
 ## License
 
