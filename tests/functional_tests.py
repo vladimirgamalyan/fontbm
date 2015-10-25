@@ -28,7 +28,7 @@ def check_diff(expected, generated, binary=False):
         raise RuntimeError('expected file not found')
     if not os.path.isfile(generated):
         raise RuntimeError('generated file not found')
-    different = filecmp.cmp(expected, generated) if binary else diff(expected, generated)
+    different = (not filecmp.cmp(expected, generated)) if binary else diff(expected, generated)
     if different:
         raise RuntimeError('generated data not equal expected')
 
@@ -47,24 +47,24 @@ def main(argv):
 
     shutil.rmtree('generated', ignore_errors=True)
 
-    run_fontbm([fontbm, '--font-file', 'fonts/FreeSans.ttf',
+    run_fontbm([fontbm, '--font-file', 'fonts/FreeSans.ttf', '--chars', '32-126',
                '--output', 'generated/test0', '--include-kerning-pairs'])
     check_diff('expected/test0.fnt', 'generated/test0.fnt')
 
-    run_fontbm([fontbm, '--font-file', 'fonts/FreeSans.ttf',
+    run_fontbm([fontbm, '--font-file', 'fonts/FreeSans.ttf', '--chars', '32-126',
                '--output', 'generated/test1', '--include-kerning-pairs',
                '--data-format', 'xml'])
     check_diff('expected/test1.fnt', 'generated/test1.fnt')
 
-    run_fontbm([fontbm, '--font-file', 'fonts/FreeSans.ttf',
+    run_fontbm([fontbm, '--font-file', 'fonts/FreeSans.ttf', '--chars', '32-126',
                '--output', 'generated/test2', '--include-kerning-pairs',
                '--data-format', 'bin'])
     check_diff('expected/test2.fnt', 'generated/test2.fnt', True)
 
-    run_fontbm([fontbm, '--font-file', 'fonts/FreeSans.ttf',
+    run_fontbm([fontbm, '--font-file', 'fonts/FreeSans.ttf', '--chars', '32-126',
                '--output', 'generated/test3', '--include-kerning-pairs',
                '--texture-width', '32', '--texture-height', '32'])
-    check_diff('expected/test3.fnt', 'generated/test3.fnt', True)
+    check_diff('expected/test3.fnt', 'generated/test3.fnt')
 
 
 if __name__ == "__main__":
