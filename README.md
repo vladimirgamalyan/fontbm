@@ -19,7 +19,7 @@ Available options:
 option  | default | comment
 ------|-----|---------------
 --font-file |  | path to ttf file, required
---chars | 32-128 | required character, for example 32-64,92,120-126
+--chars | 32-127 | required character, for example 32-64,92,120-126
 --chars-file | | optional path to UTF-8 text file with additional required characters
 --color | 255,255,255 | foreground RGB color, for example: 32,255,255
 --background-color | | background RGB color, for example: 0,0,128, transparent, if not exists
