@@ -262,6 +262,7 @@ int main(int argc, char** argv)
 
         FontInfo f;
         f.info.unicode = true;
+        f.info.aa = 1;
 
         if (config.includeKerningPairs)
         {
