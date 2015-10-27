@@ -1,7 +1,7 @@
 set(SOURCES
 	Example.cpp
-	BmFontPrinter.cpp
 	BmFont.cpp
+    FntInfo.cpp
 )
 
 add_executable(example ${SOURCES})

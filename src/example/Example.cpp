@@ -2,7 +2,6 @@
 #include <exception>
 #include <SDL2/SDL.h>
 #include <SDL2pp/SDL2pp.hh>
-#include "BmFontPrinter.h"
 #include "BmFont.h"
 
 using namespace SDL2pp;
@@ -18,18 +17,13 @@ int main(int /*argc*/, char** /*argv*/)
                       SDL_WINDOW_RESIZABLE);
 
         Renderer renderer(window, -1, SDL_RENDERER_ACCELERATED);
-        //Texture sprites(renderer, DATA_PATH "/M484SpaceSoldier.png");
         renderer.Clear();
-        //renderer.Copy(sprites);
+
+        BmFont bmFont(renderer, "test0.fnt");
+        bmFont.print(SDL2pp::Point(0, 0), "Hello, World!");
+
         renderer.Present();
-
-        BmFont bmFont("vera.fnt");
-
-        BmFontPrinter bmFontPrinter(renderer);
-        bmFontPrinter.print(SDL2pp::Point(0, 0), bmFont, "Hello, World!");
-
         SDL_Delay(5000);
-
         return 0;
     }
     catch (std::exception& e) {

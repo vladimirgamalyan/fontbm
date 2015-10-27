@@ -19,6 +19,7 @@ if(NOT EXISTS ${PROJECT_SOURCE_DIR}/extlibs/libSDL2pp/CMakeLists.txt)
     message(FATAL_ERROR "The source directory\n  ${PROJECT_SOURCE_DIR}/extlibs/libSDL2pp\ndoes not contain a CMakeLists.txt file.\nIt is likely that you forgot to run\n  git submodule init && git submodule update")
 endif(NOT EXISTS ${PROJECT_SOURCE_DIR}/extlibs/libSDL2pp/CMakeLists.txt)
 set(SDL2PP_WITH_TTF TRUE)
+set(SDL2PP_WITH_IMAGE TRUE)
 add_subdirectory(extlibs/libSDL2pp)
 include_directories(SYSTEM ${SDL2PP_INCLUDE_DIRS})
 

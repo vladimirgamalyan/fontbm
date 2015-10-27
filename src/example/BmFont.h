@@ -1,18 +1,15 @@
 #pragma once
-#include "BmFontInterface.h"
+#include <SDL2pp/SDL2pp.hh>
+#include "FntInfo.h"
 
-class BmFont : public BmFontInterface
+class BmFont
 {
 public:
-    BmFont(const std::string& fontFile);
-
-    virtual bool isValid() const override;
-    virtual bool isGlyphProvided(Uint16 ch) const override;
-    virtual SDL2pp::Rect getGlyphRect(Uint16 ch) const override;
-    virtual SDL2pp::Point getGlyphOffset(Uint16 ch) const override;
-    virtual int getKerning(Uint16 ch0, Uint16 ch1) const override;
-    virtual SDL2pp::Surface getSurface() const override;
+    BmFont(SDL2pp::Renderer& renderer, const std::string& fontFile);
+    void print(SDL2pp::Point pos, const std::string& text);
 
 private:
-
+    SDL2pp::Renderer& renderer;
+    FntInfo fntInfo;
+    std::vector<SDL2pp::Texture> textures;
 };
