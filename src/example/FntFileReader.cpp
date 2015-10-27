@@ -1,10 +1,14 @@
 #include "FntFileReader.h"
+#include <fstream>
+#include <sstream>
 
-void FntFileReader::loadFromFile(const std::string& fileName)
+FntFileReader::Info FntFileReader::loadFromFile(const std::string& fileName)
 {
 	std::ifstream f( fileName );
 	if ( !f.is_open() )
 		throw std::runtime_error( "error while opening file" );
+
+	FntFileReader::Info info;
 
 	for ( std::string line; std::getline( f, line ); )
 	{
@@ -17,22 +21,22 @@ void FntFileReader::loadFromFile(const std::string& fileName)
 			const std::vector<int> values = getCsvInt(paddingString);
 			if (values.size() == 4)
 			{
-				paddingTop = values[0];
-				paddingRight = values[1];
-				paddingBottom = values[2];
-				paddingLeft = values[3];
+				info.padding.top = values[0];
+				info.padding.right = values[1];
+				info.padding.bottom = values[2];
+				info.padding.left = values[3];
 			}
 		}
 		else if ( tag == "page" )
 		{
 			const int page = getValueInt(line, "id");
-			pages[page] = getQuotedValueString(line, "file");
+			info.pages[page] = getQuotedValueString(line, "file");
 		}
 		else if ( tag == "char" )
 		{
 			uint32_t id = static_cast<uint32_t>(getValueInt(line, "id"));
 
-			Character character;
+			Info::Character character;
 			character.x = getValueInt(line, "x");
 			character.y = getValueInt(line, "y");
 			character.w = getValueInt(line, "w");
@@ -42,12 +46,14 @@ void FntFileReader::loadFromFile(const std::string& fileName)
 			character.xadvance = getValueInt(line, "xadvance");
 			character.page = getValueInt(line, "page");
 
-			characters[id] = character;
+			info.characters[id] = character;
 		}
 	}
 
 	if ( f.bad() )
-		throw std::runtime_error( "error while reading fnt file" );	
+		throw std::runtime_error( "error while reading fnt file" );
+
+	return info;
 }
 
 std::string FntFileReader::getValueString(const std::string& line, const std::string& key)
@@ -79,10 +85,10 @@ std::string FntFileReader::getQuotedValueString(const std::string& line, const s
 	return line.substr( begin, end - begin );
 }
 
-int FntFileReader::getValueInt(const std::string& line, const std::string& key, int default)
+int FntFileReader::getValueInt(const std::string& line, const std::string& key, int defaultVal)
 {
-	std::istringstream(getValueString(line, key)) >> default;
-	return default;
+	std::istringstream(getValueString(line, key)) >> defaultVal;
+	return defaultVal;
 }
 
 std::vector<int> FntFileReader::getCsvInt( const std::string& str )
