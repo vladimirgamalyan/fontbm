@@ -232,9 +232,9 @@ int main(int argc, char** argv)
                 SDL2pp::Surface glyphSurface = font.RenderGlyph_Blended(kv.first, makeSdlColor(config.color));
 
                 int x = glyph.x - glyph.minx;
-                if (glyph.minx < 0)
-                    x = glyph.x;
-                int y = glyph.y + glyph.maxy - fontAscent;
+                //if (glyph.minx < 0)
+                  //  x = glyph.x;
+                int y = glyph.y - (fontAscent - glyph.maxy);
                 bool empty = (glyph.w == 0) && (glyph.h == 0);
                 if (!empty)
                 {
@@ -261,8 +261,49 @@ int main(int argc, char** argv)
         /////////////////////////////////////////////////////////////
 
         FontInfo f;
+
+        f.info.face = font.GetFamilyName().value_or("unknown");
+        f.info.size = config.fontSize;
         f.info.unicode = true;
         f.info.aa = 1;
+        f.info.padding.up = static_cast<uint8_t>(config.padding.up);
+        f.info.padding.right = static_cast<uint8_t>(config.padding.right);
+        f.info.padding.down = static_cast<uint8_t>(config.padding.down);
+        f.info.padding.left = static_cast<uint8_t>(config.padding.left);
+        f.info.spacing.horizontal = static_cast<uint8_t>(config.spacing.hor);
+        f.info.spacing.vertical = static_cast<uint8_t>(config.spacing.ver);
+
+        f.common.lineHeight = static_cast<uint16_t>(font.GetLineSkip());
+        f.common.base = static_cast<uint16_t>(font.GetAscent());
+        f.common.scaleW = static_cast<uint16_t>(config.textureSize.w);
+        f.common.scaleH = static_cast<uint16_t>(config.textureSize.h);
+        f.common.pages = pageCount;
+
+        for (size_t i = 0; i < pageCount; ++i )
+            f.pages.push_back(pageNames.at(i));
+
+        for (auto kv: glyphs)
+        {
+            //TODO: page = 0 for empty flyphs.
+            const GlyphInfo &glyph = kv.second;
+            FontInfo::Char c;
+            c.id = kv.first;
+            bool empty = (glyph.w == 0) && (glyph.h == 0);
+            if (!empty)
+            {
+                c.x = static_cast<uint16_t>(glyph.x);
+                c.y = static_cast<uint16_t>(glyph.y);
+                c.width = static_cast<uint16_t>(glyph.w + config.padding.left + config.padding.right);
+                c.height = static_cast<uint16_t>(glyph.h + config.padding.up + config.padding.down);
+                c.page = static_cast<uint8_t>(glyph.page);
+                c.xoffset = static_cast<int16_t>(glyph.minx - config.padding.left);
+                c.yoffset = static_cast<int16_t>(fontAscent - glyph.maxy - config.padding.up);
+            }
+            c.xadvance = static_cast<int16_t>(glyph.advance);
+            c.chnl = 15;
+
+            f.chars.push_back(c);
+        }
 
         if (config.includeKerningPairs)
         {
@@ -284,37 +325,6 @@ int main(int argc, char** argv)
                 glyphCodes2.erase(ch0);
             }
         }
-
-        for (size_t i = 0; i < pageCount; ++i )
-            f.pages.push_back(pageNames.at(i));
-        f.common.pages = pageCount;
-
-        for (auto kv: glyphs)
-        {
-            //TODO: page = 0 for empty flyphs.
-            const GlyphInfo &glyph = kv.second;
-            FontInfo::Char c;
-            c.id = kv.first;
-            c.x = static_cast<uint16_t>(glyph.x);
-            c.y = static_cast<uint16_t>(glyph.y);
-            c.width = static_cast<uint16_t>(glyph.w + config.padding.left + config.padding.right);
-            c.height = static_cast<uint16_t>(glyph.h + config.padding.up + config.padding.down);
-            c.xoffset = static_cast<int16_t>(glyph.minx - config.padding.left);
-            c.yoffset = static_cast<int16_t>(fontAscent - glyph.maxy - config.padding.up);
-            c.xadvance = static_cast<int16_t>(glyph.advance);
-            c.page = static_cast<uint8_t>(glyph.page);
-            c.chnl = 15;
-
-            f.chars.push_back(c);
-        }
-
-        //f.info.size = 48;
-        f.info.face = font.GetFamilyName().value_or("unknown");
-
-        f.common.lineHeight = static_cast<uint16_t>(font.GetLineSkip());
-        f.common.base = static_cast<uint16_t>(font.GetAscent());
-        f.common.scaleW = static_cast<uint16_t>(config.textureSize.w);
-        f.common.scaleH = static_cast<uint16_t>(config.textureSize.h);
 
         if (config.dataFormat == Config::DataFormat::Xml)
             f.writeToXmlFile(dataFilePath.generic_string());

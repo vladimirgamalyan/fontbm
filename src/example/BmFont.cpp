@@ -14,7 +14,7 @@ void BmFont::print(SDL2pp::Point pos, const std::string& text)
         uint32_t code = static_cast<uint32_t>(c);
         if (fntInfo.characters.find(code) != fntInfo.characters.end())
         {
-            FntInfo::Character& ch = fntInfo.characters[code];
+            const FntInfo::Character& ch = fntInfo.characters[code];
             renderer.Copy(textures[ch.page],
                           SDL2pp::Rect(ch.x, ch.y, ch.w, ch.h),
                           pos + SDL2pp::Point(ch.xoffset, ch.yoffset));

@@ -15,19 +15,7 @@ FntInfo FntInfo::loadFromFile(const std::string& fileName)
 		std::string tag;
 		std::istringstream( line ) >> tag;
 
-		if ( tag == "info" )
-		{
-			const std::string paddingString = getValueString(line, "padding");
-			const std::vector<int> values = getCsvInt(paddingString);
-			if (values.size() == 4)
-			{
-				info.padding.top = values[0];
-				info.padding.right = values[1];
-				info.padding.bottom = values[2];
-				info.padding.left = values[3];
-			}
-		}
-		else if ( tag == "page" )
+		if ( tag == "page" )
 		{
 			const int page = getValueInt(line, "id");
 			info.pages[page] = getQuotedValueString(line, "file");
@@ -62,7 +50,7 @@ std::string FntInfo::getValueString(const std::string& line, const std::string& 
 
 	size_t begin = line.find( k );
 	if ( begin == std::string::npos )
-		return std::string();
+		return "";
 
 	begin += k.length();
 	return line.substr( begin, line.find( " ", begin ) - begin );
@@ -74,13 +62,13 @@ std::string FntInfo::getQuotedValueString(const std::string& line, const std::st
 
 	size_t begin = line.find( key_ );
 	if ( begin == std::string::npos )
-		return std::string();
+		return "";
 
 	begin += key_.length();
 
 	size_t end = line.find( "\"", begin + 1 );
 	if ( end == std::string::npos )
-		return std::string();
+		return "";
 
 	return line.substr( begin, end - begin );
 }
@@ -89,15 +77,4 @@ int FntInfo::getValueInt(const std::string& line, const std::string& key, int de
 {
 	std::istringstream(getValueString(line, key)) >> defaultVal;
 	return defaultVal;
-}
-
-std::vector<int> FntInfo::getCsvInt(const std::string& str )
-{
-	std::istringstream iss( str );
-	std::string s;
-	int n;
-	std::vector<int> values;
-	while ( std::getline( iss, s, ',' ) && std::istringstream( s ) >> n )
-		values.push_back( n );
-	return values;
 }
