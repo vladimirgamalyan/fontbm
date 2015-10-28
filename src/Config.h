@@ -48,7 +48,7 @@ struct Config
     std::set<uint32_t> chars;
     Color color;
     boost::optional<Color> backgroundColor;
-    uint32_t fontSize;
+    uint16_t fontSize;
     Padding padding;
     Spacing spacing;
     Size textureSize;
