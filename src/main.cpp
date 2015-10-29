@@ -43,38 +43,55 @@ void printGlyphData(const SDL2pp::Font& font, Uint16 ch)
 
 struct GlyphInfo
 {
-    uint16_t page;
+    uint16_t page = 0;
+    int x = 0;
+    int y = 0;
 
-    int x;
-    int y;
-    int w;
-    int h;
+    int getWidth() const
+    {
+        return maxx - minx;
+    }
 
-    int minx;
-    int maxx;
-    int miny;
-    int maxy;
-    int advance;
+    int getHeight() const
+    {
+        return maxy - miny;
+    }
+
+    bool isEmpty() const
+    {
+        return ((getWidth() == 0) && (getHeight() == 0));
+    }
+
+    bool isInvalid() const
+    {
+        return ((!isEmpty()) && ((getWidth() <= 0) || (getHeight() <= 0)));
+    }
+
+    int minx = 0;
+    int maxx = 0;
+    int miny = 0;
+    int maxy = 0;
+    int advance = 0;
 };
 
 typedef std::map<uint32_t, GlyphInfo> Glyphs;
 
-void getSrcRects(const Glyphs &glyphs, int additionalWidth, int additionalHeight, std::vector<rbp::RectSize> &srcRects)
+std::vector<rbp::RectSize> getSrcRects(const Glyphs &glyphs, int additionalWidth, int additionalHeight)
 {
-    srcRects.clear();
+    std::vector<rbp::RectSize> result;
     for (auto& kv : glyphs)
     {
         const GlyphInfo& glyphInfo = kv.second;
-        bool empty = (glyphInfo.w == 0) && (glyphInfo.h == 0);
-        if (!empty)
+        if (!glyphInfo.isEmpty())
         {
             rbp::RectSize rs;
-            rs.width = glyphInfo.w + additionalHeight;
-            rs.height = glyphInfo.h + additionalWidth;
+            rs.width = glyphInfo.getWidth() + additionalHeight;
+            rs.height = glyphInfo.getHeight() + additionalWidth;
             rs.tag = kv.first;
-            srcRects.push_back(rs);
+            result.push_back(rs);
         }
     }
+    return result;
 }
 
 Glyphs getGlyphInfo(const SDL2pp::Font& font,
@@ -102,24 +119,16 @@ Glyphs getGlyphInfo(const SDL2pp::Font& font,
                              glyphInfo.maxy,
                              glyphInfo.advance);
 
-        glyphInfo.page = 0;
-        glyphInfo.x = 0;
-        glyphInfo.y = 0;
-        glyphInfo.w = glyphInfo.maxx - glyphInfo.minx;
-        glyphInfo.h = glyphInfo.maxy - glyphInfo.miny;
-
         if (fontAscent < glyphInfo.maxy)
             throw std::runtime_error("invalid glyph (maxy > ascent)");
 
-        if ( (glyphInfo.w > static_cast<int>(maxTextureSizeX)) || (glyphInfo.h > static_cast<int>(maxTextureSizeY)))
+        if ( (glyphInfo.getWidth() > static_cast<int>(maxTextureSizeX)) || (glyphInfo.getHeight() > static_cast<int>(maxTextureSizeY)))
             throw std::runtime_error("no room for glyph");
 
         //TODO: add more checks for glyph.
 
-        bool empty = (glyphInfo.w == 0) && (glyphInfo.h == 0);
-        if (!empty)
-            if ((glyphInfo.w <= 0) || (glyphInfo.h <= 0))
-                throw std::runtime_error("invalid glyph (zero or negative width or height)");
+        if (glyphInfo.isInvalid())
+            throw std::runtime_error("invalid glyph (zero or negative width or height)");
 
         //TODO: emplace.
         glyphs[id] = glyphInfo;
@@ -135,9 +144,8 @@ SDL_Color makeSdlColor(Config::Color c, uint8_t a = 255)
 
 uint16_t arrangeGlyphs(Glyphs& glyphs, const Config& config)
 {
-    std::vector< rbp::RectSize > srcRects;
-    getSrcRects(glyphs, config.spacing.hor + config.padding.left + config.padding.right,
-                config.spacing.ver + config.padding.up + config.padding.down, srcRects);
+    std::vector< rbp::RectSize > srcRects = getSrcRects(glyphs, config.spacing.hor + config.padding.left + config.padding.right,
+                config.spacing.ver + config.padding.up + config.padding.down);
 
     rbp::MaxRectsBinPack mrbp;
     uint16_t pageCount = 0;
@@ -235,12 +243,11 @@ int main(int argc, char** argv)
                 //if (glyph.minx < 0)
                   //  x = glyph.x;
                 int y = glyph.y - (fontAscent - glyph.maxy);
-                bool empty = (glyph.w == 0) && (glyph.h == 0);
-                if (!empty)
+                if (!glyph.isEmpty())
                 {
                     x += config.padding.left;
                     y += config.padding.up;
-                    SDL2pp::Rect dstRect(x, y, glyph.w, glyph.h);
+                    SDL2pp::Rect dstRect(x, y, glyph.getWidth(), glyph.getHeight());
                     // Blit with alpha blending.
                     glyphSurface.Blit(SDL2pp::NullOpt, outputSurface, dstRect);
                 }
@@ -288,13 +295,12 @@ int main(int argc, char** argv)
             const GlyphInfo &glyph = kv.second;
             FontInfo::Char c;
             c.id = kv.first;
-            bool empty = (glyph.w == 0) && (glyph.h == 0);
-            if (!empty)
+            if (!glyph.isEmpty())
             {
                 c.x = static_cast<uint16_t>(glyph.x);
                 c.y = static_cast<uint16_t>(glyph.y);
-                c.width = static_cast<uint16_t>(glyph.w + config.padding.left + config.padding.right);
-                c.height = static_cast<uint16_t>(glyph.h + config.padding.up + config.padding.down);
+                c.width = static_cast<uint16_t>(glyph.getWidth() + config.padding.left + config.padding.right);
+                c.height = static_cast<uint16_t>(glyph.getHeight() + config.padding.up + config.padding.down);
                 c.page = static_cast<uint8_t>(glyph.page);
                 c.xoffset = static_cast<int16_t>(glyph.minx - config.padding.left);
                 c.yoffset = static_cast<int16_t>(fontAscent - glyph.maxy - config.padding.up);
