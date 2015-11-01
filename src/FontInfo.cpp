@@ -270,7 +270,6 @@ void FontInfo::writeToBinFile(const std::string &fileName) const
         uint8_t spacingHoriz;
         uint8_t spacingVert;
         uint8_t outline;
-        int8_t fontName[1];
     };
 
     struct CommonBlock
@@ -315,7 +314,7 @@ void FontInfo::writeToBinFile(const std::string &fileName) const
     f << '\3';
 
     InfoBlock infoBlock;
-    infoBlock.blockSize = sizeof(InfoBlock) - sizeof(InfoBlock::blockSize) + info.face.length();
+    infoBlock.blockSize = sizeof(InfoBlock) - sizeof(InfoBlock::blockSize) + info.face.length() + 1;
     infoBlock.fontSize = info.size;
     infoBlock.bold = info.bold;
     infoBlock.italic = info.italic;

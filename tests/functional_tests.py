@@ -32,7 +32,7 @@ def check_diff(expected, generated, binary=False):
         raise RuntimeError('generated file not found')
     different = (not filecmp.cmp(expected, generated)) if binary else diff(expected, generated)
     if different:
-        raise RuntimeError('generated data not equal expected')
+        raise RuntimeError('generated data not equal expected for ' + generated)
 
 
 def fontbm(*args):
@@ -66,7 +66,8 @@ def main(argv):
 
     fontbm('--font-file', 'fonts/FreeSans.ttf', '--chars', '32-126',
         '--output', 'generated/test2', '--include-kerning-pairs',
-        '--spacing-vert', '4', '--spacing-horiz', '5')
+        '--spacing-vert', '4', '--spacing-horiz', '5',
+        '--data-format', 'bin')
     check_diff('expected/test2.fnt', 'generated/test2.fnt', True)
 
     fontbm('--font-file', 'fonts/FreeSans.ttf', '--chars', '32-126',
