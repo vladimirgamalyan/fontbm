@@ -52,10 +52,10 @@ std::vector<rbp::RectSize> App::getSrcRects(const Glyphs &glyphs, int additional
     return result;
 }
 
-App::Glyphs App::getGlyphInfo(const SDL2pp::Font& font,
-                    const std::set<uint32_t>& codes,
-                    uint32_t maxTextureSizeX,
-                    uint32_t maxTextureSizeY)
+App::Glyphs App::collectGlyphInfo(const SDL2pp::Font &font,
+                                  const std::set<uint32_t> &codes,
+                                  uint32_t maxTextureSizeX,
+                                  uint32_t maxTextureSizeY)
 {
     int fontAscent = font.GetAscent();
 
@@ -143,7 +143,6 @@ int App::getDigitCount(uint16_t x)
                5))));
 }
 
-
 void App::execute(int argc, char* argv[])
 {
     const Config config = ProgramOptions::parseCommandLine(argc, argv);
@@ -162,7 +161,7 @@ void App::execute(int argc, char* argv[])
     SDL2pp::SDLTTF ttf;
     SDL2pp::Font font(config.fontFile.generic_string(), config.fontSize);
 
-    Glyphs glyphs = getGlyphInfo(font, config.chars, config.textureSize.w, config.textureSize.h);
+    Glyphs glyphs = collectGlyphInfo(font, config.chars, config.textureSize.w, config.textureSize.h);
 
     const uint16_t pageCount = arrangeGlyphs(glyphs, config);
 
@@ -172,15 +171,13 @@ void App::execute(int argc, char* argv[])
 
     std::vector<std::string> pageNames;
 
+    //TODO: should we decrement pageCount before calcualte?
     int pageNameDigits = getDigitCount(pageCount);
 
     for (size_t page = 0; page < pageCount; ++page)
     {
-        //TODO: use real texture size instead max.
         SDL2pp::Surface outputSurface(0, config.textureSize.w, config.textureSize.h, 32,
                                       0x000000FF, 0x0000FF00, 0x00FF0000, 0xFF000000);
-        //std::cout << "outputSurface blend mode " << outputSurface.GetBlendMode() << std::endl;
-        // SDL_BLENDMODE_BLEND = 1 (alpha).
 
         // If the color value contains an alpha component then the destination is simply
         // filled with that alpha information, no blending takes place.
@@ -198,15 +195,12 @@ void App::execute(int argc, char* argv[])
             SDL2pp::Surface glyphSurface = font.RenderGlyph_Blended(kv.first, makeSdlColor(config.color));
 
             int x = glyph.x - glyph.minx;
-            //if (glyph.minx < 0)
-            //  x = glyph.x;
             int y = glyph.y - (fontAscent - glyph.maxy);
             if (!glyph.isEmpty())
             {
                 x += config.padding.left;
                 y += config.padding.up;
                 SDL2pp::Rect dstRect(x, y, glyph.getWidth(), glyph.getHeight());
-                // Blit with alpha blending.
                 glyphSurface.Blit(SDL2pp::NullOpt, outputSurface, dstRect);
             }
         }
@@ -271,6 +265,7 @@ void App::execute(int argc, char* argv[])
 
     if (config.includeKerningPairs)
     {
+        //TODO: test if getKerning(font, ch0, ch1) != getKerning(font, ch1, ch0) (and change logic if so)
         std::set<uint32_t> glyphCodes2(config.chars);
         for (auto& ch0 : config.chars)
         {
