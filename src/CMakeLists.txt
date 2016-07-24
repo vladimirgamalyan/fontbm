@@ -5,7 +5,7 @@ set(SOURCES
 	sdlSavePng/savepng.c
 	tinyxml2/tinyxml2.cpp
     ProgramOptions.cpp
-		App.cpp App.h)
+		App.cpp App.h GlyphInfo.h)
 
 add_executable(fontbm ${SOURCES})
 target_link_libraries(fontbm ${COMMON_LIBRARIES} ${PNG_LIBRARIES} ${FREETYPE_LIBRARIES} ${SDL2PP_LIBRARIES} ${Boost_LIBRARIES})
