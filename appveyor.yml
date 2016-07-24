@@ -8,10 +8,8 @@ platform:
   - Win32
 
 install:
-  # current appveyour workers don't have boost libraries for vs2015, so we have to build them
-  - cd C:\Libraries\boost_1_58_0
-  # boost 1.58 doesn't know about vs2015, so we need a little patch here
-  - ps: (gc C:\Libraries\boost_1_58_0\boost\config\compiler\visualc.hpp).replace('_MSC_FULL_VER > 190022310', '_MSC_FULL_VER > 190023026') | sc C:\Libraries\boost_1_58_0\boost\config\compiler\visualc.hpp
+  - dir C:\Libraries
+  - cd C:\Libraries\boost_1_60_0
   - .\bootstrap
   - .\b2 variant=release --with-system --with-filesystem --with-program_options --with-regex
 
@@ -20,7 +18,6 @@ before_build:
   - appveyor DownloadFile https://github.com/vladimirgamalian/sdl2_msvc_builds/releases/download/SDL2-Binaries/sdl2.zip
   - 7z x sdl2.zip -oC:\Libraries > nul
   # create VS solution
-  - cd C:\projects\fontbm
   - git submodule init && git submodule update
   - cmake -G "Visual Studio 14 2015" -DBOOST_ROOT="C:\Libraries\boost_1_58_0" -DBoost_USE_STATIC_LIBS=ON -DCMAKE_PREFIX_PATH="C:\Libraries"
   - set PATH=C:\Program Files (x86)\MSBuild\14.0\Bin;%PATH%
