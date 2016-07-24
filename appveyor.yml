@@ -8,7 +8,6 @@ platform:
   - Win32
 
 install:
-  - dir C:\Libraries
   - cd C:\Libraries\boost_1_60_0
   - .\bootstrap
   - .\b2 variant=release --with-system --with-filesystem --with-program_options --with-regex
@@ -17,6 +16,8 @@ before_build:
   # download and unzip precompiled SDL2 libraries
   - appveyor DownloadFile https://github.com/vladimirgamalian/sdl2_msvc_builds/releases/download/SDL2-Binaries/sdl2.zip
   - 7z x sdl2.zip -oC:\Libraries > nul
+  - dir C:\Libraries
+  - cd C:\projects\fontbm
   # create VS solution
   - git submodule init && git submodule update
   - cmake -G "Visual Studio 14 2015" -DBOOST_ROOT="C:\Libraries\boost_1_58_0" -DBoost_USE_STATIC_LIBS=ON -DCMAKE_PREFIX_PATH="C:\Libraries"
