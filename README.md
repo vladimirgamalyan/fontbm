@@ -20,11 +20,14 @@ Available options (required in **bold**):
 option  | default | comment
 ------|-----|---------------
 **--font-file** |  | path to ttf file, required
---chars | 32-127 | required characters, for example 32-64,92,120-126
---chars-file | | optional path to UTF-8 text file with additional required characters
+**--output** | | output files name without extension, required
+--font-size | 32 | font size
 --color | 255,255,255 | foreground RGB color, for example: 32,255,255
 --background-color | | background RGB color, for example: 0,0,128, transparent, if not exists
---font-size | 32 | font size
+--chars | 32-127 | required characters, for example 32-64,92,120-126
+--chars-file | | optional path to UTF-8 text file with additional required characters
+--data-format | txt | output data file format, "txt", "xml", "bin" or "json"
+--include-kerning-pairs | | include kerning pairs to output file
 --padding-up | 0 | padding up
 --padding-right | 0 | padding right
 --padding-down | 0 | padding down
@@ -33,9 +36,6 @@ option  | default | comment
 --spacing-horiz | 0 | spacing horizontal
 --texture-width | 256 | texture width
 --texture-height | 256 | texture height
-**--output** | | output files name without extension, required
---data-format | txt | output data file format, "txt", "xml", "bin" or "json"
---include-kerning-pairs | | include kerning pairs to output file
 
 ## Thanks
 
