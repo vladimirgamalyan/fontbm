@@ -9,7 +9,8 @@ struct Config
     enum class DataFormat {
         Xml,
         Text,
-        Bin
+        Bin,
+        Json
     };
 
     struct Color

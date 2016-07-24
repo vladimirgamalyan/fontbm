@@ -332,12 +332,20 @@ int main(int argc, char** argv)
             }
         }
 
-        if (config.dataFormat == Config::DataFormat::Xml)
-            f.writeToXmlFile(dataFilePath.generic_string());
-        if (config.dataFormat == Config::DataFormat::Text)
-            f.writeToTextFile(dataFilePath.generic_string());
-        if (config.dataFormat == Config::DataFormat::Bin)
-            f.writeToBinFile(dataFilePath.generic_string());
+        switch (config.dataFormat) {
+            case Config::DataFormat::Xml:
+                f.writeToXmlFile(dataFilePath.generic_string());
+                break;
+            case Config::DataFormat::Text:
+                f.writeToTextFile(dataFilePath.generic_string());
+                break;
+            case Config::DataFormat::Bin:
+                f.writeToBinFile(dataFilePath.generic_string());
+                break;
+            case Config::DataFormat::Json:
+                f.writeToJsonFile(dataFilePath.generic_string());
+                break;
+        }
 
         return 0;
 

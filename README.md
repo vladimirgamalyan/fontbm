@@ -1,5 +1,6 @@
 # fontbm
 [![Build Status](https://travis-ci.org/vladimirgamalian/fontbm.svg)](https://travis-ci.org/vladimirgamalian/fontbm)
+[![Build status](https://ci.appveyor.com/api/projects/status/boq0olngopfabaac?svg=true)](https://ci.appveyor.com/project/vladimirgamalian/fontbm)
 
 Command line bitmap font generator, compatible with [BMFont](http://www.angelcode.com/products/bmfont/).
 
@@ -8,7 +9,7 @@ Command line bitmap font generator, compatible with [BMFont](http://www.angelcod
 
 ## Usage
 ```
-fontbm --font-file Vera.ttf --output vera --font-size 24
+fontbm --font-file Vera.ttf --output vera
 ```
 will produce vera.fnt and vera.png
 
@@ -33,7 +34,7 @@ option  | default | comment
 --texture-width | 256 | texture width
 --texture-height | 256 | texture height
 **--output** | | output files name without extension, required
---data-format | txt | output data file format, "txt", "xml" or "bin"
+--data-format | txt | output data file format, "txt", "xml", "bin" or "json"
 --include-kerning-pairs | | include kerning pairs to output file
 
 ## Thanks

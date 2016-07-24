@@ -3,6 +3,7 @@
 #include <iostream>
 #include "FontInfo.h"
 #include "tinyxml2/tinyxml2.h"
+#include "json.hpp"
 
 std::string FontInfo::getCharSetName(uint8_t charSet)
 {
@@ -249,8 +250,7 @@ void FontInfo::writeToBinFile(const std::string &fileName) const
 
     std::ofstream f(fileName, std::ios::binary);
 
-#pragma pack(push)
-#pragma pack(1)
+#pragma pack(push, 1)
     struct InfoBlock
     {
         int32_t blockSize;
@@ -393,6 +393,85 @@ void FontInfo::writeToBinFile(const std::string &fileName) const
             f.write((const char*)&kerningPairsBlock, sizeof(kerningPairsBlock));
         }
     }
+}
+
+void FontInfo::writeToJsonFile(const std::string &fileName) const
+{
+    //TODO: test
+
+    nlohmann::json j;
+
+    nlohmann::json infoNodePadding;
+    infoNodePadding["up"] = info.padding.up;
+    infoNodePadding["right"] = info.padding.right;
+    infoNodePadding["down"] = info.padding.down;
+    infoNodePadding["left"] = info.padding.left;
+
+    nlohmann::json infoNodeSpacing;
+    infoNodeSpacing["horizontal"] = info.spacing.horizontal;
+    infoNodeSpacing["vertical"] = info.spacing.vertical;
+
+    nlohmann::json infoNode;
+    infoNode["size"] = info.size;
+    infoNode["smooth"] = info.smooth;
+    infoNode["unicode"] = info.unicode;
+    infoNode["italic"] = info.bold;
+    infoNode["bold"] = info.bold;
+    infoNode["charset"] = info.charset;
+    infoNode["stretchH"] = info.stretchH;
+    infoNode["aa"] = info.aa;
+    infoNode["padding"] = infoNodePadding;
+    infoNode["spacing"] = infoNodeSpacing;
+    infoNode["outline"] = info.outline;
+    infoNode["face"] = info.face;
+
+    nlohmann::json commonNode;
+    commonNode["lineHeight"] = common.lineHeight;
+    commonNode["base"] = common.base;
+    commonNode["scaleW"] = common.scaleW;
+    commonNode["scaleH"] = common.scaleH;
+    commonNode["pages"] = common.pages;
+    commonNode["packed"] = common.packed;
+    commonNode["alphaChnl"] = common.alphaChnl;
+    commonNode["redChnl"] = common.redChnl;
+    commonNode["greenChnl"] = common.greenChnl;
+    commonNode["blueChnl"] = common.blueChnl;
+
+    nlohmann::json charsNode = nlohmann::json::array();
+    for(auto c: chars)
+    {
+        nlohmann::json charNode;
+        charNode["id"] = c.id;
+        charNode["x"] = c.x;
+        charNode["y"] = c.y;
+        charNode["width"] = c.width;
+        charNode["height"] = c.height;
+        charNode["xoffset"] = c.xoffset;
+        charNode["yoffset"] = c.yoffset;
+        charNode["xadvance"] = c.xadvance;
+        charNode["page"] = c.page;
+        charNode["chnl"] = c.chnl;
+        charsNode.push_back(charNode);
+    }
+
+    nlohmann::json kerningsNode = nlohmann::json::array();
+    for(auto k: kernings)
+    {
+        nlohmann::json kerningNode;
+        kerningNode["first"] = k.first;
+        kerningNode["second"] = k.second;
+        kerningNode["amount"] = k.amount;
+        kerningsNode.push_back(kerningNode);
+    }
+
+    j["info"] = infoNode;
+    j["common"] = commonNode;
+    j["pages"] = pages;
+    j["chars"] = charsNode;
+    j["kernings"] = kerningsNode;
+
+    std::ofstream f(fileName);
+    f << j.dump(4);
 }
 
 void FontInfo::testPages() const

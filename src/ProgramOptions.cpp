@@ -74,6 +74,8 @@ Config ProgramOptions::parseCommandLine(int argc, char **argv)
         config.dataFormat = Config::DataFormat::Xml;
     else if (dataFormat == "bin")
         config.dataFormat = Config::DataFormat::Bin;
+    else if (dataFormat == "json")
+        config.dataFormat = Config::DataFormat::Json;
     else
         throw std::runtime_error("invalid data format");
 

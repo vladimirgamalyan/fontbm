@@ -81,6 +81,7 @@ struct FontInfo
     void writeToXmlFile(const std::string &fileName) const;
     void writeToTextFile(const std::string &fileName) const;
     void writeToBinFile(const std::string &fileName) const;
+    void writeToJsonFile(const std::string &fileName) const;
 
 private:
     void testPages() const;
