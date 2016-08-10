@@ -2,9 +2,25 @@ language: cpp
 sudo: required
 dist: trusty
 
-compiler:
-  - gcc
-  - clang
+matrix:
+  include:
+    - compiler: gcc
+      addons:
+        apt:
+          sources:
+            - ubuntu-toolchain-r-test
+          packages:
+            - g++-5
+      env: COMPILER=g++-5
+    - compiler: clang
+      addons:
+        apt:
+          sources:
+            - ubuntu-toolchain-r-test
+            - llvm-toolchain-precise-3.6
+          packages:
+            - clang-3.6
+      env: COMPILER=clang++-3.6
 
 before_install:
   - sudo add-apt-repository --yes ppa:zoogie/sdl2-snapshots
