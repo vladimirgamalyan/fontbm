@@ -8,6 +8,7 @@
 #include <boost/algorithm/string.hpp>
 #include <boost/regex.hpp>
 #include <boost/locale.hpp>
+#include <codecvt>
 #include "HelpException.h"
 
 namespace po = boost::program_options;
@@ -139,15 +140,16 @@ std::set<uint32_t> helpers::getCharsFromFile(const boost::filesystem::path& f)
     if (!fs::is_regular_file(f))
         throw std::runtime_error("chars file not found");
 
-    std::ifstream t(f.generic_string(), std::ifstream::binary);
-    std::string str((std::istreambuf_iterator<char>(t)),
+    std::ifstream fs(f.generic_string(), std::ifstream::binary);
+    std::string str((std::istreambuf_iterator<char>(fs)),
                     std::istreambuf_iterator<char>());
 
-    std::wstring fileContent = boost::locale::conv::utf_to_utf<wchar_t>(str.c_str(), str.c_str() + str.size());
+    std::wstring_convert<std::codecvt_utf8<char32_t>, char32_t> cvt;
+    std::u32string utf32str = cvt.from_bytes(str);
 
     std::set<uint32_t> result;
-    for (wchar_t wc: fileContent)
-        result.insert(static_cast<uint32_t>(wc));
+    for (auto c: utf32str)
+        result.insert(static_cast<uint32_t>(c));
     return result;
 }
 
