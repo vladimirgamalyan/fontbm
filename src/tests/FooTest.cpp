@@ -1,6 +1,5 @@
-#include "testing.h"
-#include <stdexcept>
+#include "catch.hpp"
 
-BEGIN_TEST()
-    EXPECT_EQUAL(2*2, 4);
-END_TEST()
+TEST_CASE( "Foo") {
+    REQUIRE(2 * 2 == 4);
+}
