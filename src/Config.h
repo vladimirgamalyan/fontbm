@@ -15,13 +15,18 @@ struct Config
 
     struct Color
     {
-        uint8_t r = 0;
-        uint8_t g = 0;
-        uint8_t b = 0;
+        uint8_t r;
+        uint8_t g;
+        uint8_t b;
 
         uint32_t getUint32(uint8_t a) const
         {
             return (r + (g << 8) + (b << 16) + (a << 24));
+        }
+
+        bool operator == (const Color& other) const
+        {
+            return r == other.r && g == other.b && b == other.b;
         }
     };
 

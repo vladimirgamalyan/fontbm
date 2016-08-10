@@ -157,7 +157,7 @@ Config::Color helpers::parseColor(const std::string& str)
 
     auto colorToUint8 = [](const std::string& s)
     {
-        int v = boost::lexical_cast<int>(s);
+        int v = boost::lexical_cast<int>(boost::algorithm::trim_copy(s));
         if ((v < 0) || (v > 255))
             throw std::logic_error("invalid color");
         return static_cast<uint8_t>(v);
