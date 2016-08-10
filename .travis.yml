@@ -39,6 +39,8 @@ script:
 
 after_success:
   - ls -l
+  - ls src
+  - ls src/tests
   - cd tests
   - python functional_tests.py ../src/fontbm
 
