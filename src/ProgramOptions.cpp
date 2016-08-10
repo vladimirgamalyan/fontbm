@@ -26,8 +26,8 @@ Config helpers::parseCommandLine(int argc, const char* const argv[])
     desc.add_options()
         ("help", "produce help message" )
         ("font-file,F", po::value<fs::path>(&config.fontFile)->required(), "path to ttf file, required")
-        ("chars", po::value<std::string>(&chars)->default_value("32-127"), "required characters, for example: 32-64,92,120-126\ndefault value is 32-127")
-        ("chars-file", po::value<fs::path>(&charsFile), "optional path to UTF-8 text file with additional required characters")
+        ("chars", po::value<std::string>(&chars), "required characters, for example: 32-64,92,120-126\ndefault value is 32-127 if chars-file not defined")
+        ("chars-file", po::value<fs::path>(&charsFile), "optional path to UTF-8 text file with required characters (will be combined with chars)")
         ("color", po::value<std::string>(&color)->default_value("255,255,255"), "foreground RGB color, for example: 32,255,255, default value is 255,255,255")
         ("background-color", po::value<std::string>(&backgroundColor), "background color RGB color, for example: 0,0,128, transparent, if not exists")
         ("font-size,S", po::value<uint16_t>(&config.fontSize)->default_value(32), "font size, default value is 32")
@@ -54,6 +54,8 @@ Config helpers::parseCommandLine(int argc, const char* const argv[])
 
     po::notify(vm);
 
+    if (chars.empty() && charsFile.empty())
+        chars = "32-127";
     config.chars = parseCharsString(chars);
     if (!charsFile.empty())
     {
@@ -90,6 +92,9 @@ std::set<uint32_t> helpers::parseCharsString(std::string str)
 {
     // remove whitespace characters
     str.erase(std::remove_if(str.begin(), str.end(), std::bind( std::isspace<char>, std::placeholders::_1, std::locale::classic() )), str.end());
+
+    if (str.empty())
+        return std::set<uint32_t>();
 
     const boost::regex e("^\\d{1,5}(-\\d{1,5})?(,\\d{1,5}(-\\d{1,5})?)*$");
     if (!boost::regex_match(str, e))
