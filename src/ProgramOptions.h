@@ -4,9 +4,9 @@
 class ProgramOptions
 {
 public:
-    static Config parseCommandLine(int argc, char** argv);
+    Config parseCommandLine(int argc, const char* const argv[]);
 private:
-    static std::set<uint32_t> parseCharsString(std::string str);
-    static std::set<uint32_t> getCharsFromFile(const boost::filesystem::path& f);
-    static Config::Color parseColor(const std::string& str);
+    std::set<uint32_t> parseCharsString(std::string str) const;
+    std::set<uint32_t> getCharsFromFile(const boost::filesystem::path& f) const;
+    Config::Color parseColor(const std::string& str) const;
 };

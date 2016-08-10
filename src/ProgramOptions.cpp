@@ -12,7 +12,7 @@
 namespace po = boost::program_options;
 namespace fs = boost::filesystem;
 
-Config ProgramOptions::parseCommandLine(int argc, char **argv)
+Config ProgramOptions::parseCommandLine(int argc, const char* const argv[])
 {
     Config config;
 
@@ -86,7 +86,7 @@ Config ProgramOptions::parseCommandLine(int argc, char **argv)
     return config;
 }
 
-std::set<uint32_t> ProgramOptions::parseCharsString(std::string str)
+std::set<uint32_t> ProgramOptions::parseCharsString(std::string str) const
 {
     // remove whitespace characters
     str.erase(std::remove_if(str.begin(), str.end(), std::bind( std::isspace<char>, std::placeholders::_1, std::locale::classic() )), str.end());
@@ -98,7 +98,7 @@ std::set<uint32_t> ProgramOptions::parseCharsString(std::string str)
     std::vector<std::string> ranges;
     boost::split(ranges, str, boost::is_any_of(","));
 
-    std::vector<std::pair<uint32_t , uint32_t>> charList;
+    std::vector<std::pair<uint32_t, uint32_t>> charList;
     for (auto range: ranges)
     {
         std::vector<std::string> minMaxStr;
@@ -129,7 +129,7 @@ std::set<uint32_t> ProgramOptions::parseCharsString(std::string str)
     return result;
 }
 
-std::set<uint32_t> ProgramOptions::getCharsFromFile(const boost::filesystem::path& f)
+std::set<uint32_t> ProgramOptions::getCharsFromFile(const boost::filesystem::path& f) const
 {
     if (!fs::is_regular_file(f))
         throw std::runtime_error("chars file not found");
@@ -142,11 +142,11 @@ std::set<uint32_t> ProgramOptions::getCharsFromFile(const boost::filesystem::pat
 
     std::set<uint32_t> result;
     for (wchar_t wc: fileContent)
-        result.insert(wc);
+        result.insert(static_cast<uint32_t>(wc));
     return result;
 }
 
-Config::Color ProgramOptions::parseColor(const std::string& str)
+Config::Color ProgramOptions::parseColor(const std::string& str) const
 {
     const boost::regex e("^\\s*\\d{1,3}\\s*,\\s*\\d{1,3}\\s*,\\s*\\d{1,3}\\s*$");
     if (!boost::regex_match(str, e))
