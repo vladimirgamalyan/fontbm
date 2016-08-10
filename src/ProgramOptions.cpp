@@ -8,6 +8,7 @@
 #include <boost/algorithm/string.hpp>
 #include <boost/regex.hpp>
 #include <boost/locale.hpp>
+#include "HelpException.h"
 
 namespace po = boost::program_options;
 namespace fs = boost::filesystem;
@@ -15,7 +16,6 @@ namespace fs = boost::filesystem;
 Config helpers::parseCommandLine(int argc, const char* const argv[])
 {
     Config config;
-
     std::string chars;
     fs::path charsFile;
     std::string color;
@@ -49,7 +49,7 @@ Config helpers::parseCommandLine(int argc, const char* const argv[])
     if (vm.count("help"))
     {
         std::cout << desc << std::endl;
-        throw std::exception();
+        throw HelpException();
     }
 
     po::notify(vm);

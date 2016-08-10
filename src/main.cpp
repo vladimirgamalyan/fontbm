@@ -1,6 +1,7 @@
 #include <iostream>
 #include <memory>
 #include "App.h"
+#include "HelpException.h"
 
 int main(int argc, char* argv[])
 {
@@ -8,6 +9,10 @@ int main(int argc, char* argv[])
     {
         std::unique_ptr<App> app(new App);
         app->execute(argc, argv);
+    }
+    catch (HelpException)
+    {
+        return EXIT_SUCCESS;
     }
     catch (std::exception& e)
     {
