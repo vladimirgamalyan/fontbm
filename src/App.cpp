@@ -145,8 +145,7 @@ int App::getDigitCount(uint16_t x)
 
 void App::execute(int argc, char* argv[])
 {
-    ProgramOptions po;
-    const Config config = po.parseCommandLine(argc, argv);
+    const Config config = helpers::parseCommandLine(argc, const_cast<const char**>(argv));
 
     const boost::filesystem::path dataFilePath = boost::filesystem::absolute(boost::filesystem::path(config.output + ".fnt"));
     const boost::filesystem::path outputDirPath = dataFilePath.parent_path();

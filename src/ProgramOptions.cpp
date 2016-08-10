@@ -12,7 +12,7 @@
 namespace po = boost::program_options;
 namespace fs = boost::filesystem;
 
-Config ProgramOptions::parseCommandLine(int argc, const char* const argv[])
+Config helpers::parseCommandLine(int argc, const char* const argv[])
 {
     Config config;
 
@@ -86,7 +86,7 @@ Config ProgramOptions::parseCommandLine(int argc, const char* const argv[])
     return config;
 }
 
-std::set<uint32_t> ProgramOptions::parseCharsString(std::string str) const
+std::set<uint32_t> helpers::parseCharsString(std::string str)
 {
     // remove whitespace characters
     str.erase(std::remove_if(str.begin(), str.end(), std::bind( std::isspace<char>, std::placeholders::_1, std::locale::classic() )), str.end());
@@ -129,7 +129,7 @@ std::set<uint32_t> ProgramOptions::parseCharsString(std::string str) const
     return result;
 }
 
-std::set<uint32_t> ProgramOptions::getCharsFromFile(const boost::filesystem::path& f) const
+std::set<uint32_t> helpers::getCharsFromFile(const boost::filesystem::path& f)
 {
     if (!fs::is_regular_file(f))
         throw std::runtime_error("chars file not found");
@@ -146,7 +146,7 @@ std::set<uint32_t> ProgramOptions::getCharsFromFile(const boost::filesystem::pat
     return result;
 }
 
-Config::Color ProgramOptions::parseColor(const std::string& str) const
+Config::Color helpers::parseColor(const std::string& str)
 {
     const boost::regex e("^\\s*\\d{1,3}\\s*,\\s*\\d{1,3}\\s*,\\s*\\d{1,3}\\s*$");
     if (!boost::regex_match(str, e))
