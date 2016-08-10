@@ -1,4 +1,4 @@
-info face="FreeSans" size=32 bold=0 italic=0 charset="" unicode=1 stretchH=0 smooth=0 aa=1 padding=8,7,6,5 spacing=0,0 outline=0
+ginfo face="FreeSans" size=32 bold=0 italic=0 charset="" unicode=1 stretchH=0 smooth=0 aa=1 padding=8,7,6,5 spacing=0,0 outline=0
 common lineHeight=45 base=32 scaleW=256 scaleH=256 pages=2 packed=0 alphaChnl=0 redChnl=0 greenChnl=0 blueChnl=0
 page id=0 file="test0_0.png"
 page id=1 file="test0_1.png"
