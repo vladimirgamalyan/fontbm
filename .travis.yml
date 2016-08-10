@@ -12,15 +12,15 @@ matrix:
             - ubuntu-toolchain-r-test
           packages:
             - g++-5
-    - env: CLANG_VERSION=3.6
+    - env: CLANG_VERSION=3.8
       os: linux
       addons:
         apt:
           sources:
             - ubuntu-toolchain-r-test
-            - llvm-toolchain-precise-3.6
+            - llvm-toolchain-precise-3.8
           packages:
-            - clang-3.6
+            - clang-3.8
 
 before_install:
   - sudo add-apt-repository --yes ppa:zoogie/sdl2-snapshots
