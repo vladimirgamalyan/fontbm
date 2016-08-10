@@ -38,6 +38,7 @@ script:
   - make
 
 after_success:
+  - ls -l
   - cd tests
   - python functional_tests.py ../src/fontbm
 
