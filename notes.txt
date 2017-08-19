@@ -1,0 +1,4 @@
+https://www.freetype.org/freetype2/docs/documentation.html
+
+http://jcatki.no-ip.org:8080/SDL_ttf/SDL_ttf_frame.html
+
