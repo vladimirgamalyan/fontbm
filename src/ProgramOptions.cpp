@@ -6,9 +6,9 @@
 #include <boost/program_options.hpp>
 #include <boost/lexical_cast.hpp>
 #include <boost/algorithm/string.hpp>
-#include <boost/regex.hpp>
 #include <boost/locale.hpp>
 #include <codecvt>
+#include <regex>
 #include "HelpException.h"
 
 namespace po = boost::program_options;
@@ -97,8 +97,8 @@ std::set<uint32_t> helpers::parseCharsString(std::string str)
     if (str.empty())
         return std::set<uint32_t>();
 
-    const boost::regex e("^\\d{1,5}(-\\d{1,5})?(,\\d{1,5}(-\\d{1,5})?)*$");
-    if (!boost::regex_match(str, e))
+    const std::regex re("^\\d{1,5}(-\\d{1,5})?(,\\d{1,5}(-\\d{1,5})?)*$");
+    if (!std::regex_match(str, re))
         throw std::logic_error("invalid chars value");
 
     std::vector<std::string> ranges;
@@ -155,8 +155,8 @@ std::set<uint32_t> helpers::getCharsFromFile(const boost::filesystem::path& f)
 
 Config::Color helpers::parseColor(const std::string& str)
 {
-    const boost::regex e("^\\s*\\d{1,3}\\s*,\\s*\\d{1,3}\\s*,\\s*\\d{1,3}\\s*$");
-    if (!boost::regex_match(str, e))
+    const std::regex e("^\\s*\\d{1,3}\\s*,\\s*\\d{1,3}\\s*,\\s*\\d{1,3}\\s*$");
+    if (!std::regex_match(str, e))
         throw std::logic_error("invalid color");
 
     std::vector<std::string> rgbStr;

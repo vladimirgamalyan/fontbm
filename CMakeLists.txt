@@ -2,7 +2,7 @@ cmake_minimum_required(VERSION 2.8)
 project(fontbm)
 
 # boost
-find_package(Boost 1.54.0 REQUIRED COMPONENTS system filesystem program_options regex)
+find_package(Boost 1.54.0 REQUIRED COMPONENTS system filesystem program_options)
 include_directories(${Boost_INCLUDE_DIR})
 
 # libpng
