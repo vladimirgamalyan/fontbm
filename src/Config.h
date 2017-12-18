@@ -1,8 +1,8 @@
 #pragma once
 
 #include <set>
-#include <boost/filesystem.hpp>
-#include <boost/optional.hpp>
+#include <cstdint>
+#include <string>
 
 struct Config
 {
@@ -50,10 +50,11 @@ struct Config
         int hor;
     };
 
-    boost::filesystem::path fontFile;
+    std::string fontFile;
     std::set<uint32_t> chars;
     Color color;
-    boost::optional<Color> backgroundColor;
+    Color backgroundColor;
+    bool backgroundTransparent;
     uint16_t fontSize;
     Padding padding;
     Spacing spacing;
