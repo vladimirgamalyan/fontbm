@@ -1,7 +1,7 @@
 #pragma once
 
 #include <set>
-#include <boost/optional.hpp>
+#include <optional>
 
 struct Config
 {
@@ -52,7 +52,7 @@ struct Config
     std::string fontFile;
     std::set<uint32_t> chars;
     Color color;
-    boost::optional<Color> backgroundColor;
+    std::optional<Color> backgroundColor;
     uint16_t fontSize;
     Padding padding;
     Spacing spacing;

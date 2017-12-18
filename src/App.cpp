@@ -7,7 +7,6 @@
 #include <limits>
 #include <algorithm>
 #include <iomanip>
-#include <boost/program_options.hpp>
 #include "sdlSavePng/savepng.h"
 #include "FontInfo.h"
 

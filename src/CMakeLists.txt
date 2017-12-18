@@ -9,7 +9,10 @@ set(SOURCES
         App.h
         GlyphInfo.h
         cxxopts.hpp
-        HelpException.h)
+        Config.h
+        json.hpp
+        HelpException.h
+        splitStrByDelim.h)
 
 add_executable(fontbm ${SOURCES})
-target_link_libraries(fontbm ${COMMON_LIBRARIES} ${PNG_LIBRARIES} ${FREETYPE_LIBRARIES} ${SDL2PP_LIBRARIES} ${Boost_LIBRARIES})
+target_link_libraries(fontbm ${COMMON_LIBRARIES} ${PNG_LIBRARIES} ${FREETYPE_LIBRARIES} ${SDL2PP_LIBRARIES})

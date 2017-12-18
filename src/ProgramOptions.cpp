@@ -1,12 +1,13 @@
 #include "ProgramOptions.h"
 #include <iostream>
 #include <fstream>
-#include <boost/algorithm/string.hpp>
 #include <stdexcept>
 #include <codecvt>
+#include <functional>
 #include <regex>
 #include "HelpException.h"
 #include "cxxopts.hpp"
+#include "splitStrByDelim.h"
 
 Config helpers::parseCommandLine(int argc, char* argv[])
 {
@@ -17,6 +18,7 @@ Config helpers::parseCommandLine(int argc, char* argv[])
         std::string charsFile;
         std::string color;
         std::string backgroundColor;
+        const std::string backgroundColorOptionName = "background-color";
         std::string dataFormat;
 
         cxxopts::Options options("fontbm", "Command line bitmap font generator, compatible with bmfont");
@@ -26,7 +28,7 @@ Config helpers::parseCommandLine(int argc, char* argv[])
                 ("chars", "required characters, for example: 32-64,92,120-126\ndefault value is 32-127 if chars-file not defined", cxxopts::value<std::string>(chars))
                 ("chars-file", "optional path to UTF-8 text file with required characters (will be combined with chars)", cxxopts::value<std::string>(charsFile))
                 ("color", "foreground RGB color, for example: 32,255,255, default value is 255,255,255", cxxopts::value<std::string>(color)->default_value("255,255,255"))
-                ("background-color", "background color RGB color, for example: 0,0,128, transparent by default", cxxopts::value<std::string>(backgroundColor))
+                (backgroundColorOptionName, "background color RGB color, for example: 0,0,128, transparent by default", cxxopts::value<std::string>(backgroundColor))
                 ("font-size", "font size, default value is 32", cxxopts::value<uint16_t>(config.fontSize)->default_value("32"))
                 ("padding-up", "padding up, default valie is 0", cxxopts::value<int>(config.padding.up)->default_value("0"))
                 ("padding-right", "padding right, default valie is 0", cxxopts::value<int>(config.padding.right)->default_value("0"))
@@ -64,10 +66,10 @@ Config helpers::parseCommandLine(int argc, char* argv[])
         }
 
         config.color = parseColor(color);
-        if (backgroundColor.empty())
-            config.backgroundColor = boost::none;
-        else
+        if (result.count(backgroundColorOptionName))
             config.backgroundColor = parseColor(backgroundColor);
+        else
+            config.backgroundColor = std::nullopt;
 
         std::transform(dataFormat.begin(), dataFormat.end(), dataFormat.begin(), ::tolower);
 
@@ -104,14 +106,12 @@ std::set<uint32_t> helpers::parseCharsString(std::string str)
     if (!std::regex_match(str, re))
         throw std::logic_error("invalid chars value");
 
-    std::vector<std::string> ranges;
-    boost::split(ranges, str, boost::is_any_of(","));
+    std::vector<std::string> ranges = splitStrByDelim(str, ',');
 
     std::vector<std::pair<uint32_t, uint32_t>> charList;
     for (auto range: ranges)
     {
-        std::vector<std::string> minMaxStr;
-        boost::split(minMaxStr, range, boost::is_any_of("-"));
+        std::vector<std::string> minMaxStr = splitStrByDelim(range, '-');
         if (minMaxStr.size() == 1)
             minMaxStr.push_back(minMaxStr[0]);
 
@@ -162,8 +162,7 @@ Config::Color helpers::parseColor(const std::string& str)
     if (!std::regex_match(str, e))
         throw std::logic_error("invalid color");
 
-    std::vector<std::string> rgbStr;
-    boost::split(rgbStr, str, boost::is_any_of(","));
+    std::vector<std::string> rgbStr = splitStrByDelim(str, ',');
 
     auto colorToUint8 = [](const std::string& s)
     {
