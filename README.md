@@ -52,3 +52,4 @@ The project also bundles third party software under its own licenses:
 * [RectangleBinPack](https://github.com/juj/RectangleBinPack) - Public Domain
 * [SDL_SavePNG](https://github.com/driedfruit/SDL_SavePNG) - zlib/libpng license
 * [www.libpng.org](http://www.libpng.org/) - [libpng license](http://www.libpng.org/pub/png/src/libpng-LICENSE.txt)
+* [jarro2783/cxxopts](https://github.com/jarro2783/cxxopts) - [MIT](https://github.com/jarro2783/cxxopts/blob/master/LICENSE)
