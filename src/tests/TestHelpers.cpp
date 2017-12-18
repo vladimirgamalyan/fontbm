@@ -2,6 +2,7 @@
 #include "../Config.h"
 #include "../ProgramOptions.h"
 #include "../splitStrByDelim.h"
+#include "../extractFileName.h"
 #include <iostream>
 #include <string>
 #include <vector>
@@ -46,6 +47,18 @@ TEST_CASE( "parseCmdLine")
         Args args({"--font-file", "vera.ttf"});
         REQUIRE_THROWS_AS(helpers::parseCommandLine(args.argc(), args.argv()), std::runtime_error);
     }
+}
+
+TEST_CASE("extractFileName")
+{
+    REQUIRE(extractFileName("foo/bar.zip") == "bar.zip");
+    REQUIRE(extractFileName("foo/bar") == "bar");
+    REQUIRE(extractFileName("foo\\bar") == "bar");
+    REQUIRE(extractFileName("bar") == "bar");
+    REQUIRE(extractFileName("c://foo/bar.gz") == "bar.gz");
+    REQUIRE(extractFileName("c://foo/baz\\bar.gz") == "bar.gz");
+    REQUIRE(extractFileName("foo\\\\//bar") == "bar");
+    REQUIRE(extractFileName("../bar") == "bar");
 }
 
 TEST_CASE("splitStrByDelim")

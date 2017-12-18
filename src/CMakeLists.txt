@@ -12,7 +12,11 @@ set(SOURCES
         Config.h
         json.hpp
         HelpException.h
-        splitStrByDelim.h)
+        splitStrByDelim.h
+		freeType/FtLibrary.h
+		freeType/FtFace.h
+		freeType/FtException.h
+		freeType/FtInclude.h extractFileName.h)
 
 add_executable(fontbm ${SOURCES})
 target_link_libraries(fontbm ${COMMON_LIBRARIES} ${PNG_LIBRARIES} ${FREETYPE_LIBRARIES} ${SDL2PP_LIBRARIES})

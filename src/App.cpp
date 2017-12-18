@@ -9,6 +9,7 @@
 #include <iomanip>
 #include "sdlSavePng/savepng.h"
 #include "FontInfo.h"
+#include "extractFileName.h"
 
 int App::getKerning(const SDL2pp::Font& font, uint32_t char0, uint32_t char1)
 {
@@ -158,7 +159,7 @@ void App::execute(int argc, char* argv[])
 
     std::vector<std::string> pageNames;
 
-    //TODO: should we decrement pageCount before calcualte?
+    //TODO: should we decrement pageCount before calculate?
     int pageNameDigits = getDigitCount(pageCount);
 
     for (size_t page = 0; page < pageCount; ++page)
@@ -196,7 +197,8 @@ void App::execute(int argc, char* argv[])
         std::stringstream ss;
         ss << config.output << "_" << std::setfill ('0') << std::setw(pageNameDigits) << page << ".png";
         std::string pageName = ss.str();
-        pageNames.push_back(pageName);
+
+        pageNames.push_back(extractFileName(pageName));
 
         if (!config.backgroundTransparent)
             outputSurface = outputSurface.Convert(SDL_PIXELFORMAT_RGB24);

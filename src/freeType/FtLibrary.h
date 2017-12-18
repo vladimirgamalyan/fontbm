@@ -19,7 +19,7 @@ public:
         FT_Done_FreeType(library);
     }
 
-    FT_Library library;
+    FT_Library library = nullptr;
 };
 
 }
