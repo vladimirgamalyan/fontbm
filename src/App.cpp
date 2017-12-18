@@ -144,7 +144,7 @@ int App::getDigitCount(uint16_t x)
 
 void App::execute(int argc, char* argv[])
 {
-    const Config config = helpers::parseCommandLine(argc, const_cast<const char**>(argv));
+    const Config config = helpers::parseCommandLine(argc, argv);
 
     SDL2pp::SDLTTF ttf;
     SDL2pp::Font font(config.fontFile, config.fontSize);

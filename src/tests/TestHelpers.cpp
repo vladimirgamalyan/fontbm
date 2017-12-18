@@ -1,6 +1,49 @@
 #include "catch.hpp"
 #include "../Config.h"
 #include "../ProgramOptions.h"
+#include <iostream>
+
+class Args
+{
+public:
+    explicit Args(const std::vector<std::string>& args) : arg0("foo"), arguments(args)
+    {
+        pointers.push_back(arg0.data());
+        for (auto& s : arguments)
+            pointers.push_back(s.data());
+    }
+    int argc() const
+    {
+        return static_cast<int>(pointers.size());
+    }
+    char** argv()
+    {
+        return &pointers[0];
+    }
+
+private:
+    std::string arg0;
+    std::vector<std::string> arguments;
+    std::vector<char*> pointers;
+};
+
+
+TEST_CASE( "parseCmdLine")
+{
+    {
+        Args args({"--font-file", "vera.ttf", "--output", "vera"});
+        Config config = helpers::parseCommandLine(args.argc(), args.argv());
+        REQUIRE(config.fontFile == "vera.ttf");
+        REQUIRE(config.output == "vera");
+        REQUIRE(config.textureSize.w == 256);
+        REQUIRE(config.textureSize.h == 256);
+    }
+
+    {
+        Args args({"--font-file", "vera.ttf"});
+        REQUIRE_THROWS_AS(helpers::parseCommandLine(args.argc(), args.argv()), std::runtime_error);
+    }
+}
 
 TEST_CASE( "parseColor")
 {
