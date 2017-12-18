@@ -168,10 +168,11 @@ void App::execute(int argc, char* argv[])
 
         // If the color value contains an alpha component then the destination is simply
         // filled with that alpha information, no blending takes place.
-        if (config.backgroundColor)
-            outputSurface.FillRect(SDL2pp::NullOpt, config.backgroundColor->getUint32(255));
-        else
+        if (config.backgroundTransparent)
             outputSurface.FillRect(SDL2pp::NullOpt, config.color.getUint32(0));
+        else
+            outputSurface.FillRect(SDL2pp::NullOpt, config.backgroundColor.getUint32(255));
+
 
         for (auto kv: glyphs)
         {
@@ -197,7 +198,7 @@ void App::execute(int argc, char* argv[])
         std::string pageName = ss.str();
         pageNames.push_back(pageName);
 
-        if (config.backgroundColor)
+        if (!config.backgroundTransparent)
             outputSurface = outputSurface.Convert(SDL_PIXELFORMAT_RGB24);
 
         SDL_SavePNG(outputSurface.Get(), pageName.c_str());

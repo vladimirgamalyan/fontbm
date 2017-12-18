@@ -1,7 +1,8 @@
 #pragma once
 
 #include <set>
-#include <optional>
+#include <cstdint>
+#include <string>
 
 struct Config
 {
@@ -52,7 +53,8 @@ struct Config
     std::string fontFile;
     std::set<uint32_t> chars;
     Color color;
-    std::optional<Color> backgroundColor;
+    Color backgroundColor;
+    bool backgroundTransparent;
     uint16_t fontSize;
     Padding padding;
     Spacing spacing;

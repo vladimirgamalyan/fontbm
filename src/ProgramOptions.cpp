@@ -55,7 +55,6 @@ Config helpers::parseCommandLine(int argc, char* argv[])
         if (!result.count("output"))
             throw std::runtime_error("--output options required");
 
-
         if (chars.empty() && charsFile.empty())
             chars = "32-127";
         config.chars = parseCharsString(chars);
@@ -66,10 +65,9 @@ Config helpers::parseCommandLine(int argc, char* argv[])
         }
 
         config.color = parseColor(color);
-        if (result.count(backgroundColorOptionName))
+        config.backgroundTransparent = (result.count(backgroundColorOptionName) == 0);
+        if (!config.backgroundTransparent)
             config.backgroundColor = parseColor(backgroundColor);
-        else
-            config.backgroundColor = std::nullopt;
 
         std::transform(dataFormat.begin(), dataFormat.end(), dataFormat.begin(), ::tolower);
 

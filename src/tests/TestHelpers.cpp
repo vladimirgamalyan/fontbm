@@ -3,15 +3,17 @@
 #include "../ProgramOptions.h"
 #include "../splitStrByDelim.h"
 #include <iostream>
+#include <string>
+#include <vector>
 
 class Args
 {
 public:
     explicit Args(const std::vector<std::string>& args) : arg0("foo"), arguments(args)
     {
-        pointers.push_back(arg0.data());
+        pointers.push_back(const_cast<char*>(arg0.data()));
         for (auto& s : arguments)
-            pointers.push_back(s.data());
+            pointers.push_back(const_cast<char*>(s.data()));
     }
     int argc() const
     {

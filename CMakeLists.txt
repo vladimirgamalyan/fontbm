@@ -33,7 +33,7 @@ endif(MINGW)
 
 # GCC/clang flags
 if(NOT MSVC)
-    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++17 -Wall -Wextra -pedantic")
+    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++11 -Wall -Wextra -pedantic")
 endif(NOT MSVC)
 
 # disable some GCC warnings
