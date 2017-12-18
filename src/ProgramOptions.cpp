@@ -2,7 +2,6 @@
 #include <iostream>
 #include <fstream>
 #include <stdexcept>
-#include <boost/filesystem.hpp>
 #include <boost/program_options.hpp>
 #include <boost/lexical_cast.hpp>
 #include <boost/algorithm/string.hpp>
@@ -12,13 +11,12 @@
 #include "HelpException.h"
 
 namespace po = boost::program_options;
-namespace fs = boost::filesystem;
 
 Config helpers::parseCommandLine(int argc, const char* const argv[])
 {
     Config config;
     std::string chars;
-    fs::path charsFile;
+    std::string charsFile;
     std::string color;
     std::string backgroundColor;
     std::string dataFormat;
@@ -26,9 +24,9 @@ Config helpers::parseCommandLine(int argc, const char* const argv[])
     boost::program_options::options_description desc("Allowed options");
     desc.add_options()
         ("help", "produce help message" )
-        ("font-file,F", po::value<fs::path>(&config.fontFile)->required(), "path to ttf file, required")
+        ("font-file,F", po::value<std::string>(&config.fontFile)->required(), "path to ttf file, required")
         ("chars", po::value<std::string>(&chars), "required characters, for example: 32-64,92,120-126\ndefault value is 32-127 if chars-file not defined")
-        ("chars-file", po::value<fs::path>(&charsFile), "optional path to UTF-8 text file with required characters (will be combined with chars)")
+        ("chars-file", po::value<std::string>(&charsFile), "optional path to UTF-8 text file with required characters (will be combined with chars)")
         ("color", po::value<std::string>(&color)->default_value("255,255,255"), "foreground RGB color, for example: 32,255,255, default value is 255,255,255")
         ("background-color", po::value<std::string>(&backgroundColor), "background color RGB color, for example: 0,0,128, transparent, if not exists")
         ("font-size,S", po::value<uint16_t>(&config.fontSize)->default_value(32), "font size, default value is 32")
@@ -135,12 +133,11 @@ std::set<uint32_t> helpers::parseCharsString(std::string str)
     return result;
 }
 
-std::set<uint32_t> helpers::getCharsFromFile(const boost::filesystem::path& f)
+std::set<uint32_t> helpers::getCharsFromFile(const std::string& f)
 {
-    if (!fs::is_regular_file(f))
-        throw std::runtime_error("chars file not found");
-
-    std::ifstream fs(f.generic_string(), std::ifstream::binary);
+    std::ifstream fs(f, std::ifstream::binary);
+    if (!fs)
+        throw std::runtime_error("can`t open characters file");
     std::string str((std::istreambuf_iterator<char>(fs)),
                     std::istreambuf_iterator<char>());
 

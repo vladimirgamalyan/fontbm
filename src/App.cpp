@@ -1,6 +1,5 @@
 #include "App.h"
 #include "ProgramOptions.h"
-#include <boost/filesystem.hpp>
 #include <SDL2/SDL.h>
 #include <string>
 #include <fstream>
@@ -147,19 +146,8 @@ void App::execute(int argc, char* argv[])
 {
     const Config config = helpers::parseCommandLine(argc, const_cast<const char**>(argv));
 
-    const boost::filesystem::path dataFilePath = boost::filesystem::absolute(boost::filesystem::path(config.output + ".fnt"));
-    const boost::filesystem::path outputDirPath = dataFilePath.parent_path();
-    const std::string outputName = dataFilePath.stem().string();
-
-    //TODO: create directory only if there is no problem (exceptions), good place is right before write outputs.
-
-    boost::filesystem::create_directory(outputDirPath);
-
-    if (!boost::filesystem::is_regular_file(config.fontFile))
-        throw std::runtime_error("font file not found");
-
     SDL2pp::SDLTTF ttf;
-    SDL2pp::Font font(config.fontFile.generic_string(), config.fontSize);
+    SDL2pp::Font font(config.fontFile, config.fontSize);
 
     Glyphs glyphs = collectGlyphInfo(font, config.chars, config.textureSize.w, config.textureSize.h);
 
@@ -206,15 +194,14 @@ void App::execute(int argc, char* argv[])
         }
 
         std::stringstream ss;
-        ss << outputName << "_" << std::setfill ('0') << std::setw(pageNameDigits) << page << ".png";
+        ss << config.output << "_" << std::setfill ('0') << std::setw(pageNameDigits) << page << ".png";
         std::string pageName = ss.str();
         pageNames.push_back(pageName);
 
         if (config.backgroundColor)
             outputSurface = outputSurface.Convert(SDL_PIXELFORMAT_RGB24);
 
-        boost::filesystem::path texturePath = outputDirPath / boost::filesystem::path(pageName);
-        SDL_SavePNG(outputSurface.Get(), texturePath.generic_string().c_str());
+        SDL_SavePNG(outputSurface.Get(), pageName.c_str());
     }
 
     /////////////////////////////////////////////////////////////
@@ -285,18 +272,19 @@ void App::execute(int argc, char* argv[])
         }
     }
 
+    const std::string dataFileName = config.output + ".fnt";
     switch (config.dataFormat) {
         case Config::DataFormat::Xml:
-            f.writeToXmlFile(dataFilePath.generic_string());
+            f.writeToXmlFile(dataFileName);
             break;
         case Config::DataFormat::Text:
-            f.writeToTextFile(dataFilePath.generic_string());
+            f.writeToTextFile(dataFileName);
             break;
         case Config::DataFormat::Bin:
-            f.writeToBinFile(dataFilePath.generic_string());
+            f.writeToBinFile(dataFileName);
             break;
         case Config::DataFormat::Json:
-            f.writeToJsonFile(dataFilePath.generic_string());
+            f.writeToJsonFile(dataFileName);
             break;
     }
 }

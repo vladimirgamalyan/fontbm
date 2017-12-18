@@ -1,7 +1,6 @@
 #pragma once
 
 #include <set>
-#include <boost/filesystem.hpp>
 #include <boost/optional.hpp>
 
 struct Config
@@ -50,7 +49,7 @@ struct Config
         int hor;
     };
 
-    boost::filesystem::path fontFile;
+    std::string fontFile;
     std::set<uint32_t> chars;
     Color color;
     boost::optional<Color> backgroundColor;
