@@ -5,13 +5,6 @@ project(fontbm)
 find_package(Freetype REQUIRED)
 include_directories(${FREETYPE_INCLUDE_DIRS})
 
-# additional libraries for windows platform (winmm.lib and sdl2main.lib)
-if(WIN32)
-    find_library(SDL2MAIN_LIBRARY NAMES SDL2main)
-    set(SDL2PP_LIBRARIES ${SDL2MAIN_LIBRARY} ${SDL2PP_LIBRARIES})
-    set(COMMON_LIBRARIES winmm.lib ${COMMON_LIBRARIES})
-endif(WIN32)
-
 # additional libraries for mingw32 (mingw32.lib)
 if(MINGW)
     set(MINGW32_LIBRARY mingw32 CACHE STRING "mwindows for MinGW")
@@ -25,7 +18,7 @@ endif(NOT MSVC)
 
 # disable some GCC warnings
 if(CMAKE_COMPILER_IS_GNUCC)
-    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wno-deprecated -Wno-unused-local-typedefs")
+    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wno-deprecated -Wno-unused-local-typedefs -Wno-implicit-fallthrough")
 endif(CMAKE_COMPILER_IS_GNUCC)
 
 add_subdirectory(src)
