@@ -23,10 +23,8 @@ matrix:
 #            - clang-3.9
 
 before_install:
-  - sudo add-apt-repository --yes ppa:zoogie/sdl2-snapshots
   - sudo apt-get update -qq
-  - sudo apt-get install -qq libsdl2-dev libsdl2-image-dev libsdl2-ttf-dev
-  - sudo apt-get install -qq libboost-system-dev libboost-filesystem-dev libboost-program-options-dev libboost-regex-dev
+  - sudo apt-get install -qq libfreetype6-dev
   - if [ -n "$GCC_VERSION" ]; then export CXX="g++-${GCC_VERSION}" CC="gcc-${GCC_VERSION}"; fi
   - if [ -n "$CLANG_VERSION" ]; then export CXX="clang++-${CLANG_VERSION}" CC="clang-${CLANG_VERSION}"; fi  
   - which $CXX
