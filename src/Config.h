@@ -61,5 +61,5 @@ struct Config
     Size textureSize;
     std::string output;
     DataFormat dataFormat;
-    bool includeKerningPairs;
+    bool includeKerningPairs = false;
 };

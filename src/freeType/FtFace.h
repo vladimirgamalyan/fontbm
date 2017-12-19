@@ -61,6 +61,7 @@ public:
                 FT_Done_Face(face);
                 throw Exception("Couldn't set font size", error);
             }
+
             /* Get the scalable font metrics for this font */
             FT_Fixed scale = face->size->metrics.y_scale;
             ascent  = FT_CEIL(FT_MulFix(face->ascender, scale));
@@ -122,56 +123,49 @@ public:
         FT_Done_Face(face);
     }
 
-    void renderGlyph(uint32_t* buffer, uint32_t w, uint32_t h, int x, int y, uint32_t ch)
+    struct GlyphMetrics
+    {
+        uint32_t width; // This is the width of the glyph image's bounding box. It is independent of the layout direction.
+        uint32_t height; // This is the height of the glyph image's bounding box. It is independent of the layout direction.
+        int32_t horiBearingX; // For horizontal text layouts, this is the horizontal distance from the current cursor position to the leftmost border of the glyph image's bounding box.
+        int32_t horiBearingY; // For horizontal text layouts, this is the vertical distance from the current cursor position (on the baseline) to the topmost border of the glyph image's bounding box.
+        int32_t horiAdvance; // For horizontal text layouts, this is the horizontal distance to increment the pen position when the glyph is drawn as part of a string of text.
+    };
+
+    GlyphMetrics renderGlyph(uint32_t* buffer, uint32_t surfaceW, uint32_t surfaceH, int x, int y, uint32_t ch, uint32_t color)
     {
         FT_Error error = FT_Load_Char(face, ch, FT_LOAD_RENDER);
         if (error)
             throw std::runtime_error("Load glyph error");
 
         FT_GlyphSlot slot = face->glyph;
+        FT_Glyph_Metrics* metrics = &slot->metrics;
 
-        uint32_t* dst_check = buffer + w * h;
-//        std::cout << (int)buffer << std::endl;
-//        std::cout << (int)dst_check << std::endl;
-//        std::cout << (int)(dst_check - buffer) << std::endl;
-//        std::cout << "----------" << std::endl;
+        GlyphMetrics glyphMetrics;
+        glyphMetrics.width = slot->bitmap.width;
+        glyphMetrics.height = slot->bitmap.rows;
+        glyphMetrics.horiBearingX = FT_FLOOR(metrics->horiBearingX);
+        glyphMetrics.horiBearingY = FT_FLOOR(metrics->horiBearingY);
+        glyphMetrics.horiAdvance = FT_CEIL(metrics->horiAdvance);
 
+        if (buffer)
+        {
+            uint32_t* dst_check = buffer + surfaceW * surfaceH;
+            color &= 0xffffff;
 
-        int width = slot->bitmap.width;
-//        if (outline <= 0 && width > glyph->maxx - glyph->minx) {
-//            width = glyph->maxx - glyph->minx;
-//        }
+            for (uint32_t row = 0; row < glyphMetrics.height; ++row)
+            {
+                uint32_t *dst = buffer + (y + row) * surfaceW + x;
+                uint8_t *src = slot->bitmap.buffer + slot->bitmap.pitch * row;
 
-        uint32_t pixel = 0xff00; // (fg.r<<16)|(fg.g<<8)|fg.b;
-
-        for ( unsigned int row = 0; row < slot->bitmap.rows; ++row ) {
-
-            /* Make sure we don't go either over, or under the
-             * limit */
-//            if ( row + glyph->yoffset < 0 ) {
-//                continue;
-//            }
-//            if ( row + glyph->yoffset >= textbuf->h ) {
-//                continue;
-//            }
-
-
-//            Uint32 *dst = buffer +
-//                  (row + glyph->yoffset) * textbuf->pitch / 4 +
-//                  xstart + glyph->minx;
-
-            Uint32 *dst = buffer + (y + row) * w + x;
-
-            /* Added code to adjust src pointer for pixmaps to
-             * account for pitch.
-             * */
-            uint8_t *src = slot->bitmap.buffer + slot->bitmap.pitch * row;
-
-            for ( int col = width; col > 0 && dst < dst_check; --col) {
-                Uint32 alpha = *src++;
-                *dst++ = pixel | (alpha << 24);
+                for (uint32_t col = glyphMetrics.width; col > 0 && dst < dst_check; --col) {
+                    uint32_t alpha = *src++;
+                    *dst++ = color | (alpha << 24);
+                }
             }
         }
+
+        return glyphMetrics;
     }
 
     int isGlyphProvided(FT_ULong ch) const
@@ -191,78 +185,8 @@ public:
 
         FT_Error error = FT_Get_Kerning(face, indexLeft, indexRight, ft_kerning_default, &delta);
         if (error)
-            throw std::runtime_error("Couldn't find glyph");
+            throw std::runtime_error("Couldn't find glyphs kerning");
         return delta.x >> 6;
-    }
-
-    void GetGlyphMetrics(FT_ULong ch, int& minx_, int& maxx_, int& miny_, int& maxy_, int& advance_) const
-    {
-        FT_UInt index = FT_Get_Char_Index(face, ch);
-        if (!index)
-            throw std::runtime_error("Couldn't find glyph");
-
-        FT_Int32 hinting = 0;
-        FT_Error error = FT_Load_Glyph(face, index, FT_LOAD_DEFAULT | hinting);
-        if (error)
-            throw Exception("Error load glyph", error);
-
-        /* Get our glyph shortcuts */
-        FT_GlyphSlot glyph = face->glyph;
-        FT_Glyph_Metrics* metrics = &glyph->metrics;
-        //FT_Outline* outline = &glyph->outline;
-
-        int minx;
-        int maxx;
-        int miny;
-        int maxy;
-        //int yoffset;
-        int advance;
-
-        if ( FT_IS_SCALABLE( face ) ) {
-            /* Get the bounding box */
-            minx = FT_FLOOR(metrics->horiBearingX);
-            maxx = FT_CEIL(metrics->horiBearingX + metrics->width);
-            maxy = FT_FLOOR(metrics->horiBearingY);
-            miny = maxy - FT_CEIL(metrics->height);
-            //yoffset = ascent - maxy;
-            advance = FT_CEIL(metrics->horiAdvance);
-        } else {
-            /* Get the bounding box for non-scalable format.
-             * Again, freetype2 fills in many of the font metrics
-             * with the value of 0, so some of the values we
-             * need must be calculated differently with certain
-             * assumptions about non-scalable formats.
-             * */
-            minx = FT_FLOOR(metrics->horiBearingX);
-            maxx = FT_CEIL(metrics->horiBearingX + metrics->width);
-            maxy = FT_FLOOR(metrics->horiBearingY);
-            miny = maxy - FT_CEIL(face->available_sizes[font_size_family].height);
-            //yoffset = 0;
-            advance = FT_CEIL(metrics->horiAdvance);
-        }
-
-        /* Adjust for bold and italic text */
-        if ( TTF_HANDLE_STYLE_BOLD() ) {
-            maxx += glyph_overhang;
-        }
-        if ( TTF_HANDLE_STYLE_ITALIC() ) {
-            maxx += (int)std::ceil(glyph_italics);
-        }
-
-        minx_ = minx;
-        maxx_ = maxx;
-        if ( TTF_HANDLE_STYLE_BOLD() ) {
-            maxx_ += glyph_overhang;
-        }
-
-        miny_ = miny;
-        maxy_ = maxy;
-
-        advance_ = advance;
-        if ( TTF_HANDLE_STYLE_BOLD() ) {
-            advance_ += glyph_overhang;
-        }
-
     }
 
     void debugInfo() {

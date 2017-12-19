@@ -19,14 +19,16 @@ Config helpers::parseCommandLine(int argc, char* argv[])
         std::string color;
         std::string backgroundColor;
         const std::string backgroundColorOptionName = "background-color";
+        const std::string charsFileOptionName = "chars-file";
+        const std::string charsOptionName = "chars";
         std::string dataFormat;
 
         cxxopts::Options options("fontbm", "Command line bitmap font generator, compatible with bmfont");
         options.add_options()
                 ("help", "produce help message")
                 ("font-file", "path to ttf file, required", cxxopts::value<std::string>(config.fontFile))
-                ("chars", "required characters, for example: 32-64,92,120-126\ndefault value is 32-127 if chars-file not defined", cxxopts::value<std::string>(chars))
-                ("chars-file", "optional path to UTF-8 text file with required characters (will be combined with chars)", cxxopts::value<std::string>(charsFile))
+                (charsOptionName, "required characters, for example: 32-64,92,120-126\ndefault value is 32-127 if 'chars-file' option is not defined", cxxopts::value<std::string>(chars))
+                (charsFileOptionName, "optional path to UTF-8 text file with required characters (will be combined with 'chars')", cxxopts::value<std::string>(charsFile))
                 ("color", "foreground RGB color, for example: 32,255,255, default value is 255,255,255", cxxopts::value<std::string>(color)->default_value("255,255,255"))
                 (backgroundColorOptionName, "background color RGB color, for example: 0,0,128, transparent by default", cxxopts::value<std::string>(backgroundColor))
                 ("font-size", "font size, default value is 32", cxxopts::value<uint16_t>(config.fontSize)->default_value("32"))
@@ -55,10 +57,10 @@ Config helpers::parseCommandLine(int argc, char* argv[])
         if (!result.count("output"))
             throw std::runtime_error("--output options required");
 
-        if (chars.empty() && charsFile.empty())
+        if ((!result.count(charsOptionName)) && (!result.count(charsFileOptionName)))
             chars = "32-127";
         config.chars = parseCharsString(chars);
-        if (!charsFile.empty())
+        if (result.count(charsFileOptionName))
         {
             auto c = getCharsFromFile(charsFile);
             config.chars.insert(c.begin(), c.end());

@@ -19,3 +19,6 @@ set(SOURCES
 
 add_executable(fontbm ${SOURCES})
 target_link_libraries(fontbm ${COMMON_LIBRARIES} ${PNG_LIBRARIES} ${FREETYPE_LIBRARIES} ${SDL2PP_LIBRARIES})
+
+add_definitions(-DLODEPNG_NO_COMPILE_DECODER)
+

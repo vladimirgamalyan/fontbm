@@ -116,7 +116,7 @@ void FontInfo::writeToXmlFile(const std::string &fileName) const
     commonElement->SetAttribute("base", common.base);
     commonElement->SetAttribute("scaleW", common.scaleW);
     commonElement->SetAttribute("scaleH", common.scaleH);
-    commonElement->SetAttribute("pages", common.pages);
+    commonElement->SetAttribute("pages", pages.size());
     commonElement->SetAttribute("packed", common.packed);
     commonElement->SetAttribute("alphaChnl", common.alphaChnl);
     commonElement->SetAttribute("redChnl", common.redChnl);
@@ -205,7 +205,7 @@ void FontInfo::writeToTextFile(const std::string &fileName) const
         << " base=" << common.base
         << " scaleW=" << common.scaleW
         << " scaleH=" << common.scaleH
-        << " pages=" << common.pages
+        << " pages=" << pages.size()
         << " packed=" << common.packed
         << " alphaChnl=" << static_cast<int>(common.alphaChnl)
         << " redChnl=" << static_cast<int>(common.redChnl)
@@ -341,7 +341,7 @@ void FontInfo::writeToBinFile(const std::string &fileName) const
     commonBlock.base = common.base;
     commonBlock.scaleW = common.scaleW;
     commonBlock.scaleH = common.scaleH;
-    commonBlock.pages = common.pages;
+    commonBlock.pages = static_cast<uint16_t>(pages.size());
     commonBlock.packed = common.packed;
     commonBlock.alphaChnl = common.alphaChnl;
     commonBlock.redChnl = common.redChnl;
@@ -430,7 +430,7 @@ void FontInfo::writeToJsonFile(const std::string &fileName) const
     commonNode["base"] = common.base;
     commonNode["scaleW"] = common.scaleW;
     commonNode["scaleH"] = common.scaleH;
-    commonNode["pages"] = common.pages;
+    commonNode["pages"] = pages.size();
     commonNode["packed"] = common.packed;
     commonNode["alphaChnl"] = common.alphaChnl;
     commonNode["redChnl"] = common.redChnl;
@@ -485,7 +485,4 @@ void FontInfo::testPages() const
             if (l != pages[i].length())
                 throw std::runtime_error("page names have different length");
     }
-
-    if (common.pages != pages.size())
-        throw std::runtime_error("common.pages != pages.size()");
 }
