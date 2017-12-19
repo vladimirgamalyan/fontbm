@@ -7,31 +7,9 @@
 #include <limits>
 #include <algorithm>
 #include <iomanip>
-#include "sdlSavePng/savepng.h"
 #include "FontInfo.h"
 #include "extractFileName.h"
-
-int App::getKerning(const SDL2pp::Font& font, uint32_t char0, uint32_t char1)
-{
-    if ((char0 > 0xFFFF) || (char1 > 0xFFFF))
-        return 0;
-    Uint16 ch0 = static_cast<Uint16>(char0);
-    Uint16 ch1 = static_cast<Uint16>(char1);
-    Uint16 text[ 3 ] = {ch0, ch1, 0};
-    return font.GetSizeUNICODE(text).x - ( font.GetGlyphAdvance(ch0) + font.GetGlyphAdvance(ch1) );
-}
-
-void App::printGlyphData(const SDL2pp::Font& font, Uint16 ch)
-{
-    int minx, maxx, miny, maxy, advance;
-    font.GetGlyphMetrics(ch, minx, maxx, miny, maxy, advance);
-    std::cout << "minx=" << minx
-              << ", maxx=" << maxx
-              << ", miny=" << miny
-              << ", maxy=" << maxy
-              << ", advance: " << advance
-              << std::endl;
-}
+#include "lodepng/lodepng.h"
 
 std::vector<rbp::RectSize> App::getSrcRects(const Glyphs &glyphs, int additionalWidth, int additionalHeight)
 {
@@ -51,25 +29,25 @@ std::vector<rbp::RectSize> App::getSrcRects(const Glyphs &glyphs, int additional
     return result;
 }
 
-App::Glyphs App::collectGlyphInfo(const SDL2pp::Font &font,
+App::Glyphs App::collectGlyphInfo(const ft::Face& face,
                                   const std::set<uint32_t> &codes,
                                   uint32_t maxTextureSizeX,
                                   uint32_t maxTextureSizeY)
 {
-    int fontAscent = font.GetAscent();
+    int fontAscent = face.ascent;
 
     Glyphs glyphs;
 
     for (auto& id : codes)
     {
-        if ((id > 0xFFFF) || (!font.IsGlyphProvided(static_cast<Uint16>(id))))
+        if ((id > 0xFFFF) || (!face.isGlyphProvided(id)))
         {
             std::cout << "warning: glyph " << id << " not found " << std::endl;
             continue;
         }
 
         GlyphInfo glyphInfo;
-        font.GetGlyphMetrics(static_cast<Uint16>(id),
+        face.GetGlyphMetrics(static_cast<Uint16>(id),
                              glyphInfo.minx,
                              glyphInfo.maxx,
                              glyphInfo.miny,
@@ -79,7 +57,7 @@ App::Glyphs App::collectGlyphInfo(const SDL2pp::Font &font,
         if (fontAscent < glyphInfo.maxy)
             throw std::runtime_error("invalid glyph (maxy > ascent)");
 
-        if ( (glyphInfo.getWidth() > static_cast<int>(maxTextureSizeX)) || (glyphInfo.getHeight() > static_cast<int>(maxTextureSizeY)))
+        if ((glyphInfo.getWidth() > static_cast<int>(maxTextureSizeX)) || (glyphInfo.getHeight() > static_cast<int>(maxTextureSizeY)))
             throw std::runtime_error("no room for glyph");
 
         //TODO: add more checks for glyph.
@@ -146,14 +124,18 @@ void App::execute(int argc, char* argv[])
 {
     const Config config = helpers::parseCommandLine(argc, argv);
 
+    ft::Library library;
+    ft::Face face(library, config.fontFile, config.fontSize);
+    face.debugInfo();
+
     SDL2pp::SDLTTF ttf;
     SDL2pp::Font font(config.fontFile, config.fontSize);
 
-    Glyphs glyphs = collectGlyphInfo(font, config.chars, config.textureSize.w, config.textureSize.h);
+    Glyphs glyphs = collectGlyphInfo(face, config.chars, config.textureSize.w, config.textureSize.h);
 
     const uint16_t pageCount = arrangeGlyphs(glyphs, config);
 
-    const int fontAscent = font.GetAscent();
+    const int fontAscent = face.ascent;
 
     /////////////////////////////////////////////////////////////
 
@@ -162,35 +144,44 @@ void App::execute(int argc, char* argv[])
     //TODO: should we decrement pageCount before calculate?
     int pageNameDigits = getDigitCount(pageCount);
 
+    // Render every page
     for (size_t page = 0; page < pageCount; ++page)
     {
-        SDL2pp::Surface outputSurface(0, config.textureSize.w, config.textureSize.h, 32,
-                                      0x000000FF, 0x0000FF00, 0x00FF0000, 0xFF000000);
+        std::vector<uint32_t> surface(config.textureSize.w * config.textureSize.h);
+        std::cout << "surface size: " << surface.size() << std::endl;
+
+        //SDL2pp::Surface outputSurface(0, config.textureSize.w, config.textureSize.h, 32,
+        //                              0x000000FF, 0x0000FF00, 0x00FF0000, 0xFF000000);
 
         // If the color value contains an alpha component then the destination is simply
         // filled with that alpha information, no blending takes place.
-        if (config.backgroundTransparent)
-            outputSurface.FillRect(SDL2pp::NullOpt, config.color.getUint32(0));
-        else
-            outputSurface.FillRect(SDL2pp::NullOpt, config.backgroundColor.getUint32(255));
+        //if (config.backgroundTransparent)
+        //    outputSurface.FillRect(SDL2pp::NullOpt, config.color.getUint32(0));
+        //else
+        //    outputSurface.FillRect(SDL2pp::NullOpt, config.backgroundColor.getUint32(255));
 
-
+        // Render every glyph
+        //TODO: do not repeat same glyphs (with same index)
         for (auto kv: glyphs)
         {
             const GlyphInfo& glyph = kv.second;
             if (glyph.page != static_cast<int>(page))
                 continue;
 
-            SDL2pp::Surface glyphSurface = font.RenderGlyph_Blended(kv.first, makeSdlColor(config.color));
+            // Get glyph images
+            //SDL2pp::Surface glyphSurface = font.RenderGlyph_Blended(kv.first, makeSdlColor(config.color));
 
             int x = glyph.x - glyph.minx;
             int y = glyph.y - (fontAscent - glyph.maxy);
+
             if (!glyph.isEmpty())
             {
                 x += config.padding.left;
                 y += config.padding.up;
-                SDL2pp::Rect dstRect(x, y, glyph.getWidth(), glyph.getHeight());
-                glyphSurface.Blit(SDL2pp::NullOpt, outputSurface, dstRect);
+
+                face.renderGlyph(&surface[0], config.textureSize.w, config.textureSize.h, x, y, kv.first);
+                //SDL2pp::Rect dstRect(x, y, glyph.getWidth(), glyph.getHeight());
+                //glyphSurface.Blit(SDL2pp::NullOpt, outputSurface, dstRect);
             }
         }
 
@@ -200,17 +191,19 @@ void App::execute(int argc, char* argv[])
 
         pageNames.push_back(extractFileName(pageName));
 
-        if (!config.backgroundTransparent)
-            outputSurface = outputSurface.Convert(SDL_PIXELFORMAT_RGB24);
+        //if (!config.backgroundTransparent)
+        //    outputSurface = outputSurface.Convert(SDL_PIXELFORMAT_RGB24);
 
-        SDL_SavePNG(outputSurface.Get(), pageName.c_str());
+        //unsigned error = lodepng::encode(pageName, reinterpret_cast<unsigned char*>(&surface[0]), config.textureSize.w, config.textureSize.h, LCT_RGBA, 8);
+        //if (error)
+        //    throw std::runtime_error("encoder error " + std::to_string(error) + ": " + lodepng_error_text(error));
     }
 
     /////////////////////////////////////////////////////////////
 
     FontInfo f;
 
-    f.info.face = font.GetFamilyName().value_or("unknown");
+    f.info.face = face.getFamilyName("unknown");
     f.info.size = config.fontSize;
     f.info.unicode = true;
     f.info.aa = 1;
@@ -221,8 +214,8 @@ void App::execute(int argc, char* argv[])
     f.info.spacing.horizontal = static_cast<uint8_t>(config.spacing.hor);
     f.info.spacing.vertical = static_cast<uint8_t>(config.spacing.ver);
 
-    f.common.lineHeight = static_cast<uint16_t>(font.GetLineSkip());
-    f.common.base = static_cast<uint16_t>(font.GetAscent());
+    f.common.lineHeight = static_cast<uint16_t>(face.lineskip);
+    f.common.base = static_cast<uint16_t>(face.ascent);
     f.common.scaleW = static_cast<uint16_t>(config.textureSize.w);
     f.common.scaleH = static_cast<uint16_t>(config.textureSize.h);
     f.common.pages = pageCount;
@@ -256,11 +249,13 @@ void App::execute(int argc, char* argv[])
     {
         //TODO: test if getKerning(font, ch0, ch1) != getKerning(font, ch1, ch0) (and change logic if so)
         std::set<uint32_t> glyphCodes2(config.chars);
+        //TODO: remove bruteforcing
         for (auto& ch0 : config.chars)
         {
             for (auto& ch1 : glyphCodes2)
             {
-                int16_t k = static_cast<int16_t>(getKerning(font, ch0, ch1));
+                int16_t k = static_cast<int16_t>(face.getKerning(ch0, ch1));
+                //int16_t k = static_cast<int16_t>(getKerning(face, font, ch0, ch1));
                 if (k)
                 {
                     FontInfo::Kerning kerning;

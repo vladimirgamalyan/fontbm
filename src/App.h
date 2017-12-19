@@ -5,6 +5,8 @@
 #include "maxRectsBinPack/MaxRectsBinPack.h"
 #include "Config.h"
 #include "GlyphInfo.h"
+#include "freeType/FtLibrary.h"
+#include "freeType/FtFace.h"
 
 class App
 {
@@ -16,7 +18,7 @@ private:
     int getKerning(const SDL2pp::Font& font, uint32_t char0, uint32_t char1);
     void printGlyphData(const SDL2pp::Font& font, Uint16 ch);
     std::vector<rbp::RectSize> getSrcRects(const Glyphs &glyphs, int additionalWidth, int additionalHeight);
-    Glyphs collectGlyphInfo(const SDL2pp::Font &font,
+    Glyphs collectGlyphInfo(const ft::Face& face,
                             const std::set<uint32_t> &codes,
                             uint32_t maxTextureSizeX,
                             uint32_t maxTextureSizeY);
