@@ -51,6 +51,7 @@ def main(argv):
         raise RuntimeError('not found fontbm executable')
 
     shutil.rmtree('generated', ignore_errors=True)
+    os.makedirs('generated')
 
     fontbm('--font-file', 'fonts/FreeSans.ttf', '--chars', '32-126',
         '--padding-up', '8', '--padding-right', '7',

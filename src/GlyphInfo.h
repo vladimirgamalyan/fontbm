@@ -3,33 +3,24 @@
 
 struct GlyphInfo
 {
-    uint16_t page = 0;
+    uint32_t page = 0;
+
+    // pos on texture page
     int x = 0;
     int y = 0;
 
-    int getWidth() const
-    {
-        return maxx - minx;
-    }
+    // size on texture page
+    uint32_t width = 0;
+    uint32_t height = 0;
 
-    int getHeight() const
-    {
-        return maxy - miny;
-    }
+    // shift before render
+    int xOffset = 0;
+    int yOffset = 0;
 
     bool isEmpty() const
     {
-        return ((getWidth() == 0) && (getHeight() == 0));
+        return (width == 0) || (height == 0);
     }
 
-    bool isInvalid() const
-    {
-        return ((!isEmpty()) && ((getWidth() <= 0) || (getHeight() <= 0)));
-    }
-
-    int minx = 0;
-    int maxx = 0;
-    int miny = 0;
-    int maxy = 0;
-    int advance = 0;
+    int xAdvance = 0;
 };
