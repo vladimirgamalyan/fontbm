@@ -36,17 +36,11 @@ option  | default | comment
 --texture-width | 256 | texture width
 --texture-height | 256 | texture height
 
-## Thanks
-
-* [juj/RectangleBinPack](https://github.com/juj/RectangleBinPack) 2d rectangular bin packing
-* [lvandeve/lodepng](https://github.com/lvandeve/lodepng) PNG encoder and decoder in C and C++
-* [jarro2783/cxxopts](https://github.com/jarro2783/cxxopts) Lightweight C++ command line option parser
-
 ## License
 
 [MIT License](http://opensource.org/licenses/MIT)
 
 The project also bundles third party software under its own licenses:
-* [juj/RectangleBinPack](https://github.com/juj/RectangleBinPack) - Public Domain
-* [lvandeve/lodepng](https://github.com/lvandeve/lodepng) - [zlib](https://github.com/lvandeve/lodepng/issues/25)
-* [jarro2783/cxxopts](https://github.com/jarro2783/cxxopts) - [MIT](https://github.com/jarro2783/cxxopts/blob/master/LICENSE)
+* [juj/RectangleBinPack](https://github.com/juj/RectangleBinPack) - 2d rectangular bin packing - Public Domain
+* [lvandeve/lodepng](https://github.com/lvandeve/lodepng) - PNG encoder and decoder in C and C++ - [zlib](https://github.com/lvandeve/lodepng/issues/25)
+* [jarro2783/cxxopts](https://github.com/jarro2783/cxxopts) - Lightweight C++ command line option parser - [MIT](https://github.com/jarro2783/cxxopts/blob/master/LICENSE)
