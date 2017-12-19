@@ -116,7 +116,7 @@ void FontInfo::writeToXmlFile(const std::string &fileName) const
     commonElement->SetAttribute("base", common.base);
     commonElement->SetAttribute("scaleW", common.scaleW);
     commonElement->SetAttribute("scaleH", common.scaleH);
-    commonElement->SetAttribute("pages", pages.size());
+    commonElement->SetAttribute("pages", static_cast<int>(pages.size()));
     commonElement->SetAttribute("packed", common.packed);
     commonElement->SetAttribute("alphaChnl", common.alphaChnl);
     commonElement->SetAttribute("redChnl", common.redChnl);
