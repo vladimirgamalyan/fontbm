@@ -15,7 +15,6 @@ cache:
 
 before_build:
   - cmake -G "Visual Studio 14 2015" -DCMAKE_TOOLCHAIN_FILE=c:/tools/vcpkg/scripts/buildsystems/vcpkg.cmake
-#  - set PATH=c:\Program Files (x86)\MSBuild\14.0\Bin;%PATH%
 
 build:
   project: fontbm.sln
