@@ -25,7 +25,7 @@ after_build:
 artifacts:
   - path: fontbm.zip
     name: fontbm
-	
+
 deploy:
   provider: GitHub
   release: fontbm
