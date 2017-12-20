@@ -1,5 +1,6 @@
 #pragma once
 #include <exception>
+#include <string>
 #include "FtInclude.h"
 
 namespace ft {
