@@ -18,7 +18,7 @@ endif(NOT MSVC)
 
 # disable some GCC warnings
 if(CMAKE_COMPILER_IS_GNUCC)
-    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wno-deprecated -Wno-unused-local-typedefs -Wno-implicit-fallthrough")
+    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wno-deprecated -Wno-unused-local-typedefs")
 endif(CMAKE_COMPILER_IS_GNUCC)
 
 add_subdirectory(src)
