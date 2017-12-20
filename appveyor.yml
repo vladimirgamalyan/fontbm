@@ -9,10 +9,13 @@ platform:
   
 install:
   - vcpkg install freetype
+  
+cache:
+  - c:\tools\vcpkg\installed\  
 
 before_build:
-  - cmake -G "Visual Studio 14 2015"
-  - set PATH=C:\Program Files (x86)\MSBuild\14.0\Bin;%PATH%
+  - cmake -G "Visual Studio 14 2015" -DCMAKE_TOOLCHAIN_FILE=c:/tools/vcpkg/scripts/buildsystems/vcpkg.cmake
+#  - set PATH=c:\Program Files (x86)\MSBuild\14.0\Bin;%PATH%
 
 build:
   project: fontbm.sln

@@ -15,10 +15,13 @@ set(SOURCES
 		freeType/FtLibrary.h
 		freeType/FtFace.h
 		freeType/FtException.h
-		freeType/FtInclude.h extractFileName.h freeType/FtLibrary.cpp lodepng/lodepng.h lodepng/lodepng.cpp)
-
-add_executable(fontbm ${SOURCES})
-target_link_libraries(fontbm ${COMMON_LIBRARIES} ${PNG_LIBRARIES} ${FREETYPE_LIBRARIES} ${SDL2PP_LIBRARIES})
+		freeType/FtInclude.h
+		extractFileName.h
+		freeType/FtLibrary.cpp
+		lodepng/lodepng.h
+		lodepng/lodepng.cpp)
 
 add_definitions(-DLODEPNG_NO_COMPILE_DECODER)
 
+add_executable(fontbm ${SOURCES})
+target_link_libraries(fontbm ${COMMON_LIBRARIES} ${FREETYPE_LIBRARIES})
