@@ -18,3 +18,10 @@ before_build:
 
 build:
   project: fontbm.sln
+  
+after_build:
+ - 7z a fontbm.zip "src/Release/*"
+
+artifacts:
+  - path: fontbm.zip
+    name: fontbm
