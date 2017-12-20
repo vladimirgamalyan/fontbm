@@ -11,7 +11,6 @@ install:
   - vcpkg install freetype
 
 before_build:
-  - git submodule init && git submodule update
   - cmake -G "Visual Studio 14 2015" -DCMAKE_PREFIX_PATH="C:\Libraries"
   - set PATH=C:\Program Files (x86)\MSBuild\14.0\Bin;%PATH%
 
