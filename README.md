@@ -3,7 +3,7 @@
 [![Build status](https://ci.appveyor.com/api/projects/status/boq0olngopfabaac?svg=true)](https://ci.appveyor.com/project/vladimirgamalyan/fontbm)
 [![Coverity Scan Build Status](https://scan.coverity.com/projects/14665/badge.svg)](https://scan.coverity.com/projects/14665)
 
-Command line bitmap font generator, compatible with [BMFont](http://www.angelcode.com/products/bmfont/).
+Command line bitmap font generator, compatible with [BMFont](http://www.angelcode.com/products/bmfont/). Download compiled version (windows, linux) from [Releases](https://github.com/vladimirgamalyan/fontbm/releases)
 
 ![sample](/assets/sample0.png?raw=true)
 ![sample](/assets/sample1.png?raw=true)
