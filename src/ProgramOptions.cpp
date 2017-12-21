@@ -1,13 +1,13 @@
 #include "ProgramOptions.h"
 #include <iostream>
 #include <fstream>
-#include <stdexcept>
 #include <codecvt>
 #include <functional>
 #include <regex>
 #include "HelpException.h"
 #include "cxxopts.hpp"
 #include "splitStrByDelim.h"
+#include "utfcpp/utf8.h"
 
 Config helpers::parseCommandLine(int argc, char* argv[])
 {
@@ -147,12 +147,14 @@ std::set<uint32_t> helpers::getCharsFromFile(const std::string& f)
     std::string str((std::istreambuf_iterator<char>(fs)),
                     std::istreambuf_iterator<char>());
 
-    std::wstring_convert<std::codecvt_utf8<char32_t>, char32_t> cvt;
-    std::u32string utf32str = cvt.from_bytes(str);
-
     std::set<uint32_t> result;
-    for (auto c: utf32str)
-        result.insert(static_cast<uint32_t>(c));
+    try {
+        for (std::string::iterator it = str.begin(); it != str.end();)
+            result.insert(utf8::next(it, str.end()));
+    } catch (utf8::not_enough_room& ) {
+        throw std::runtime_error("malformed characters file");
+    }
+
     return result;
 }
 

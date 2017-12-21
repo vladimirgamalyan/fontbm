@@ -30,3 +30,4 @@
 /testdata/output
 /build
 /tests/generated
+/cmake-build-debug

@@ -1,7 +1,10 @@
 # fontbm
 [![Build Status](https://travis-ci.org/vladimirgamalyan/fontbm.svg)](https://travis-ci.org/vladimirgamalyan/fontbm)
+[![Build status](https://ci.appveyor.com/api/projects/status/boq0olngopfabaac?svg=true)](https://ci.appveyor.com/project/vladimirgamalyan/fontbm)
+[![Coverity Scan Build Status](https://scan.coverity.com/projects/14665/badge.svg)](https://scan.coverity.com/projects/14665)
 
-Command line bitmap font generator, compatible with [BMFont](http://www.angelcode.com/products/bmfont/).
+Command line bitmap font generator, compatible with [BMFont](http://www.angelcode.com/products/bmfont/).  
+Download compiled version (windows, linux) from [Releases](https://github.com/vladimirgamalyan/fontbm/releases)
 
 ![sample](/assets/sample0.png?raw=true)
 ![sample](/assets/sample1.png?raw=true)
@@ -36,17 +39,11 @@ option  | default | comment
 --texture-width | 256 | texture width
 --texture-height | 256 | texture height
 
-## Thanks
-
-* [RectangleBinPack](https://github.com/juj/RectangleBinPack) 2d rectangular bin packing
-* [lodepng](https://github.com/lvandeve/lodepng) PNG encoder and decoder in C and C++
-* [jarro2783/cxxopts](https://github.com/jarro2783/cxxopts) Lightweight C++ command line option parser
-
 ## License
 
 [MIT License](http://opensource.org/licenses/MIT)
 
 The project also bundles third party software under its own licenses:
-* [RectangleBinPack](https://github.com/juj/RectangleBinPack) - Public Domain
-* [lodepng](https://github.com/lvandeve/lodepng) [zlib](https://github.com/lvandeve/lodepng/issues/25)
-* [jarro2783/cxxopts](https://github.com/jarro2783/cxxopts) - [MIT](https://github.com/jarro2783/cxxopts/blob/master/LICENSE)
+* [juj/RectangleBinPack](https://github.com/juj/RectangleBinPack) - 2d rectangular bin packing - Public Domain
+* [lvandeve/lodepng](https://github.com/lvandeve/lodepng) - PNG encoder and decoder in C and C++ - [zlib](https://github.com/lvandeve/lodepng/issues/25)
+* [jarro2783/cxxopts](https://github.com/jarro2783/cxxopts) - Lightweight C++ command line option parser - [MIT](https://github.com/jarro2783/cxxopts/blob/master/LICENSE)

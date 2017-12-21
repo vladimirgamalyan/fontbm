@@ -6,22 +6,31 @@ configuration:
 
 platform:
   - Win32
-
+  
 install:
-  - cd C:\Libraries\boost_1_60_0
-  - .\bootstrap
-  - .\b2 variant=release --with-system --with-filesystem --with-program_options --with-regex
+  - vcpkg install freetype
+  
+cache:
+  - c:\tools\vcpkg\installed\  
 
 before_build:
-  # download and unzip precompiled SDL2 libraries
-  - appveyor DownloadFile https://github.com/vladimirgamalian/sdl2_msvc_builds/releases/download/SDL2-Binaries/sdl2.zip
-  - 7z x sdl2.zip -oC:\Libraries > nul
-  - dir C:\Libraries
-  - cd C:\projects\fontbm
-  # create VS solution
-  - git submodule init && git submodule update
-  - cmake -G "Visual Studio 14 2015" -DBOOST_ROOT="C:\Libraries\boost_1_58_0" -DBoost_USE_STATIC_LIBS=ON -DCMAKE_PREFIX_PATH="C:\Libraries"
-  - set PATH=C:\Program Files (x86)\MSBuild\14.0\Bin;%PATH%
+  - cmake -G "Visual Studio 14 2015" -DCMAKE_TOOLCHAIN_FILE=c:/tools/vcpkg/scripts/buildsystems/vcpkg.cmake
 
 build:
   project: fontbm.sln
+  
+after_build:
+ - 7z a fontbm.zip "./src/Release/*"
+
+artifacts:
+  - path: fontbm.zip
+    name: fontbm
+
+deploy:
+  provider: GitHub
+  description: 'fontbm windows binaries'
+  auth_token:
+    secure: NmZvjeSjyBO6deqSmYnOk2QHPDm4/IQ6Aup8OozhGMhOmIa8xvaC5IM+y+21kkvG
+  artifact: fontbm
+  on:
+    appveyor_repo_tag: true
