@@ -34,7 +34,8 @@ deploy:
   skip_cleanup: true
 #  overwrite: true
   on:
+    branch: release
     tags: true
-
+    
 notifications:
   email: false

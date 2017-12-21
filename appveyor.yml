@@ -28,12 +28,9 @@ artifacts:
 
 deploy:
   provider: GitHub
-  release: fontbm
-  description: 'fontbm binaries'
+  description: 'fontbm windows binaries'
   auth_token:
     secure: NmZvjeSjyBO6deqSmYnOk2QHPDm4/IQ6Aup8OozhGMhOmIa8xvaC5IM+y+21kkvG
   artifact: fontbm
-  draft: false
-  prerelease: false
   on:
-    branch: master
+    appveyor_repo_tag: true
