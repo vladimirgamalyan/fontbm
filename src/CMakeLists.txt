@@ -18,10 +18,6 @@ set(SOURCES
         maxRectsBinPack/MaxRectsBinPack.cpp
         maxRectsBinPack/MaxRectsBinPack.h
         maxRectsBinPack/Rect.h
-        utfcpp/utf8.h
-        utfcpp/utf8/core.h
-        utfcpp/utf8/unchecked.h
-        utfcpp/utf8/checked.h
 		freeType/FtLibrary.h
 		freeType/FtFace.h
 		freeType/FtException.h

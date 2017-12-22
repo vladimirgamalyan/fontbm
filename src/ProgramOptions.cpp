@@ -7,7 +7,6 @@
 #include "HelpException.h"
 #include "cxxopts.hpp"
 #include "splitStrByDelim.h"
-#include "utfcpp/utf8.h"
 
 Config helpers::parseCommandLine(int argc, char* argv[])
 {
@@ -24,6 +23,7 @@ Config helpers::parseCommandLine(int argc, char* argv[])
         std::string dataFormat;
 
         cxxopts::Options options("fontbm", "Command line bitmap font generator, compatible with bmfont");
+        //TODO: unit test to test that default values are set to config
         options.add_options()
                 ("help", "produce help message")
                 ("font-file", "path to ttf file, required", cxxopts::value<std::string>(config.fontFile))
@@ -48,7 +48,7 @@ Config helpers::parseCommandLine(int argc, char* argv[])
 
         if (result.count("help"))
         {
-            std::cout << options.help({"", "Group"}) << std::endl;
+            std::cout << options.help() << std::endl;
             throw HelpException();
         }
 
@@ -147,13 +147,19 @@ std::set<uint32_t> helpers::getCharsFromFile(const std::string& f)
     std::string str((std::istreambuf_iterator<char>(fs)),
                     std::istreambuf_iterator<char>());
 
+    // VS 2015 and VS 2017 have different bugs in std::codecvt_utf8<char32_t> (VS 2013 works fine).
+#if defined(_MSC_VER) && _MSC_VER >= 1900 && _MSC_VER < 2000
+    std::wstring_convert<std::codecvt_utf8<__int32>, __int32> cvt;
+	auto r = cvt.from_bytes(str);
+	std::u32string utf32str = reinterpret_cast<const char32_t*>(r.data());
+#else
+    std::wstring_convert<std::codecvt_utf8<char32_t>, char32_t> cvt;
+    std::u32string utf32str = cvt.from_bytes(str);
+#endif
+
     std::set<uint32_t> result;
-    try {
-        for (std::string::iterator it = str.begin(); it != str.end();)
-            result.insert(utf8::next(it, str.end()));
-    } catch (utf8::not_enough_room& ) {
-        throw std::runtime_error("malformed characters file");
-    }
+        for (auto c: utf32str)
+            result.insert(static_cast<uint32_t>(c));
 
     return result;
 }
