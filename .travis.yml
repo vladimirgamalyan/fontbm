@@ -24,7 +24,7 @@ before_install:
 script:
 - cmake -DCMAKE_CXX_FLAGS=-Werror .
 - make
-- ".tests"
+- ".unit_tests"
 
 deploy:
   provider: releases

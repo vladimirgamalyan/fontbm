@@ -45,7 +45,7 @@ add_definitions(-DLODEPNG_NO_COMPILE_DECODER)
 add_executable(fontbm ${SOURCES})
 target_link_libraries(fontbm ${COMMON_LIBRARIES} ${FREETYPE_LIBRARIES})
 
-add_executable(tests
+add_executable(unit_tests
         src/catch.hpp
         src/catchMain.cpp
         src/ProgramOptions.cpp
@@ -53,4 +53,4 @@ add_executable(tests
         src/utils/splitStrByDelimTest.cpp
         src/utils/extractFileNameTest.cpp
         src/ProgramOptionsTest.cpp)
-target_link_libraries(tests ${COMMON_LIBRARIES})
+target_link_libraries(unit_tests ${COMMON_LIBRARIES})
