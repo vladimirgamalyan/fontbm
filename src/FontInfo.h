@@ -43,7 +43,6 @@ struct FontInfo
         uint16_t base = 0;
         uint16_t scaleW = 0;
         uint16_t scaleH = 0;
-        //uint32_t pages = 0;      //TODO: duplicate std::vector<Page> pages
         bool packed = false;
         uint8_t alphaChnl = 0;
         uint8_t redChnl = 0;

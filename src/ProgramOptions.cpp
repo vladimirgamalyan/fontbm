@@ -6,9 +6,9 @@
 #include <regex>
 #include "HelpException.h"
 #include "cxxopts.hpp"
-#include "splitStrByDelim.h"
+#include "utils/splitStrByDelim.h"
 
-Config helpers::parseCommandLine(int argc, char* argv[])
+Config ProgramOptions::parseCommandLine(int argc, char* argv[])
 {
     try
     {
@@ -57,14 +57,17 @@ Config helpers::parseCommandLine(int argc, char* argv[])
         if (!result.count("output"))
             throw std::runtime_error("--output options required");
 
+        if ((config.padding.up < 0) || (config.padding.right < 0) || (config.padding.down < 0) || (config.padding.left < 0))
+            throw std::runtime_error("invalid padding value");
+
+        if ((config.spacing.ver < 0) || (config.spacing.hor < 0))
+            throw std::runtime_error("invalid spacing value");
+
         if ((!result.count(charsOptionName)) && (!result.count(charsFileOptionName)))
             chars = "32-127";
         config.chars = parseCharsString(chars);
         if (result.count(charsFileOptionName))
-        {
-            auto c = getCharsFromFile(charsFile);
-            config.chars.insert(c.begin(), c.end());
-        }
+            getCharsFromFile(charsFile, config.chars);
 
         config.color = parseColor(color);
         config.backgroundTransparent = (result.count(backgroundColorOptionName) == 0);
@@ -94,7 +97,7 @@ Config helpers::parseCommandLine(int argc, char* argv[])
     }
 }
 
-std::set<uint32_t> helpers::parseCharsString(std::string str)
+std::set<uint32_t> ProgramOptions::parseCharsString(std::string str)
 {
     // remove whitespace characters
     str.erase(std::remove_if(str.begin(), str.end(), std::bind( std::isspace<char>, std::placeholders::_1, std::locale::classic() )), str.end());
@@ -102,29 +105,27 @@ std::set<uint32_t> helpers::parseCharsString(std::string str)
     if (str.empty())
         return std::set<uint32_t>();
 
-    const std::regex re("^\\d{1,5}(-\\d{1,5})?(,\\d{1,5}(-\\d{1,5})?)*$");
+    const std::regex re("^\\d{1,7}(-\\d{1,7})?(,\\d{1,7}(-\\d{1,7})?)*$");
     if (!std::regex_match(str, re))
         throw std::logic_error("invalid chars value");
 
     std::vector<std::string> ranges = splitStrByDelim(str, ',');
 
     std::vector<std::pair<uint32_t, uint32_t>> charList;
-    for (auto range: ranges)
+    for (const auto& range: ranges)
     {
         std::vector<std::string> minMaxStr = splitStrByDelim(range, '-');
         if (minMaxStr.size() == 1)
             minMaxStr.push_back(minMaxStr[0]);
 
-        try
-        {
-            unsigned long v0 = std::stoul(minMaxStr[0]);
-            unsigned long v1 = std::stoul(minMaxStr[1]);
-            charList.emplace_back(static_cast<uint32_t>(v0), static_cast<uint32_t>(v1));
-        }
-        catch (std::out_of_range &)
-        {
-            throw std::logic_error("incorrect character value (out of range)");
-        }
+        unsigned long v0 = std::stoul(minMaxStr[0]);
+        unsigned long v1 = std::stoul(minMaxStr[1]);
+
+        const unsigned long maxUtf32 = 0x10FFFF;
+        if ((v0 > maxUtf32) || (v1 > maxUtf32))
+            throw std::out_of_range("invalid utf-32 value (out of range 0x000000..0x10ffff)");
+
+        charList.emplace_back(static_cast<uint32_t>(v0), static_cast<uint32_t>(v1));
     }
 
     std::set<uint32_t> result;
@@ -139,9 +140,9 @@ std::set<uint32_t> helpers::parseCharsString(std::string str)
     return result;
 }
 
-std::set<uint32_t> helpers::getCharsFromFile(const std::string& f)
+void ProgramOptions::getCharsFromFile(const std::string& fileName, std::set<uint32_t>& result)
 {
-    std::ifstream fs(f, std::ifstream::binary);
+    std::ifstream fs(fileName, std::ifstream::binary);
     if (!fs)
         throw std::runtime_error("can`t open characters file");
     std::string str((std::istreambuf_iterator<char>(fs)),
@@ -157,14 +158,11 @@ std::set<uint32_t> helpers::getCharsFromFile(const std::string& f)
     std::u32string utf32str = cvt.from_bytes(str);
 #endif
 
-    std::set<uint32_t> result;
-        for (auto c: utf32str)
-            result.insert(static_cast<uint32_t>(c));
-
-    return result;
+    for (auto c: utf32str)
+        result.insert(static_cast<uint32_t>(c));
 }
 
-Config::Color helpers::parseColor(const std::string& str)
+Config::Color ProgramOptions::parseColor(const std::string& str)
 {
     const std::regex e("^\\s*\\d{1,3}\\s*,\\s*\\d{1,3}\\s*,\\s*\\d{1,3}\\s*$");
     if (!std::regex_match(str, e))
@@ -180,10 +178,5 @@ Config::Color helpers::parseColor(const std::string& str)
         return static_cast<uint8_t>(v);
     };
 
-    Config::Color color;
-    color.r = colorToUint8(rgbStr[0]);
-    color.g = colorToUint8(rgbStr[1]);
-    color.b = colorToUint8(rgbStr[2]);
-
-    return color;
+    return Config::Color{colorToUint8(rgbStr[0]), colorToUint8(rgbStr[1]), colorToUint8(rgbStr[2])};
 }

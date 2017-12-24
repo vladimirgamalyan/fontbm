@@ -20,7 +20,7 @@ build:
   project: fontbm.sln
   
 after_build:
- - 7z a fontbm.zip "./src/Release/*"
+ - 7z a fontbm.zip "./Release/*" "-x!unit_tests.exe"
 
 artifacts:
   - path: fontbm.zip

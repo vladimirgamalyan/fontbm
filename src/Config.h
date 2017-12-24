@@ -19,9 +19,9 @@ struct Config
         uint8_t g;
         uint8_t b;
 
-        uint32_t getUint32(uint8_t a) const
+        uint32_t getBGR() const
         {
-            return (r + (g << 8) + (b << 16) + (a << 24));
+            return r + (g << 8) + (b << 16);
         }
 
         bool operator == (const Color& other) const

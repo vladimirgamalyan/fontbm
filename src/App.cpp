@@ -2,15 +2,15 @@
 #include "ProgramOptions.h"
 #include <string>
 #include <fstream>
-#include <array>
 #include <limits>
 #include <algorithm>
 #include <iomanip>
 #include "FontInfo.h"
-#include "extractFileName.h"
+#include "utils/extractFileName.h"
 #include "lodepng/lodepng.h"
+#include "utils/getNumberLen.h"
 
-std::vector<rbp::RectSize> App::getSrcRects(const Glyphs &glyphs, int additionalWidth, int additionalHeight)
+std::vector<rbp::RectSize> App::getGlyphRectangles(const Glyphs &glyphs, int additionalWidth, int additionalHeight)
 {
     std::vector<rbp::RectSize> result;
     for (auto& kv : glyphs)
@@ -19,8 +19,8 @@ std::vector<rbp::RectSize> App::getSrcRects(const Glyphs &glyphs, int additional
         if (!glyphInfo.isEmpty())
         {
             rbp::RectSize rs;
-            rs.width = glyphInfo.width + additionalHeight;
-            rs.height = glyphInfo.height + additionalWidth;
+            rs.width = glyphInfo.width + additionalWidth;
+            rs.height = glyphInfo.height + additionalHeight;
             rs.tag = kv.first;
             result.push_back(rs);
         }
@@ -64,8 +64,9 @@ App::Glyphs App::collectGlyphInfo(ft::Face& face,
 
 uint32_t App::arrangeGlyphs(Glyphs& glyphs, const Config& config)
 {
-    std::vector< rbp::RectSize > srcRects = getSrcRects(glyphs, config.spacing.hor + config.padding.left + config.padding.right,
-                                                        config.spacing.ver + config.padding.up + config.padding.down);
+    int additionalWidth = config.spacing.hor + config.padding.left + config.padding.right;
+    int additionalHeight = config.spacing.ver + config.padding.up + config.padding.down;
+    std::vector<rbp::RectSize> glyphRectangles = getGlyphRectangles(glyphs, additionalWidth, additionalHeight);
 
     rbp::MaxRectsBinPack mrbp;
     uint32_t pageCount = 0;
@@ -74,35 +75,26 @@ uint32_t App::arrangeGlyphs(Glyphs& glyphs, const Config& config)
         //TODO: check negative dimension.
         mrbp.Init(config.textureSize.w - config.spacing.hor, config.textureSize.h - config.spacing.ver);
 
-        std::vector<rbp::Rect> readyRects;
-        mrbp.Insert( srcRects, readyRects, rbp::MaxRectsBinPack::RectBestAreaFit );
-        if ( readyRects.empty() )
+        std::vector<rbp::Rect> arrangedRectangles;
+        mrbp.Insert( glyphRectangles, arrangedRectangles, rbp::MaxRectsBinPack::RectBestAreaFit );
+        if ( arrangedRectangles.empty() )
         {
-            if ( !srcRects.empty() )
+            if ( !glyphRectangles.empty() )
                 throw std::runtime_error("can not fit glyphs to texture");
             break;
         }
 
-        for ( auto r: readyRects )
+        for ( const auto& r: arrangedRectangles )
         {
             glyphs[r.tag].x = r.x + config.spacing.hor;
             glyphs[r.tag].y = r.y + config.spacing.ver;
             glyphs[r.tag].page = pageCount;
         }
 
-        pageCount++;
+        ++pageCount;
     }
 
     return pageCount;
-}
-
-int App::getDigitCount(uint16_t x)
-{
-    return (x < 10 ? 1 :
-            (x < 100 ? 2 :
-             (x < 1000 ? 3 :
-              (x < 10000 ? 4 :
-               5))));
 }
 
 void App::savePng(const std::string& fileName, const uint32_t* buffer, uint32_t w, uint32_t h, bool withAlpha)
@@ -110,10 +102,9 @@ void App::savePng(const std::string& fileName, const uint32_t* buffer, uint32_t 
     std::vector<unsigned char> png;
     lodepng::State state;
 
-    state.encoder.add_id = 0; //Don't add LodePNG version chunk to save more bytes
+    state.encoder.add_id = 0; // Don't add LodePNG version chunk to save more bytes
     state.encoder.auto_convert = 0;
     state.info_png.color.colortype = withAlpha ? LCT_RGBA : LCT_RGB;
-
 
     ///state.encoder.text_compression = 1; //Not needed because we don't add text chunks, but this demonstrates another optimization setting
     //state.encoder.zlibsettings.nicematch = 258; //Set this to the max possible, otherwise it can hurt compression
@@ -122,23 +113,22 @@ void App::savePng(const std::string& fileName, const uint32_t* buffer, uint32_t 
 
     unsigned error = lodepng::encode(png, reinterpret_cast<const unsigned char*>(buffer), w, h, state);
     if (error)
-        throw std::runtime_error("PNG encoder error " + std::to_string(error) + ": " + lodepng_error_text(error));
+        throw std::runtime_error("png encoder error " + std::to_string(error) + ": " + lodepng_error_text(error));
 
     error = lodepng::save_file(png, fileName);
     if (error)
-        throw std::runtime_error("PNG save to file error " + std::to_string(error) + ": " + lodepng_error_text(error));
+        throw std::runtime_error("png save to file error " + std::to_string(error) + ": " + lodepng_error_text(error));
 }
 
 void App::execute(int argc, char* argv[])
 {
-    const Config config = helpers::parseCommandLine(argc, argv);
+    ProgramOptions po;
+    const Config config = po.parseCommandLine(argc, argv);
 
     ft::Library library;
     ft::Face face(library, config.fontFile, config.fontSize);
-    //face.debugInfo();
 
     Glyphs glyphs = collectGlyphInfo(face, config.chars, config.textureSize.w, config.textureSize.h);
-
     const uint32_t pageCount = arrangeGlyphs(glyphs, config);
 
     /////////////////////////////////////////////////////////////
@@ -146,7 +136,7 @@ void App::execute(int argc, char* argv[])
     std::vector<std::string> pageNames;
 
     //TODO: should we decrement pageCount before calculate?
-    int pageNameDigits = getDigitCount(pageCount);
+    size_t pageNameDigits = getNumberLen(pageCount);
 
     // Render every page
     for (uint32_t page = 0; page < pageCount; ++page)
@@ -170,7 +160,7 @@ void App::execute(int argc, char* argv[])
                 assert(x >= 0);
                 assert(y >= 0);
 
-                face.renderGlyph(&surface[0], config.textureSize.w, config.textureSize.h, x, y, kv.first, config.color.getUint32(0));
+                face.renderGlyph(&surface[0], config.textureSize.w, config.textureSize.h, x, y, kv.first, config.color.getBGR());
             }
         }
 
@@ -179,8 +169,8 @@ void App::execute(int argc, char* argv[])
             uint32_t* cur = surface.data();
             uint32_t* end = &surface.back();
 
-            uint32_t fgColor = config.color.getUint32(0);
-            uint32_t bgColor = config.backgroundColor.getUint32(0);
+            uint32_t fgColor = config.color.getBGR();
+            uint32_t bgColor = config.backgroundColor.getBGR();
 
             while (cur <= end)
             {
