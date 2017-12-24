@@ -35,8 +35,9 @@ addons:
     project:
       name: "vladimirgamalyan/fontbm"
       description: "Build submitted via Travis CI"
+    notification_email: vladimir.gamalian@gmail.com
     build_command_prepend: "cmake ."
-    build_command:   "make -j 4"
+    build_command:   "make"
     branch_pattern: coverity_scan
 
 deploy:
