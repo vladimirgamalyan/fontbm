@@ -14,13 +14,15 @@
 #define debug_assert(x)
 #endif
 
+#include <cstdint>
+
 namespace rbp {
 
 struct RectSize
 {
 	int width;
 	int height;
-	int tag;
+    std::uint32_t tag;
 };
 
 struct Rect
@@ -29,7 +31,7 @@ struct Rect
 	int y;
 	int width;
 	int height;
-	int tag;
+	std::uint32_t tag;
 };
 
 /// Performs a lexicographic compare on (rect short side, rect long side).

@@ -5,7 +5,7 @@
 #include "Config.h"
 #include "GlyphInfo.h"
 #include "freeType/FtLibrary.h"
-#include "freeType/FtFace.h"
+#include "freeType/FtFont.h"
 
 class App
 {
@@ -14,12 +14,11 @@ public:
 
 private:
     typedef std::map<uint32_t, GlyphInfo> Glyphs;
-    std::vector<rbp::RectSize> getSrcRects(const Glyphs &glyphs, int additionalWidth, int additionalHeight);
+    std::vector<rbp::RectSize> getGlyphRectangles(const Glyphs& glyphs, int additionalWidth, int additionalHeight);
     Glyphs collectGlyphInfo(ft::Face& face,
                             const std::set<uint32_t> &codes,
                             uint32_t maxTextureSizeX,
                             uint32_t maxTextureSizeY);
     uint32_t arrangeGlyphs(Glyphs& glyphs, const Config& config);
-    int getDigitCount(uint16_t x);
     void savePng(const std::string& fileName, const uint32_t* buffer, uint32_t w, uint32_t h, bool withAlpha);
 };
