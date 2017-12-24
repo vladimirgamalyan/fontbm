@@ -3,7 +3,9 @@ dist: trusty
 
 env:
   global:
-   - secure: "kzCmAIYygxPZIEL0vJ0ntJAPiN5Oc6R1hg5F5z6gLVz4GrbQSOJW2evul9NF82wwLeNs5KoM7fOKKGLB2XitVh5iVE8RMDp4a/4aQkT7bVUUV7q1rJYsnFZ3RN3MiVeMlRX/XswIlgdPbq9MOADdgO6+SVcdxo217tujtBly3SIJhINrnUxMBAU0ZbtX3z4sC1xjH6zTp4LTjfOwpGCvsyoihCb8yAzP/bGYnymN83KTRCBdXustwDRmfukxX8gUP4G3kwWk5ygy9iH2b/svyOTn5L1Q5J1O+3uOaSVGKLKBbtxj6IzNyXkr8LJxAhqyLVWDQkP6QI0zztXvE+9dgrBaPksToAosP2ClyLty0q+h4fOBxgkOqtfq096X4Zerwh1W38nyVzdOn7LFwsU57KkXRdiSYiWYos+AcQIsXa+dJUAspIcQPAPo2OIEsPWEy/Ey1oO5AGgcoRgmSRWPLNfxDwXQAGtZPnqHTnUgzhKkBz6L1oNs7bRLhAPMFz2g0WZJTxOcM3EmsxEEBQKKLiEsa+pSicHPmhSq+Sa5tK/MZzExsqLnBrUgmXwAmG7YAJcWmjpowJodI+6qOhr+g/K5rLDilDFehCABDfeSaJBNtpaLPOH8neFop7Tci3WZBfWjzcC2nIaCj/FtLrmXOnIah0G27TYQUvF813t967E="
+   # The next declaration is the encrypted COVERITY_SCAN_TOKEN, created
+   #   via the "travis encrypt" command using the project repo's public key
+   - secure: "myimba0DXAhH/evNNdP8tmGWNRcl7evPLjtd6o+Bm3gMsp0cS3IuiVW1Golx6fg9BJk48h0P/KR68n9N7tPstZp3leHMuk2n07YIHs4Lvc2DIvnVc9AyBA/4dxxfmUrTwI4r19UcAElvFWSllk3T2Bz8j8kTzkuvjkMidVPFEjmFGxLQ8XpZdy+6oJCLrBr5vjqSl2W1hMb+YK8C/rKp4MXX00lzebVTsOuDoukRF4/LLPR8f/4XPMylg4506xtl7NCMDRb3AFWxiQ438jdKrkHeIbawybrbNeoc+VAgY9olKKIJjXzleVHKyByyNz1NdYpvwXckRewS0PMJqV4K53lH1htyzZTFEgKmBjJAHqUv28JHNMCSfJ4PNxjKyjytB/RBhFt8pHd/sCslFZwd3+Mxb3UyBdoQ0nKQ2eqdZ9LofT9cqUZI7j5RaX6p7/tLiKGzaaVwvQ8PhR5jDHN52nm6vyWHMtypl4YKnpF09aoqrMRuT/hna3X0EUFy85Svu69tppOqh0uIgQMwmRRTQ0lT2gmgt5lhJOyUFSTYkqvgC9JR3WL9ubEVM9UnZd73nk8cZQcfQtr0m9ot9xbUG8oMy04ffHcXObkjH3KWKgwCC6Sh++ItfVgiS3ah2RhpbTIMKg82mjmPZIDtsVjQypFz4PXsiU7Graso+hLnCug="
 
 matrix:
   include:
@@ -17,6 +19,7 @@ matrix:
         - g++-5
 
 before_install:
+- echo -n | openssl s_client -connect scan.coverity.com:443 | sed -ne '/-BEGIN CERTIFICATE-/,/-END CERTIFICATE-/p' | sudo tee -a /etc/ssl/certs/ca-
 - if [ -n "$GCC_VERSION" ]; then export CXX="g++-${GCC_VERSION}" CC="gcc-${GCC_VERSION}";
   fi
 - if [ -n "$CLANG_VERSION" ]; then export CXX="clang++-${CLANG_VERSION}" CC="clang-${CLANG_VERSION}";
@@ -37,8 +40,8 @@ addons:
       description: "Build submitted via Travis CI"
     notification_email: vladimir.gamalian@gmail.com
     build_command_prepend: "cmake ."
-    build_command:   "make"
-    branch_pattern: coverity_scan
+    build_command: "make"
+    branch_pattern: coverity_scan	
 
 deploy:
   provider: releases
