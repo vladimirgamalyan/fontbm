@@ -17,6 +17,14 @@ matrix:
         - ubuntu-toolchain-r-test
         packages:
         - g++-5
+    coverity_scan:
+      project:
+        name: "vladimirgamalyan/fontbm"
+        description: "Build submitted via Travis CI"
+      notification_email: vladimir.gamalian@gmail.com
+      build_command_prepend: "cmake ."
+      build_command: "make"
+      branch_pattern: coverity_scan			
 
 before_install:
 - echo -n | openssl s_client -connect scan.coverity.com:443 | sed -ne '/-BEGIN CERTIFICATE-/,/-END CERTIFICATE-/p' | sudo tee -a /etc/ssl/certs/ca-
@@ -32,16 +40,6 @@ script:
 - cmake -DCMAKE_CXX_FLAGS=-Werror .
 - make
 - "./unit_tests"
-
-addons:
-  coverity_scan:
-    project:
-      name: "vladimirgamalyan/fontbm"
-      description: "Build submitted via Travis CI"
-    notification_email: vladimir.gamalian@gmail.com
-    build_command_prepend: "cmake ."
-    build_command: "make"
-    branch_pattern: coverity_scan	
 
 deploy:
   provider: releases
