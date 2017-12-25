@@ -1,11 +1,9 @@
 cmake_minimum_required(VERSION 3.0)
 project(fontbm)
 
-# freetype
 find_package(Freetype REQUIRED)
 include_directories(${FREETYPE_INCLUDE_DIRS})
 
-# GCC/clang flags
 if(NOT MSVC)
     set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++11 -Wall -Wextra -pedantic")
 endif(NOT MSVC)
@@ -52,5 +50,6 @@ add_executable(unit_tests
         src/utils/getNumberLenTest.cpp
         src/utils/splitStrByDelimTest.cpp
         src/utils/extractFileNameTest.cpp
-        src/ProgramOptionsTest.cpp)
+        src/ProgramOptionsTest.cpp
+        )
 target_link_libraries(unit_tests ${COMMON_LIBRARIES})
