@@ -9,10 +9,8 @@ int main(int argc, char* argv[])
     {
         std::unique_ptr<App> app(new App);
         app->execute(argc, argv);
-
-        return EXIT_SUCCESS;
     }
-    catch (HelpException)
+    catch (HelpException&)
     {
         return EXIT_SUCCESS;
     }
@@ -26,4 +24,6 @@ int main(int argc, char* argv[])
         std::cerr << "unknown exception" << std::endl;
         return EXIT_FAILURE;
     }
+
+    return EXIT_SUCCESS;
 }

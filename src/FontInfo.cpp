@@ -2,8 +2,8 @@
 #include <fstream>
 #include <iostream>
 #include "FontInfo.h"
-#include "tinyxml2/tinyxml2.h"
-#include "json.hpp"
+#include "external/tinyxml2/tinyxml2.h"
+#include "external/json.hpp"
 
 std::string FontInfo::getCharSetName(uint8_t charSet)
 {

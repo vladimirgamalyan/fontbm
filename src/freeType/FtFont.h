@@ -25,10 +25,10 @@
 
 namespace ft {
 
-class Face
+class Font
 {
 public:
-    Face(Library& library, const std::string& fontFile, int ptsize, int faceIndex = 0) : library(library) {
+    Font(Library& library, const std::string& fontFile, int ptsize, int faceIndex = 0) : library(library) {
         if (!library.library)
             throw std::runtime_error("Library not initialized");
 
@@ -119,7 +119,7 @@ public:
         glyph_italics *= height;
     }
 
-    ~Face() {
+    ~Font() {
         FT_Done_Face(face);
     }
 
@@ -199,7 +199,7 @@ public:
         }
     }
 
-    std::string getFamilyName(const std::string& defaultName)
+    std::string getFamilyNameOr(const std::string& defaultName)
     {
         if (!face->family_name)
             return defaultName;

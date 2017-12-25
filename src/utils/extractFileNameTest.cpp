@@ -1,4 +1,4 @@
-#include "../catch.hpp"
+#include "../external/catch.hpp"
 #include "extractFileName.h"
 
 TEST_CASE("extractFileName")
