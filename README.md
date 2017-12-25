@@ -1,6 +1,7 @@
 # fontbm
 [![Build Status](https://travis-ci.org/vladimirgamalyan/fontbm.svg)](https://travis-ci.org/vladimirgamalyan/fontbm)
 [![Build status](https://ci.appveyor.com/api/projects/status/boq0olngopfabaac?svg=true)](https://ci.appveyor.com/project/vladimirgamalyan/fontbm)
+[![Coverage Status](https://coveralls.io/repos/github/vladimirgamalyan/fontbm/badge.svg?branch=master)](https://coveralls.io/github/vladimirgamalyan/fontbm?branch=master)
 [![Coverity Scan Build Status](https://scan.coverity.com/projects/14665/badge.svg)](https://scan.coverity.com/projects/14665)
 
 Command line bitmap font generator, compatible with [BMFont](http://www.angelcode.com/products/bmfont/).  
