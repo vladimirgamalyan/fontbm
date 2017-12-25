@@ -7,7 +7,7 @@
 #include <iomanip>
 #include "FontInfo.h"
 #include "utils/extractFileName.h"
-#include "lodepng/lodepng.h"
+#include "external/lodepng/lodepng.h"
 #include "utils/getNumberLen.h"
 
 std::vector<rbp::RectSize> App::getGlyphRectangles(const Glyphs &glyphs, int additionalWidth, int additionalHeight)

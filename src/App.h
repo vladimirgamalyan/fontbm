@@ -1,7 +1,7 @@
 #pragma once
 #include <stdint.h>
 #include <map>
-#include "maxRectsBinPack/MaxRectsBinPack.h"
+#include "external/maxRectsBinPack/MaxRectsBinPack.h"
 #include "Config.h"
 #include "GlyphInfo.h"
 #include "freeType/FtLibrary.h"

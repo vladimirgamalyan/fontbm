@@ -5,7 +5,7 @@
 #include <functional>
 #include <regex>
 #include "HelpException.h"
-#include "cxxopts.hpp"
+#include "external/cxxopts.hpp"
 #include "utils/splitStrByDelim.h"
 
 Config ProgramOptions::parseCommandLine(int argc, char* argv[])

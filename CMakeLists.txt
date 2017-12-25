@@ -19,25 +19,25 @@ set(SOURCES
         src/ProgramOptions.cpp
         src/ProgramOptions.h
         src/GlyphInfo.h
-        src/cxxopts.hpp
+        src/external/cxxopts.hpp
         src/Config.h
-        src/json.hpp
+        src/external/json.hpp
         src/HelpException.h
         src/utils/extractFileName.h
         src/utils/splitStrByDelim.h
         src/utils/getNumberLen.h
-        src/tinyxml2/tinyxml2.cpp
-        src/tinyxml2/tinyxml2.h
-        src/maxRectsBinPack/MaxRectsBinPack.cpp
-        src/maxRectsBinPack/MaxRectsBinPack.h
-        src/maxRectsBinPack/Rect.h
         src/freeType/FtLibrary.h
         src/freeType/FtFont.h
         src/freeType/FtException.h
         src/freeType/FtInclude.h
         src/freeType/FtLibrary.cpp
-        src/lodepng/lodepng.h
-        src/lodepng/lodepng.cpp
+        src/external/tinyxml2/tinyxml2.cpp
+        src/external/tinyxml2/tinyxml2.h
+        src/external/maxRectsBinPack/MaxRectsBinPack.cpp
+        src/external/maxRectsBinPack/MaxRectsBinPack.h
+        src/external/maxRectsBinPack/Rect.h
+        src/external/lodepng/lodepng.h
+        src/external/lodepng/lodepng.cpp
         )
 
 add_definitions(-DLODEPNG_NO_COMPILE_DECODER)
@@ -46,7 +46,7 @@ add_executable(fontbm ${SOURCES})
 target_link_libraries(fontbm ${COMMON_LIBRARIES} ${FREETYPE_LIBRARIES})
 
 add_executable(unit_tests
-        src/catch.hpp
+        src/external/catch.hpp
         src/catchMain.cpp
         src/ProgramOptions.cpp
         src/utils/getNumberLenTest.cpp

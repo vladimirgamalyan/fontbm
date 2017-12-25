@@ -1,4 +1,4 @@
-#include "../catch.hpp"
+#include "../external/catch.hpp"
 #include "getNumberLen.h"
 
 TEST_CASE("getNumberLen")
