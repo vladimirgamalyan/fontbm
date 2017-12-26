@@ -40,6 +40,12 @@ option  | default | comment
 --texture-width | 256 | texture width
 --texture-height | 256 | texture height
 
+## Build
+Required:
+  >= GCC-4.9 or >= clang-3.8 or VS2015.
+  >= cmake 3.0
+  FreeType
+
 ## License
 
 [MIT License](http://opensource.org/licenses/MIT)
