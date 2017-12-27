@@ -16,7 +16,7 @@ fontbm --font-file Vera.ttf --output vera
 ```
 Will produce vera.fnt ([file format](http://www.angelcode.com/products/bmfont/doc/file_format.html)) and vera.png ([how to render text](http://www.angelcode.com/products/bmfont/doc/render_text.html)).
 
-Available options (required in **bold**):
+Available options (**bold** options are required):
 
 
 option  | default | comment
@@ -44,8 +44,8 @@ option  | default | comment
 Dependencies:
 
 * GCC-4.9 (or VS2015 Update 3, for windows)
-* cmake 3.0
-* FreeType
+* CMake 3.0 (CMake 3.10, for use vcpkg on windows)
+* [FreeType](https://www.freetype.org/)
 
 Quickstart (ubuntu):
 ```
