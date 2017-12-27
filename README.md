@@ -43,7 +43,7 @@ option  | default | comment
 
 Dependencies:
 
-* GCC-4.9 (VS2015 for windows)
+* GCC-4.9 (or VS2015 for windows)
 * cmake 3.0
 * FreeType
 
@@ -54,6 +54,8 @@ make
 ```
 
 Quickstart (windows):
+
+Generate project files:
 ```
 cmake -G "Visual Studio 14 2015"
 ```
@@ -62,7 +64,7 @@ Download and install FreeType library, open .sln file in Visual Studio 2015, con
 Or, if vcpkg is used:
 ```
 vcpkg install freetype
-cmake -G "Visual Studio 14 2015" -DCMAKE_TOOLCHAIN_FILE=c:/tools/vcpkg/scripts/buildsystems/vcpkg.cmake
+cmake -G "Visual Studio 14 2015" -DCMAKE_TOOLCHAIN_FILE=<path to vcpkg dir>/scripts/buildsystems/vcpkg.cmake
 ```
 Then open .sln in Visual Studio 2015 and rebuild all.
 
