@@ -38,7 +38,7 @@ matrix:
       addons:
         apt:
           sources:
-            - llvm-toolchain-precise-4.0
+            - llvm-toolchain-trusty-4.0
           packages:
             - clang-4.0
       env:
