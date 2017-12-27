@@ -42,8 +42,8 @@ option  | default | comment
 
 ## Build
 Required:
-* >= GCC-4.9 or >= clang-3.8 or VS2015
-* >= cmake 3.0
+* GCC-4.9 or clang-3.8 or VS2015
+* cmake 3.0
 * FreeType
 
 cmake .
