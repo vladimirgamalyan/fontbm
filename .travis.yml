@@ -16,6 +16,7 @@ matrix:
           - secure: "myimba0DXAhH/evNNdP8tmGWNRcl7evPLjtd6o+Bm3gMsp0cS3IuiVW1Golx6fg9BJk48h0P/KR68n9N7tPstZp3leHMuk2n07YIHs4Lvc2DIvnVc9AyBA/4dxxfmUrTwI4r19UcAElvFWSllk3T2Bz8j8kTzkuvjkMidVPFEjmFGxLQ8XpZdy+6oJCLrBr5vjqSl2W1hMb+YK8C/rKp4MXX00lzebVTsOuDoukRF4/LLPR8f/4XPMylg4506xtl7NCMDRb3AFWxiQ438jdKrkHeIbawybrbNeoc+VAgY9olKKIJjXzleVHKyByyNz1NdYpvwXckRewS0PMJqV4K53lH1htyzZTFEgKmBjJAHqUv28JHNMCSfJ4PNxjKyjytB/RBhFt8pHd/sCslFZwd3+Mxb3UyBdoQ0nKQ2eqdZ9LofT9cqUZI7j5RaX6p7/tLiKGzaaVwvQ8PhR5jDHN52nm6vyWHMtypl4YKnpF09aoqrMRuT/hna3X0EUFy85Svu69tppOqh0uIgQMwmRRTQ0lT2gmgt5lhJOyUFSTYkqvgC9JR3WL9ubEVM9UnZd73nk8cZQcfQtr0m9ot9xbUG8oMy04ffHcXObkjH3KWKgwCC6Sh++ItfVgiS3ah2RhpbTIMKg82mjmPZIDtsVjQypFz4PXsiU7Graso+hLnCug="
       before_install:
         - echo -n | openssl s_client -connect scan.coverity.com:443 | sed -ne '/-BEGIN CERTIFICATE-/,/-END CERTIFICATE-/p' | sudo tee -a /etc/ssl/certs/ca-
+        - eval "${MATRIX_EVAL}"
       deploy:
         provider: releases
         api_key:
@@ -33,9 +34,6 @@ matrix:
         build_command_prepend: "cmake ."
         build_command: "make"
         branch_pattern: coverity_scan
-
-before_install:
-  - eval "${MATRIX_EVAL}"
 
 script:
   - cmake -DCMAKE_CXX_FLAGS=-Werror .
