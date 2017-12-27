@@ -43,7 +43,7 @@ option  | default | comment
 
 Dependencies:
 
-* GCC-4.9 (or VS2015 for windows)
+* GCC-4.9 (or VS2015 Update 3 for windows)
 * cmake 3.0
 * FreeType
 
@@ -61,7 +61,7 @@ cmake -G "Visual Studio 14 2015"
 ```
 Download and install FreeType library, open .sln file in Visual Studio 2015, configure paths to FreeType and rebuild all.
 
-Or, if vcpkg is used:
+Or, if [vcpkg](https://github.com/Microsoft/vcpkg) is used:
 ```
 vcpkg install freetype
 cmake -G "Visual Studio 14 2015" -DCMAKE_TOOLCHAIN_FILE=<path to vcpkg dir>/scripts/buildsystems/vcpkg.cmake
