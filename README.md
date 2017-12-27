@@ -44,7 +44,7 @@ option  | default | comment
 Dependencies:
 
 * GCC-4.9 (or VS2015 Update 3, for windows)
-* cmake 3.0
+* CMake 3.0 (CMake 3.10, for windows)
 * [FreeType](https://www.freetype.org/)
 
 Quickstart (ubuntu):
