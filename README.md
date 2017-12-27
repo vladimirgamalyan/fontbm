@@ -42,7 +42,7 @@ option  | default | comment
 
 ## Build
 Required:
-* GCC-4.9 or clang-3.9 or VS2015
+* GCC-4.9 or VS2015
 * cmake 3.0
 * FreeType
 
