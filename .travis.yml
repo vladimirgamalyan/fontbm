@@ -34,16 +34,6 @@ matrix:
         build_command: "make"
         branch_pattern: coverity_scan
 
-    - os: linux
-      addons:
-        apt:
-          sources:
-            - llvm-toolchain-trusty-5.0
-          packages:
-            - clang-5.0
-      env:
-        - MATRIX_EVAL="CC=clang-5.0 && CXX=clang++-5.0"
-
 before_install:
   - eval "${MATRIX_EVAL}"
 
