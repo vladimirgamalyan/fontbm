@@ -16,7 +16,7 @@ fontbm --font-file Vera.ttf --output vera
 ```
 Will produce vera.fnt ([file format](http://www.angelcode.com/products/bmfont/doc/file_format.html)) and vera.png ([how to render text](http://www.angelcode.com/products/bmfont/doc/render_text.html)).
 
-Available options (required in **bold**):
+Available options (**bold** options are required):
 
 
 option  | default | comment
