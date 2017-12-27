@@ -1,21 +1,20 @@
 # fontbm
-[![Build Status](https://travis-ci.org/vladimirgamalyan/fontbm.svg)](https://travis-ci.org/vladimirgamalyan/fontbm)
-[![Build status](https://ci.appveyor.com/api/projects/status/boq0olngopfabaac?svg=true)](https://ci.appveyor.com/project/vladimirgamalyan/fontbm)
-[![Coverage Status](https://coveralls.io/repos/github/vladimirgamalyan/fontbm/badge.svg?branch=master)](https://coveralls.io/github/vladimirgamalyan/fontbm?branch=master)
-[![Coverity Scan Build Status](https://scan.coverity.com/projects/14665/badge.svg)](https://scan.coverity.com/projects/14665)
-
-Command line bitmap font generator, compatible with [BMFont](http://www.angelcode.com/products/bmfont/).  
-Download compiled version (windows, linux) from [Releases](https://github.com/vladimirgamalyan/fontbm/releases)
-
 ![sample](/assets/sample0.png?raw=true)
 ![sample](/assets/sample1.png?raw=true)
+
+[![Build Status](https://travis-ci.org/vladimirgamalyan/fontbm.svg)](https://travis-ci.org/vladimirgamalyan/fontbm)
+[![Build status](https://ci.appveyor.com/api/projects/status/boq0olngopfabaac?svg=true)](https://ci.appveyor.com/project/vladimirgamalyan/fontbm)
+
+Command line bitmap font generator, compatible with [BMFont](http://www.angelcode.com/products/bmfont/).  
+Download compiled version (fontbm.zip for windows, fontbm for linux) from [Releases](https://github.com/vladimirgamalyan/fontbm/releases).
+
+
 
 ## Usage
 ```
 fontbm --font-file Vera.ttf --output vera
 ```
-will produce vera.fnt and vera.png
-
+Will produce vera.fnt ([file format](http://www.angelcode.com/products/bmfont/doc/file_format.html)) and vera.png ([how to render text](http://www.angelcode.com/products/bmfont/doc/render_text.html)).
 
 Available options (required in **bold**):
 
@@ -40,11 +39,44 @@ option  | default | comment
 --texture-width | 256 | texture width
 --texture-height | 256 | texture height
 
+## Building
+
+Dependencies:
+
+* GCC-4.9 (or VS2015 Update 3, for windows)
+* cmake 3.0
+* FreeType
+
+Quickstart (ubuntu):
+```
+cmake .  
+make
+```
+
+Quickstart (windows):
+
+Generate project files:
+```
+cmake -G "Visual Studio 14 2015"
+```
+Download and install FreeType library, open .sln file in Visual Studio 2015, configure paths to FreeType and rebuild all.
+
+Or, if [vcpkg](https://github.com/Microsoft/vcpkg) is used:
+```
+vcpkg install freetype
+cmake -G "Visual Studio 14 2015" -DCMAKE_TOOLCHAIN_FILE=<path to vcpkg dir>/scripts/buildsystems/vcpkg.cmake
+```
+Then open .sln in Visual Studio 2015 and rebuild all.
+
 ## License
 
 [MIT License](http://opensource.org/licenses/MIT)
 
 The project also bundles third party software under its own licenses:
-* [juj/RectangleBinPack](https://github.com/juj/RectangleBinPack) - 2d rectangular bin packing - Public Domain
 * [lvandeve/lodepng](https://github.com/lvandeve/lodepng) - PNG encoder and decoder in C and C++ - [zlib](https://github.com/lvandeve/lodepng/issues/25)
+* [juj/RectangleBinPack](https://github.com/juj/RectangleBinPack) - 2d rectangular bin packing - Public Domain
+* [leethomason/tinyxml2](https://github.com/leethomason/tinyxml2) - a simple, small, efficient, C++ XML parse - [zlib](https://github.com/leethomason/tinyxml2#license)
+* [UTF8-CPP](http://utfcpp.sourceforge.net/) - UTF-8 with C++ in a Portable Way - [BSL-1.0](http://www.boost.org/users/license.html)
+* [catchorg/Catch2](https://github.com/catchorg/Catch2) - A modern, C++-native, header-only, test framework for unit-tests - [BSL-1.0](https://github.com/catchorg/Catch2/blob/master/LICENSE.txt)
 * [jarro2783/cxxopts](https://github.com/jarro2783/cxxopts) - Lightweight C++ command line option parser - [MIT](https://github.com/jarro2783/cxxopts/blob/master/LICENSE)
+* [nlohmann/json](https://github.com/nlohmann/json) - JSON for Modern C++ - [MIT](https://github.com/nlohmann/json/blob/develop/LICENSE.MIT)

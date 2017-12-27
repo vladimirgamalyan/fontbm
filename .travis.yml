@@ -1,57 +1,46 @@
 language: cpp
 dist: trusty
 
-env:
-  global:
-   # The next declaration is the encrypted COVERITY_SCAN_TOKEN, created
-   #   via the "travis encrypt" command using the project repo's public key
-   - secure: "myimba0DXAhH/evNNdP8tmGWNRcl7evPLjtd6o+Bm3gMsp0cS3IuiVW1Golx6fg9BJk48h0P/KR68n9N7tPstZp3leHMuk2n07YIHs4Lvc2DIvnVc9AyBA/4dxxfmUrTwI4r19UcAElvFWSllk3T2Bz8j8kTzkuvjkMidVPFEjmFGxLQ8XpZdy+6oJCLrBr5vjqSl2W1hMb+YK8C/rKp4MXX00lzebVTsOuDoukRF4/LLPR8f/4XPMylg4506xtl7NCMDRb3AFWxiQ438jdKrkHeIbawybrbNeoc+VAgY9olKKIJjXzleVHKyByyNz1NdYpvwXckRewS0PMJqV4K53lH1htyzZTFEgKmBjJAHqUv28JHNMCSfJ4PNxjKyjytB/RBhFt8pHd/sCslFZwd3+Mxb3UyBdoQ0nKQ2eqdZ9LofT9cqUZI7j5RaX6p7/tLiKGzaaVwvQ8PhR5jDHN52nm6vyWHMtypl4YKnpF09aoqrMRuT/hna3X0EUFy85Svu69tppOqh0uIgQMwmRRTQ0lT2gmgt5lhJOyUFSTYkqvgC9JR3WL9ubEVM9UnZd73nk8cZQcfQtr0m9ot9xbUG8oMy04ffHcXObkjH3KWKgwCC6Sh++ItfVgiS3ah2RhpbTIMKg82mjmPZIDtsVjQypFz4PXsiU7Graso+hLnCug="
-
 matrix:
   include:
-  - env: GCC_VERSION=5
-    os: linux
-	
-addons:
-  apt:
-	sources:
-	- ubuntu-toolchain-r-test
-	packages:
-	- g++-5
-  coverity_scan:
-	project:
-	  name: "vladimirgamalyan/fontbm"
-	  description: "Build submitted via Travis CI"
-	notification_email: vladimir.gamalian@gmail.com
-	build_command_prepend: "cmake ."
-	build_command: "make"
-	branch_pattern: coverity_scan			
+    - os: linux
+      addons:
+        apt:
+          sources:
+            - ubuntu-toolchain-r-test
+          packages:
+            - g++-4.9
+      env:
+        - MATRIX_EVAL="CC=gcc-4.9 && CXX=g++-4.9"
+        - global:
+          - secure: "myimba0DXAhH/evNNdP8tmGWNRcl7evPLjtd6o+Bm3gMsp0cS3IuiVW1Golx6fg9BJk48h0P/KR68n9N7tPstZp3leHMuk2n07YIHs4Lvc2DIvnVc9AyBA/4dxxfmUrTwI4r19UcAElvFWSllk3T2Bz8j8kTzkuvjkMidVPFEjmFGxLQ8XpZdy+6oJCLrBr5vjqSl2W1hMb+YK8C/rKp4MXX00lzebVTsOuDoukRF4/LLPR8f/4XPMylg4506xtl7NCMDRb3AFWxiQ438jdKrkHeIbawybrbNeoc+VAgY9olKKIJjXzleVHKyByyNz1NdYpvwXckRewS0PMJqV4K53lH1htyzZTFEgKmBjJAHqUv28JHNMCSfJ4PNxjKyjytB/RBhFt8pHd/sCslFZwd3+Mxb3UyBdoQ0nKQ2eqdZ9LofT9cqUZI7j5RaX6p7/tLiKGzaaVwvQ8PhR5jDHN52nm6vyWHMtypl4YKnpF09aoqrMRuT/hna3X0EUFy85Svu69tppOqh0uIgQMwmRRTQ0lT2gmgt5lhJOyUFSTYkqvgC9JR3WL9ubEVM9UnZd73nk8cZQcfQtr0m9ot9xbUG8oMy04ffHcXObkjH3KWKgwCC6Sh++ItfVgiS3ah2RhpbTIMKg82mjmPZIDtsVjQypFz4PXsiU7Graso+hLnCug="
+      before_install:
+        - echo -n | openssl s_client -connect scan.coverity.com:443 | sed -ne '/-BEGIN CERTIFICATE-/,/-END CERTIFICATE-/p' | sudo tee -a /etc/ssl/certs/ca-
+      deploy:
+        provider: releases
+        api_key:
+          secure: d6b/6Z50XUCe6Ucjyb8Cglcb9mS2eTUVUkT24nsK1zVoZcPOFN5fCzPMTnJ+QPl1w3YypoYQR4r/kD1POA4ozaul9qjGK0T3zDYAlmr7jS9+f5ehRrY8Vtl2ii4CiDYgQ3/KAHgiHcGBQPosV7+AEMkzVLj0AQ6QjIfQuMIlf19l/i4c5cn/Z4lVp3AnjaFVFNYVB5ZdP8lqf5GIZf1YgflkuvpeSDjlkzXfajwFh8ZiQUDm5VtEr4tySbFyDQjnW8r2sff1MvVZCdEDs2N5CS5Hqikrry4kneOI46NdGwr1RDRXzAibZa6E9V3ACgYAZEAlvGKpM+YKD91/u4ATnTIhowlKqWDwN3cfXLZ0haXd02lJI8B4Vt5Ls3hrc/IlrbEF8TwuDO6jgtMqgva4K/rXQkgK7dIrNkC214TpxOjXDwLIQdJCig/czr7orunjOOtL+WPjRgLeYSP2e0/3SUd2imWvJ2T9FRB5looj8QXi/RmUg3UZJi37mZue6/xfvzv0URbd0ZUxRQFnrVZa6v0tAYhaiQ3jBFZPUKLEMshRD1hj6c2qb+7gWa8AwL3caeJlpZk0kwpdtVH4UWVVFHQJe8tu4pam6bm/deRNrhScp4x2lpHiJ0H4MkQZVsxi/lc/RgYmS5I+Ok1QTCQTNaOiEtXFKNXD5wpgWu4dc+A=
+        file: "./fontbm"
+        skip_cleanup: true
+        overwrite: true
+        on:
+          branch: release
+          tags: true
+      coverity_scan:
+        project:
+          name: "vladimirgamalyan/fontbm"
+          description: "Build submitted via Travis CI"
+        build_command_prepend: "cmake ."
+        build_command: "make"
+        branch_pattern: coverity_scan
 
 before_install:
-- echo -n | openssl s_client -connect scan.coverity.com:443 | sed -ne '/-BEGIN CERTIFICATE-/,/-END CERTIFICATE-/p' | sudo tee -a /etc/ssl/certs/ca-
-- if [ -n "$GCC_VERSION" ]; then export CXX="g++-${GCC_VERSION}" CC="gcc-${GCC_VERSION}";
-  fi
-- if [ -n "$CLANG_VERSION" ]; then export CXX="clang++-${CLANG_VERSION}" CC="clang-${CLANG_VERSION}";
-  fi
-- which $CXX
-- which $CC
-- "$CXX --version"
+  - eval "${MATRIX_EVAL}"
 
 script:
-- cmake -DCMAKE_CXX_FLAGS=-Werror .
-- make
-- "./unit_tests"
-
-deploy:
-  provider: releases
-  api_key:
-    secure: d6b/6Z50XUCe6Ucjyb8Cglcb9mS2eTUVUkT24nsK1zVoZcPOFN5fCzPMTnJ+QPl1w3YypoYQR4r/kD1POA4ozaul9qjGK0T3zDYAlmr7jS9+f5ehRrY8Vtl2ii4CiDYgQ3/KAHgiHcGBQPosV7+AEMkzVLj0AQ6QjIfQuMIlf19l/i4c5cn/Z4lVp3AnjaFVFNYVB5ZdP8lqf5GIZf1YgflkuvpeSDjlkzXfajwFh8ZiQUDm5VtEr4tySbFyDQjnW8r2sff1MvVZCdEDs2N5CS5Hqikrry4kneOI46NdGwr1RDRXzAibZa6E9V3ACgYAZEAlvGKpM+YKD91/u4ATnTIhowlKqWDwN3cfXLZ0haXd02lJI8B4Vt5Ls3hrc/IlrbEF8TwuDO6jgtMqgva4K/rXQkgK7dIrNkC214TpxOjXDwLIQdJCig/czr7orunjOOtL+WPjRgLeYSP2e0/3SUd2imWvJ2T9FRB5looj8QXi/RmUg3UZJi37mZue6/xfvzv0URbd0ZUxRQFnrVZa6v0tAYhaiQ3jBFZPUKLEMshRD1hj6c2qb+7gWa8AwL3caeJlpZk0kwpdtVH4UWVVFHQJe8tu4pam6bm/deRNrhScp4x2lpHiJ0H4MkQZVsxi/lc/RgYmS5I+Ok1QTCQTNaOiEtXFKNXD5wpgWu4dc+A=
-  file: "./fontbm"
-  skip_cleanup: true
-#  overwrite: true
-  on:
-    branch: release
-    tags: true
+  - cmake -DCMAKE_CXX_FLAGS=-Werror .
+  - make
+  - "./unit_tests"
 
 notifications:
   email: false

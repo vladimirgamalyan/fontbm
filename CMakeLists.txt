@@ -29,6 +29,10 @@ set(SOURCES
         src/freeType/FtException.h
         src/freeType/FtInclude.h
         src/freeType/FtLibrary.cpp
+        src/external/utf8cpp/utf8.h
+        src/external/utf8cpp/utf8/core.h
+        src/external/utf8cpp/utf8/unchecked.h
+        src/external/utf8cpp/utf8/checked.h
         src/external/tinyxml2/tinyxml2.cpp
         src/external/tinyxml2/tinyxml2.h
         src/external/maxRectsBinPack/MaxRectsBinPack.cpp
