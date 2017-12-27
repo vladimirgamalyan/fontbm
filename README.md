@@ -12,9 +12,7 @@ Download compiled version (windows, linux) from [Releases](https://github.com/vl
 ```
 fontbm --font-file Vera.ttf --output vera
 ```
-will produce vera.fnt and vera.png
-
-["fnt" file format](http://www.angelcode.com/products/bmfont/doc/file_format.html), [how to render text](http://www.angelcode.com/products/bmfont/doc/render_text.html).
+Will produce vera.fnt ([file format](http://www.angelcode.com/products/bmfont/doc/file_format.html)) and vera.png ([how to render text](http://www.angelcode.com/products/bmfont/doc/render_text.html)).
 
 Available options (required in **bold**):
 
