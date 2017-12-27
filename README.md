@@ -6,7 +6,7 @@
 [![Build status](https://ci.appveyor.com/api/projects/status/boq0olngopfabaac?svg=true)](https://ci.appveyor.com/project/vladimirgamalyan/fontbm)
 
 Command line bitmap font generator, compatible with [BMFont](http://www.angelcode.com/products/bmfont/).  
-Download compiled version (fontbm.zip for windows, fontbm for linux) from [Releases](https://github.com/vladimirgamalyan/fontbm/releases)
+Download compiled version (fontbm.zip for windows, fontbm for linux) from [Releases](https://github.com/vladimirgamalyan/fontbm/releases).
 
 
 
@@ -39,14 +39,32 @@ option  | default | comment
 --texture-width | 256 | texture width
 --texture-height | 256 | texture height
 
-## Build
-Required:
-* GCC-4.9 or VS2015
+## Building
+
+Dependencies:
+
+* GCC-4.9 (VS2015 for windows)
 * cmake 3.0
 * FreeType
 
-cmake .
+Quickstart (ubuntu):
+```
+cmake .  
 make
+```
+
+Quickstart (windows):
+```
+cmake -G "Visual Studio 14 2015"
+```
+Download and install FreeType library, open .sln file in Visual Studio 2015, configure paths to FreeType and rebuild all.
+
+Or, if vcpkg is used:
+```
+vcpkg install freetype
+cmake -G "Visual Studio 14 2015" -DCMAKE_TOOLCHAIN_FILE=c:/tools/vcpkg/scripts/buildsystems/vcpkg.cmake
+```
+Then open .sln in Visual Studio 2015 and rebuild all.
 
 ## License
 
