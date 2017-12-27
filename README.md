@@ -45,7 +45,7 @@ Dependencies:
 
 * GCC-4.9 (or VS2015 Update 3, for windows)
 * cmake 3.0
-* FreeType
+* [FreeType](https://www.freetype.org/)
 
 Quickstart (ubuntu):
 ```
