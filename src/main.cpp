@@ -3,12 +3,11 @@
 #include "App.h"
 #include "HelpException.h"
 
-int main(int argc, char* argv[])
+int main(const int argc, char* argv[])
 {
     try
     {
-        std::unique_ptr<App> app(new App);
-        app->execute(argc, argv);
+		App::execute(argc, argv);
     }
     catch (HelpException&)
     {

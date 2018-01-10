@@ -20,6 +20,9 @@ namespace rbp {
 
 struct RectSize
 {
+	RectSize() = default;
+	RectSize(const int width, const int height, const int tag) : width(width), height(height), tag(tag) {}
+
 	int width;
 	int height;
     std::uint32_t tag;

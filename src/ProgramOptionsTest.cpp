@@ -63,12 +63,12 @@ TEST_CASE("parseColor")
 TEST_CASE("parseCharsString")
 {
     ProgramOptions po;
-    REQUIRE((po.parseCharsString("") == std::set<uint32_t>{}));
-    REQUIRE((po.parseCharsString("0") == std::set<uint32_t>{0}));
-    REQUIRE((po.parseCharsString("42") == std::set<uint32_t>{42}));
-    REQUIRE((po.parseCharsString("0-1") == std::set<uint32_t>{0,1}));
-    REQUIRE((po.parseCharsString("1-3") == std::set<uint32_t>{1,2,3}));
-    REQUIRE((po.parseCharsString(" 1 - 3 ") == std::set<uint32_t>{1,2,3}));
+    REQUIRE((po.parseCharsString("") == std::set<std::uint32_t>{}));
+    REQUIRE((po.parseCharsString("0") == std::set<std::uint32_t>{0}));
+    REQUIRE((po.parseCharsString("42") == std::set<std::uint32_t>{42}));
+    REQUIRE((po.parseCharsString("0-1") == std::set<std::uint32_t>{0,1}));
+    REQUIRE((po.parseCharsString("1-3") == std::set<std::uint32_t>{1,2,3}));
+    REQUIRE((po.parseCharsString(" 1 - 3 ") == std::set<std::uint32_t>{1,2,3}));
 
     REQUIRE_THROWS_AS(po.parseCharsString("foo"), std::logic_error);
     REQUIRE_THROWS_AS(po.parseCharsString("-1"), std::logic_error);

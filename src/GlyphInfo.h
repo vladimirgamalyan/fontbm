@@ -3,15 +3,15 @@
 
 struct GlyphInfo
 {
-    uint32_t page = 0;
+    std::uint32_t page = 0;
 
     // position on texture
-    int x = 0;
-    int y = 0;
+	std::uint32_t x = 0;
+	std::uint32_t y = 0;
 
     // size on texture
-    uint32_t width = 0;
-    uint32_t height = 0;
+    std::uint32_t width = 0;
+    std::uint32_t height = 0;
 
     // shift before render
     int xOffset = 0;
