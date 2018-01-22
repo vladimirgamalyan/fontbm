@@ -134,9 +134,6 @@ std::vector<std::string> App::renderTextures(const Glyphs& glyphs, const Config&
                 const auto x = glyph.x + config.padding.left;
 				const auto y = glyph.y + config.padding.up;
 
-                assert(x >= 0);
-                assert(y >= 0);
-
                 font.renderGlyph(&surface[0], config.textureSize.w, config.textureSize.h, x, y, kv.first, config.color.getBGR());
             }
         }
