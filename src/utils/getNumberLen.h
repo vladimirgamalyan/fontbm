@@ -6,10 +6,12 @@
 inline std::size_t getNumberLen(std::uint32_t x)
 {
     std::size_t digits = 0;
-    do {
+    do
+    {
         x /= 10;
         ++digits;
-    } while (x);
+    }
+    while (x);
 
     return digits;
 }

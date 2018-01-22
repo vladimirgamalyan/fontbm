@@ -51,10 +51,10 @@ App::Glyphs App::collectGlyphInfo(ft::Font& font, const std::set<std::uint32_t>&
 std::uint32_t App::arrangeGlyphs(Glyphs& glyphs, const Config& config)
 {
     const auto additionalWidth = config.spacing.hor + config.padding.left + config.padding.right;
-	const auto additionalHeight = config.spacing.ver + config.padding.up + config.padding.down;
-	//TODO: check workAreaW,H
-	const auto workAreaW = config.textureSize.w - config.spacing.hor;
-	const auto workAreaH = config.textureSize.h - config.spacing.ver;
+    const auto additionalHeight = config.spacing.ver + config.padding.up + config.padding.down;
+    //TODO: check workAreaW,H
+    const auto workAreaW = config.textureSize.w - config.spacing.hor;
+    const auto workAreaH = config.textureSize.h - config.spacing.ver;
 
     auto glyphRectangles = getGlyphRectangles(glyphs, additionalWidth, additionalHeight);
 
@@ -132,7 +132,7 @@ std::vector<std::string> App::renderTextures(const Glyphs& glyphs, const Config&
             if (!glyph.isEmpty())
             {
                 const auto x = glyph.x + config.padding.left;
-				const auto y = glyph.y + config.padding.up;
+                const auto y = glyph.y + config.padding.up;
 
                 font.renderGlyph(&surface[0], config.textureSize.w, config.textureSize.h, x, y, kv.first, config.color.getBGR());
             }
@@ -141,19 +141,19 @@ std::vector<std::string> App::renderTextures(const Glyphs& glyphs, const Config&
         if (!config.backgroundTransparent)
         {
             auto cur = surface.data();
-			const auto end = &surface.back();
+            const auto end = &surface.back();
 
-			const auto fgColor = config.color.getBGR();
-			const auto bgColor = config.backgroundColor.getBGR();
+            const auto fgColor = config.color.getBGR();
+            const auto bgColor = config.backgroundColor.getBGR();
 
             while (cur <= end)
             {
                 const std::uint32_t a0 = (*cur) >> 24;
-				const std::uint32_t a1 = 256 - a0;
-				const std::uint32_t rb1 = (a1 * (bgColor & 0xFF00FF)) >> 8;
-				const std::uint32_t rb2 = (a0 * (fgColor & 0xFF00FF)) >> 8;
-				const std::uint32_t g1  = (a1 * (bgColor & 0x00FF00)) >> 8;
-				const std::uint32_t g2  = (a0 * (fgColor & 0x00FF00)) >> 8;
+                const std::uint32_t a1 = 256 - a0;
+                const std::uint32_t rb1 = (a1 * (bgColor & 0xFF00FF)) >> 8;
+                const std::uint32_t rb2 = (a0 * (fgColor & 0xFF00FF)) >> 8;
+                const std::uint32_t g1  = (a1 * (bgColor & 0x00FF00)) >> 8;
+                const std::uint32_t g2  = (a0 * (fgColor & 0x00FF00)) >> 8;
                 *cur =  ((rb1 | rb2) & 0xFF00FF) + ((g1 | g2) & 0x00FF00);
                 ++cur;
             }
@@ -223,7 +223,7 @@ void App::writeFontInfoFile(const Glyphs& glyphs, const Config& config, ft::Font
         {
             for (const auto& ch1 : glyphCodes2)
             {
-				const auto k = static_cast<std::int16_t>(font.getKerning(ch0, ch1));
+                const auto k = static_cast<std::int16_t>(font.getKerning(ch0, ch1));
                 if (k)
                 {
                     FontInfo::Kerning kerning;
