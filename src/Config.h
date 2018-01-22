@@ -17,7 +17,7 @@ struct Config
     struct Color
     {
         std::uint8_t r;
-		std::uint8_t g;
+        std::uint8_t g;
         std::uint8_t b;
 
         std::uint32_t getBGR() const
@@ -39,16 +39,16 @@ struct Config
 
     struct Padding
     {
-		std::uint32_t up = 0;
-		std::uint32_t right = 0;
-		std::uint32_t down = 0;
-		std::uint32_t left = 0;
+        std::uint32_t up = 0;
+        std::uint32_t right = 0;
+        std::uint32_t down = 0;
+        std::uint32_t left = 0;
     };
 
     struct Spacing
     {
-		std::uint32_t ver = 0;
-		std::uint32_t hor = 0;
+        std::uint32_t ver = 0;
+        std::uint32_t hor = 0;
     };
 
     std::string fontFile;
@@ -64,9 +64,9 @@ struct Config
     DataFormat dataFormat = DataFormat::Text;
     bool includeKerningPairs = false;
 
-	void validate() const
-	{
-		if (textureSize.w > 65536 || textureSize.h > 65536)
-			throw std::runtime_error("too big texture size (width or height greater than 65536)");
-	}
+    void validate() const
+    {
+        if (textureSize.w > 65536 || textureSize.h > 65536)
+            throw std::runtime_error("too big texture size (width or height greater than 65536)");
+    }
 };

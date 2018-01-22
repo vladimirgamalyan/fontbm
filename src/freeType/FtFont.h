@@ -28,14 +28,14 @@ class Font
 {
 public:
 
-	struct GlyphMetrics
-	{
-		std::uint32_t width; // This is the width of the glyph image's bounding box. It is independent of the layout direction.
-		std::uint32_t height; // This is the height of the glyph image's bounding box. It is independent of the layout direction.
-		std::int32_t horiBearingX; // For horizontal text layouts, this is the horizontal distance from the current cursor position to the leftmost border of the glyph image's bounding box.
-		std::int32_t horiBearingY; // For horizontal text layouts, this is the vertical distance from the current cursor position (on the baseline) to the topmost border of the glyph image's bounding box.
-		std::int32_t horiAdvance; // For horizontal text layouts, this is the horizontal distance to increment the pen position when the glyph is drawn as part of a string of text.
-	};
+    struct GlyphMetrics
+    {
+        std::uint32_t width; // This is the width of the glyph image's bounding box. It is independent of the layout direction.
+        std::uint32_t height; // This is the height of the glyph image's bounding box. It is independent of the layout direction.
+        std::int32_t horiBearingX; // For horizontal text layouts, this is the horizontal distance from the current cursor position to the leftmost border of the glyph image's bounding box.
+        std::int32_t horiBearingY; // For horizontal text layouts, this is the vertical distance from the current cursor position (on the baseline) to the topmost border of the glyph image's bounding box.
+        std::int32_t horiAdvance; // For horizontal text layouts, this is the horizontal distance to increment the pen position when the glyph is drawn as part of a string of text.
+    };
 
     Font(Library& library, const std::string& fontFile, int ptsize, const int faceIndex = 0) : library(library) {
         if (!library.library)
@@ -132,7 +132,7 @@ public:
         FT_Done_Face(face);
     }
 
-	GlyphMetrics renderGlyph(std::uint32_t* buffer, std::uint32_t surfaceW, std::uint32_t surfaceH, int x, int y, std::uint32_t ch, std::uint32_t color) const
+    GlyphMetrics renderGlyph(std::uint32_t* buffer, std::uint32_t surfaceW, std::uint32_t surfaceH, int x, int y, std::uint32_t ch, std::uint32_t color) const
     {
         const auto error = FT_Load_Char(face, ch, FT_LOAD_RENDER);
         if (error)
@@ -181,9 +181,9 @@ public:
         FT_Vector delta;
 
         const auto indexLeft = FT_Get_Char_Index(face, left);
-		const auto indexRight = FT_Get_Char_Index(face, right);
+        const auto indexRight = FT_Get_Char_Index(face, right);
 
-		const auto error = FT_Get_Kerning(face, indexLeft, indexRight, ft_kerning_default, &delta);
+        const auto error = FT_Get_Kerning(face, indexLeft, indexRight, ft_kerning_default, &delta);
         if (error)
             throw std::runtime_error("Couldn't find glyphs kerning");
         return delta.x >> 6;

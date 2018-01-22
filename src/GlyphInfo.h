@@ -6,8 +6,8 @@ struct GlyphInfo
     std::uint32_t page = 0;
 
     // position on texture
-	std::uint32_t x = 0;
-	std::uint32_t y = 0;
+    std::uint32_t x = 0;
+    std::uint32_t y = 0;
 
     // size on texture
     std::uint32_t width = 0;
