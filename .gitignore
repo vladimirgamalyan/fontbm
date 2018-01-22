@@ -31,3 +31,8 @@
 /build
 /tests/generated
 /cmake-build-debug
+/.vs
+/Debug
+/fontbm.dir
+/unit_tests.dir
+/fontbm.VC.db

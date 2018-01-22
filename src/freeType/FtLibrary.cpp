@@ -1,4 +1,5 @@
 #include "FtLibrary.h"
+#include "FtException.h"
 
 namespace ft {
 
@@ -8,7 +9,7 @@ Library::Library()
 {
     if (!initialized)
     {
-        FT_Error error = FT_Init_FreeType(&library);
+        const auto error = FT_Init_FreeType(&library);
         if (error)
             throw Exception("Couldn't init FreeType engine", error);
     }

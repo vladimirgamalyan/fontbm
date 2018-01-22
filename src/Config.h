@@ -3,6 +3,7 @@
 #include <set>
 #include <cstdint>
 #include <string>
+#include <stdexcept>
 
 struct Config
 {
@@ -15,11 +16,11 @@ struct Config
 
     struct Color
     {
-        uint8_t r;
-        uint8_t g;
-        uint8_t b;
+        std::uint8_t r;
+		std::uint8_t g;
+        std::uint8_t b;
 
-        uint32_t getBGR() const
+        std::uint32_t getBGR() const
         {
             return r + (g << 8) + (b << 16);
         }
@@ -32,34 +33,40 @@ struct Config
 
     struct Size
     {
-        uint32_t w;
-        uint32_t h;
+        std::uint32_t w = 0;
+        std::uint32_t h = 0;
     };
 
     struct Padding
     {
-        int up;
-        int right;
-        int down;
-        int left;
+		std::uint32_t up = 0;
+		std::uint32_t right = 0;
+		std::uint32_t down = 0;
+		std::uint32_t left = 0;
     };
 
     struct Spacing
     {
-        int ver;
-        int hor;
+		std::uint32_t ver = 0;
+		std::uint32_t hor = 0;
     };
 
     std::string fontFile;
-    std::set<uint32_t> chars;
+    std::set<std::uint32_t> chars;
     Color color;
     Color backgroundColor;
-    bool backgroundTransparent;
-    uint16_t fontSize;
+    bool backgroundTransparent = true;
+    std::uint16_t fontSize = 16;
     Padding padding;
     Spacing spacing;
     Size textureSize;
     std::string output;
-    DataFormat dataFormat;
+    DataFormat dataFormat = DataFormat::Text;
     bool includeKerningPairs = false;
+
+	void validate() const
+	{
+		if (textureSize.w > 65536 || textureSize.h > 65536)
+			throw std::runtime_error("too big texture size (width or height greater than 65536)");
+	}
 };

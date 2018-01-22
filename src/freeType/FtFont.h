@@ -2,7 +2,6 @@
 #include <iostream>
 #include "FtInclude.h"
 #include "FtException.h"
-#include <cmath>
 
 /* Handy routines for converting from fixed point */
 #define FT_FLOOR(X) (((X) & -64) / 64)
@@ -28,19 +27,29 @@ namespace ft {
 class Font
 {
 public:
-    Font(Library& library, const std::string& fontFile, int ptsize, int faceIndex = 0) : library(library) {
-        if (!library.library)
-            throw std::runtime_error("Library not initialized");
 
-        FT_Error error = FT_New_Face(library.library, fontFile.c_str(), faceIndex, &face);
+	struct GlyphMetrics
+	{
+		std::uint32_t width; // This is the width of the glyph image's bounding box. It is independent of the layout direction.
+		std::uint32_t height; // This is the height of the glyph image's bounding box. It is independent of the layout direction.
+		std::int32_t horiBearingX; // For horizontal text layouts, this is the horizontal distance from the current cursor position to the leftmost border of the glyph image's bounding box.
+		std::int32_t horiBearingY; // For horizontal text layouts, this is the vertical distance from the current cursor position (on the baseline) to the topmost border of the glyph image's bounding box.
+		std::int32_t horiAdvance; // For horizontal text layouts, this is the horizontal distance to increment the pen position when the glyph is drawn as part of a string of text.
+	};
+
+    Font(Library& library, const std::string& fontFile, int ptsize, const int faceIndex = 0) : library(library) {
+        if (!library.library)
+            throw std::runtime_error("Library is not initialized");
+
+        auto error = FT_New_Face(library.library, fontFile.c_str(), faceIndex, &face);
         if (error == FT_Err_Unknown_File_Format)
             throw Exception("Unsupported font format", error);
         if (error)
             throw Exception("Couldn't load font file", error);
 
-        FT_CharMap found = 0;
-        for (int i = 0; i < face->num_charmaps; i++) {
-            FT_CharMap charmap = face->charmaps[i];
+        FT_CharMap found = nullptr;
+        for (auto i = 0; i < face->num_charmaps; i++) {
+            const auto charmap = face->charmaps[i];
             if ((charmap->platform_id == 3 && charmap->encoding_id == 1) /* Windows Unicode */
                 || (charmap->platform_id == 3 && charmap->encoding_id == 0) /* Windows Symbol */
                 || (charmap->platform_id == 2 && charmap->encoding_id == 1) /* ISO Unicode */
@@ -63,7 +72,7 @@ public:
             }
 
             /* Get the scalable font metrics for this font */
-            FT_Fixed scale = face->size->metrics.y_scale;
+            const auto scale = face->size->metrics.y_scale;
             ascent  = FT_CEIL(FT_MulFix(face->ascender, scale));
             descent = FT_CEIL(FT_MulFix(face->descender, scale));
             height  = ascent - descent + /* baseline */ 1;
@@ -123,23 +132,14 @@ public:
         FT_Done_Face(face);
     }
 
-    struct GlyphMetrics
+	GlyphMetrics renderGlyph(std::uint32_t* buffer, std::uint32_t surfaceW, std::uint32_t surfaceH, int x, int y, std::uint32_t ch, std::uint32_t color) const
     {
-        uint32_t width; // This is the width of the glyph image's bounding box. It is independent of the layout direction.
-        uint32_t height; // This is the height of the glyph image's bounding box. It is independent of the layout direction.
-        int32_t horiBearingX; // For horizontal text layouts, this is the horizontal distance from the current cursor position to the leftmost border of the glyph image's bounding box.
-        int32_t horiBearingY; // For horizontal text layouts, this is the vertical distance from the current cursor position (on the baseline) to the topmost border of the glyph image's bounding box.
-        int32_t horiAdvance; // For horizontal text layouts, this is the horizontal distance to increment the pen position when the glyph is drawn as part of a string of text.
-    };
-
-    GlyphMetrics renderGlyph(uint32_t* buffer, uint32_t surfaceW, uint32_t surfaceH, int x, int y, uint32_t ch, uint32_t color)
-    {
-        FT_Error error = FT_Load_Char(face, ch, FT_LOAD_RENDER);
+        const auto error = FT_Load_Char(face, ch, FT_LOAD_RENDER);
         if (error)
             throw std::runtime_error("Load glyph error");
 
-        FT_GlyphSlot slot = face->glyph;
-        FT_Glyph_Metrics* metrics = &slot->metrics;
+        auto slot = face->glyph;
+        const auto metrics = &slot->metrics;
 
         GlyphMetrics glyphMetrics;
         glyphMetrics.width = slot->bitmap.width;
@@ -150,16 +150,16 @@ public:
 
         if (buffer)
         {
-            uint32_t* dst_check = buffer + surfaceW * surfaceH;
+            const auto dst_check = buffer + surfaceW * surfaceH;
             color &= 0xffffff;
 
-            for (uint32_t row = 0; row < glyphMetrics.height; ++row)
+            for (std::uint32_t row = 0; row < glyphMetrics.height; ++row)
             {
-                uint32_t *dst = buffer + (y + row) * surfaceW + x;
-                uint8_t *src = slot->bitmap.buffer + slot->bitmap.pitch * row;
+                std::uint32_t *dst = buffer + (y + row) * surfaceW + x;
+                std::uint8_t *src = slot->bitmap.buffer + slot->bitmap.pitch * row;
 
-                for (uint32_t col = glyphMetrics.width; col > 0 && dst < dst_check; --col) {
-                    uint32_t alpha = *src++;
+                for (auto col = glyphMetrics.width; col > 0 && dst < dst_check; --col) {
+                    const std::uint32_t alpha = *src++;
                     *dst++ = color | (alpha << 24);
                 }
             }
@@ -173,33 +173,33 @@ public:
         return FT_Get_Char_Index(face, ch);
     }
 
-    int getKerning(uint32_t left, uint32_t right)
+    int getKerning(const std::uint32_t left, const std::uint32_t right) const
     {
         if (!FT_HAS_KERNING(face))
             return 0;
 
         FT_Vector delta;
 
-        FT_UInt indexLeft = FT_Get_Char_Index(face, left);
-        FT_UInt indexRight = FT_Get_Char_Index(face, right);
+        const auto indexLeft = FT_Get_Char_Index(face, left);
+		const auto indexRight = FT_Get_Char_Index(face, right);
 
-        FT_Error error = FT_Get_Kerning(face, indexLeft, indexRight, ft_kerning_default, &delta);
+		const auto error = FT_Get_Kerning(face, indexLeft, indexRight, ft_kerning_default, &delta);
         if (error)
             throw std::runtime_error("Couldn't find glyphs kerning");
         return delta.x >> 6;
     }
 
-    void debugInfo() {
+    void debugInfo() const {
         std::cout << "num_charmaps " << face->num_charmaps << std::endl;
         std::cout << "num_glyphs " << face->num_glyphs << std::endl;
 
-        for (int i = 0; i < face->num_charmaps; i++) {
-            FT_CharMap charmap = face->charmaps[i];
+        for (auto i = 0; i < face->num_charmaps; i++) {
+            const auto charmap = face->charmaps[i];
             std::cout << charmap->platform_id << ", " << charmap->encoding_id << std::endl;
         }
     }
 
-    std::string getFamilyNameOr(const std::string& defaultName)
+    std::string getFamilyNameOr(const std::string& defaultName) const
     {
         if (!face->family_name)
             return defaultName;

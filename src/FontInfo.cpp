@@ -5,7 +5,7 @@
 #include "external/tinyxml2/tinyxml2.h"
 #include "external/json.hpp"
 
-std::string FontInfo::getCharSetName(uint8_t charSet)
+std::string FontInfo::getCharSetName(std::uint8_t charSet)
 {
     std::string str;
 
@@ -253,60 +253,60 @@ void FontInfo::writeToBinFile(const std::string &fileName) const
 #pragma pack(push, 1)
     struct InfoBlock
     {
-        int32_t blockSize;
-        uint16_t fontSize;
-        int8_t reserved:4;
-        int8_t bold:1;
-        int8_t italic:1;
-        int8_t unicode:1;
-        int8_t smooth:1;
-        uint8_t charSet;
-        uint16_t stretchH;
-        int8_t aa;
-        uint8_t paddingUp;
-        uint8_t paddingRight;
-        uint8_t paddingDown;
-        uint8_t paddingLeft;
-        uint8_t spacingHoriz;
-        uint8_t spacingVert;
-        uint8_t outline;
+        std::int32_t blockSize;
+        std::uint16_t fontSize;
+        std::int8_t reserved:4;
+        std::int8_t bold:1;
+        std::int8_t italic:1;
+        std::int8_t unicode:1;
+        std::int8_t smooth:1;
+        std::uint8_t charSet;
+        std::uint16_t stretchH;
+        std::int8_t aa;
+        std::uint8_t paddingUp;
+        std::uint8_t paddingRight;
+        std::uint8_t paddingDown;
+        std::uint8_t paddingLeft;
+        std::uint8_t spacingHoriz;
+        std::uint8_t spacingVert;
+        std::uint8_t outline;
     };
 
     struct CommonBlock
     {
-        int32_t blockSize;
-        uint16_t lineHeight;
-        uint16_t base;
-        uint16_t scaleW;
-        uint16_t scaleH;
-        uint16_t pages;
-        uint8_t packed:1;
-        uint8_t reserved:7;
-        uint8_t alphaChnl;
-        uint8_t redChnl;
-        uint8_t greenChnl;
-        uint8_t blueChnl;
+        std::int32_t blockSize;
+        std::uint16_t lineHeight;
+        std::uint16_t base;
+        std::uint16_t scaleW;
+        std::uint16_t scaleH;
+        std::uint16_t pages;
+        std::uint8_t packed:1;
+        std::uint8_t reserved:7;
+        std::uint8_t alphaChnl;
+        std::uint8_t redChnl;
+        std::uint8_t greenChnl;
+        std::uint8_t blueChnl;
     };
 
     struct CharBlock
     {
-        uint32_t id;
-        uint16_t x;
-        uint16_t y;
-        uint16_t width;
-        uint16_t height;
-        int16_t xoffset;
-        int16_t yoffset;
-        int16_t xadvance;
-        int8_t page;
-        int8_t channel;
+        std::uint32_t id;
+        std::uint16_t x;
+        std::uint16_t y;
+        std::uint16_t width;
+        std::uint16_t height;
+        std::int16_t xoffset;
+        std::int16_t yoffset;
+        std::int16_t xadvance;
+        std::int8_t page;
+        std::int8_t channel;
     };
 
     struct KerningPairsBlock
     {
-        uint32_t first;
-        uint32_t second;
-        int16_t amount;
+        std::uint32_t first;
+        std::uint32_t second;
+        std::int16_t amount;
     };
 #pragma pack(pop)
 
@@ -341,7 +341,7 @@ void FontInfo::writeToBinFile(const std::string &fileName) const
     commonBlock.base = common.base;
     commonBlock.scaleW = common.scaleW;
     commonBlock.scaleH = common.scaleH;
-    commonBlock.pages = static_cast<uint16_t>(pages.size());
+    commonBlock.pages = static_cast<std::uint16_t>(pages.size());
     commonBlock.packed = common.packed;
     commonBlock.alphaChnl = common.alphaChnl;
     commonBlock.redChnl = common.redChnl;
@@ -352,13 +352,13 @@ void FontInfo::writeToBinFile(const std::string &fileName) const
     f.write((const char*)&commonBlock, sizeof(commonBlock));
 
     f << '\3';
-    int32_t pageBlockSize = pages.empty() ? 0 : pages[0].length() * pages.size();
+    std::int32_t pageBlockSize = pages.empty() ? 0 : pages[0].length() * pages.size();
     f << pageBlockSize;
     for (auto s: pages)
         f << s;
 
     f << '\4';
-    int32_t charsBlockSize = chars.size() * sizeof(CharBlock);
+    std::int32_t charsBlockSize = chars.size() * sizeof(CharBlock);
     f << charsBlockSize;
     for (auto c: chars)
     {
@@ -380,7 +380,7 @@ void FontInfo::writeToBinFile(const std::string &fileName) const
     if (!kernings.empty())
     {
         f << '\5';
-        int32_t kerningPairsBlockSize = kernings.size() * sizeof(KerningPairsBlock);
+        std::int32_t kerningPairsBlockSize = kernings.size() * sizeof(KerningPairsBlock);
         f << kerningPairsBlockSize;
 
         for (auto k: kernings)
