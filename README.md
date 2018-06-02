@@ -55,7 +55,9 @@ cmake .
 make
 ```
 
-## Building Windows
+## Building Windows (using [vcpkg](https://github.com/Microsoft/vcpkg) )
+
+Download and install CMake 3.10.2 (or above). Run:
 
 ```
 vcpkg install freetype
@@ -63,13 +65,15 @@ cmake -G "Visual Studio 14 2015" -DCMAKE_TOOLCHAIN_FILE=<path to vcpkg dir>/scri
 ```
 Open .sln in Visual Studio 2015 and rebuild all.
 
-Or, if [vcpkg](https://github.com/Microsoft/vcpkg) is not used:
+## Building Windows
+
+Download and install CMake 3.0 (or above) and [FreeType](https://www.freetype.org/). Run: 
 
 ```
 cmake -G "Visual Studio 14 2015"
 ```
 
-Download and install FreeType library, open .sln file in Visual Studio 2015, configure paths to FreeType and rebuild all.
+Open .sln file in Visual Studio 2015, configure paths to FreeType and rebuild all.
 
 ## License
 
