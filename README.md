@@ -10,14 +10,12 @@ Command line bitmap font generator, compatible with [BMFont](http://www.angelcod
 
 ## Usage
 
-Download compiled version (fontbm.zip for **windows**, fontbm for **linux**) from [Releases](https://github.com/vladimirgamalyan/fontbm/releases).
-
-Then run (fontbm**.exe** for windows, of course):
+Download compiled version (fontbm.zip for **windows**, fontbm for **linux**) from [Releases](https://github.com/vladimirgamalyan/fontbm/releases). Run (fontbm.exe for windows, of course):
 
 ```
 fontbm --font-file Vera.ttf --output vera
 ```
-Will produce vera.fnt ([file format](http://www.angelcode.com/products/bmfont/doc/file_format.html)) and vera.png ([how to render text](http://www.angelcode.com/products/bmfont/doc/render_text.html)).
+It will produce vera.fnt ([file format](http://www.angelcode.com/products/bmfont/doc/file_format.html)) and vera.png ([how to render text](http://www.angelcode.com/products/bmfont/doc/render_text.html)).
 
 Available options (**bold** options are required):
 
@@ -29,9 +27,9 @@ option  | default | comment
 --font-size | 32 | font size
 --color | 255,255,255 | foreground RGB color, for example: 32,255,255 (without spaces)
 --background-color | | background RGB color, for example: 0,0,128 (without spaces), transparent by default
---chars | 32-127* | required characters, for example 32-64,92,120-126, *default value is 32-127 if 'chars-file' option is not defined
+--chars | 32-127* | required characters, for example 32-64,92,120-126 (without spaces), *default value is 32-127 if 'chars-file' option is not defined
 --chars-file | | optional path to UTF-8 text file with additional required characters (will be combined with 'chars' option).
---data-format | txt | output data file format, "txt", "xml", "bin" or "json"
+--data-format | txt | output data file format: txt, xml, bin, json
 --include-kerning-pairs | | include kerning pairs to output file
 --padding-up | 0 | padding up
 --padding-right | 0 | padding right
@@ -57,7 +55,9 @@ cmake .
 make
 ```
 
-## Building Windows
+## Building Windows (using [vcpkg](https://github.com/Microsoft/vcpkg))
+
+Download and install [vcpkg](https://github.com/Microsoft/vcpkg) and [CMake 3.10.2](https://cmake.org/) (or above). Run:
 
 ```
 vcpkg install freetype
@@ -65,13 +65,15 @@ cmake -G "Visual Studio 14 2015" -DCMAKE_TOOLCHAIN_FILE=<path to vcpkg dir>/scri
 ```
 Open .sln in Visual Studio 2015 and rebuild all.
 
-Or, if [vcpkg](https://github.com/Microsoft/vcpkg) is not used:
+## Building Windows
+
+Download and install [CMake 3.0](https://cmake.org/) (or above) and [FreeType](https://www.freetype.org/). Run: 
 
 ```
 cmake -G "Visual Studio 14 2015"
 ```
 
-Download and install FreeType library, open .sln file in Visual Studio 2015, configure paths to FreeType and rebuild all.
+Open .sln file in Visual Studio 2015, configure paths to FreeType and rebuild all.
 
 ## License
 
