@@ -6,11 +6,14 @@
 [![Build status](https://ci.appveyor.com/api/projects/status/boq0olngopfabaac?svg=true)](https://ci.appveyor.com/project/vladimirgamalyan/fontbm)
 
 Command line bitmap font generator, compatible with [BMFont](http://www.angelcode.com/products/bmfont/).  
-Download compiled version (fontbm.zip for windows, fontbm for linux) from [Releases](https://github.com/vladimirgamalyan/fontbm/releases).
-
 
 
 ## Usage
+
+Download compiled version (fontbm.zip for **windows**, fontbm for **linux**) from [Releases](https://github.com/vladimirgamalyan/fontbm/releases).
+
+Then run (fontbm**.exe** for windows, of course):
+
 ```
 fontbm --font-file Vera.ttf --output vera
 ```
@@ -24,10 +27,10 @@ option  | default | comment
 **--font-file** |  | path to ttf file, required
 **--output** | | output files name without extension, required
 --font-size | 32 | font size
---color | 255,255,255 | foreground RGB color, for example: 32,255,255
---background-color | | background RGB color, for example: 0,0,128, transparent by default
+--color | 255,255,255 | foreground RGB color, for example: 32,255,255 (without spaces)
+--background-color | | background RGB color, for example: 0,0,128 (without spaces), transparent by default
 --chars | 32-127* | required characters, for example 32-64,92,120-126, *default value is 32-127 if 'chars-file' option is not defined
---chars-file | | optional path to UTF-8 text file with additional required characters (will be combined with 'chars' option)
+--chars-file | | optional path to UTF-8 text file with additional required characters (will be combined with 'chars' option).
 --data-format | txt | output data file format, "txt", "xml", "bin" or "json"
 --include-kerning-pairs | | include kerning pairs to output file
 --padding-up | 0 | padding up
@@ -39,34 +42,36 @@ option  | default | comment
 --texture-width | 256 | texture width
 --texture-height | 256 | texture height
 
-## Building
+## Building Linux
 
 Dependencies:
 
-* GCC-4.9 (or VS2015 Update 3, for windows)
-* CMake 3.0 (CMake 3.10, for use vcpkg on windows)
+* GCC-4.9
+* CMake 3.0
 * [FreeType](https://www.freetype.org/)
 
-Quickstart (ubuntu):
+Build:
+
 ```
 cmake .  
 make
 ```
 
-Quickstart (windows):
+## Building Windows
 
-Generate project files:
-```
-cmake -G "Visual Studio 14 2015"
-```
-Download and install FreeType library, open .sln file in Visual Studio 2015, configure paths to FreeType and rebuild all.
-
-Or, if [vcpkg](https://github.com/Microsoft/vcpkg) is used:
 ```
 vcpkg install freetype
 cmake -G "Visual Studio 14 2015" -DCMAKE_TOOLCHAIN_FILE=<path to vcpkg dir>/scripts/buildsystems/vcpkg.cmake
 ```
-Then open .sln in Visual Studio 2015 and rebuild all.
+Open .sln in Visual Studio 2015 and rebuild all.
+
+Or, if [vcpkg](https://github.com/Microsoft/vcpkg) is not used:
+
+```
+cmake -G "Visual Studio 14 2015"
+```
+
+Download and install FreeType library, open .sln file in Visual Studio 2015, configure paths to FreeType and rebuild all.
 
 ## License
 
