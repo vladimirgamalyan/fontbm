@@ -55,7 +55,7 @@ cmake .
 make
 ```
 
-## Building Windows (using [vcpkg](https://github.com/Microsoft/vcpkg) )
+## Building Windows (using [vcpkg](https://github.com/Microsoft/vcpkg))
 
 Download and install [vcpkg](https://github.com/Microsoft/vcpkg) and [CMake 3.10.2](https://cmake.org/) (or above). Run:
 
@@ -67,7 +67,7 @@ Open .sln in Visual Studio 2015 and rebuild all.
 
 ## Building Windows
 
-Download and install CMake 3.0 (or above) and [FreeType](https://www.freetype.org/). Run: 
+Download and install [CMake 3.0](https://cmake.org/) (or above) and [FreeType](https://www.freetype.org/). Run: 
 
 ```
 cmake -G "Visual Studio 14 2015"
