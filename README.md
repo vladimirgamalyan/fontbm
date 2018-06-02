@@ -57,7 +57,7 @@ make
 
 ## Building Windows (using [vcpkg](https://github.com/Microsoft/vcpkg) )
 
-Download and install CMake 3.10.2 (or above). Run:
+Download and install [vcpkg](https://github.com/Microsoft/vcpkg) and [CMake 3.10.2](https://cmake.org/) (or above). Run:
 
 ```
 vcpkg install freetype
