@@ -5,12 +5,12 @@
 [![Build Status](https://travis-ci.org/vladimirgamalyan/fontbm.svg)](https://travis-ci.org/vladimirgamalyan/fontbm)
 [![Build status](https://ci.appveyor.com/api/projects/status/boq0olngopfabaac?svg=true)](https://ci.appveyor.com/project/vladimirgamalyan/fontbm)
 
-[BMFont](http://www.angelcode.com/products/bmfont/) compatible, command line bitmap font generator.
+[BMFont](http://www.angelcode.com/products/bmfont/) compatible, cross-platform command line bitmap font generator.
 
 
 ## Usage
 
-Download compiled version (fontbm.zip for **windows**, fontbm for **linux**) from [Releases](https://github.com/vladimirgamalyan/fontbm/releases). Run (fontbm.exe for windows, of course):
+Download compiled version (fontbm.zip for Windows, fontbm for Linux) from [Releases](https://github.com/vladimirgamalyan/fontbm/releases). Run:
 
 ```
 fontbm --font-file Vera.ttf --output vera
