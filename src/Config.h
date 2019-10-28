@@ -4,6 +4,7 @@
 #include <cstdint>
 #include <string>
 #include <stdexcept>
+#include <vector>
 
 struct Config
 {
@@ -51,7 +52,7 @@ struct Config
         std::uint32_t hor = 0;
     };
 
-    std::string fontFile;
+    std::vector<std::string> fontFile;
     std::set<std::uint32_t> chars;
     Color color;
     Color backgroundColor;

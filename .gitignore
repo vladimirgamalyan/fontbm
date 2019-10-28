@@ -32,6 +32,7 @@
 /tests/generated
 /cmake-build-debug
 /.vs
+/Release
 /Debug
 /fontbm.dir
 /unit_tests.dir

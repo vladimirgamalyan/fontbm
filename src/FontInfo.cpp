@@ -99,12 +99,12 @@ void FontInfo::writeToXmlFile(const std::string &fileName) const
     tinyxml2::XMLElement* infoElement = doc.NewElement("info");
     infoElement->SetAttribute("face", info.face.c_str());
     infoElement->SetAttribute("size", info.size);
-    infoElement->SetAttribute("bold", info.bold);
-    infoElement->SetAttribute("italic", info.italic);
+    infoElement->SetAttribute("bold", info.bold ? 1 : 0);
+    infoElement->SetAttribute("italic", info.italic ? 1 : 0);
     infoElement->SetAttribute("charset", info.unicode ? "" : getCharSetName(info.charset).c_str());
-    infoElement->SetAttribute("unicode", info.unicode);
+    infoElement->SetAttribute("unicode", info.unicode ? 1 : 0);
     infoElement->SetAttribute("stretchH", info.stretchH);
-    infoElement->SetAttribute("smooth", info.smooth);
+    infoElement->SetAttribute("smooth", info.smooth ? 1 : 0);
     infoElement->SetAttribute("aa", info.aa);
     infoElement->SetAttribute("padding", padding.str().c_str());
     infoElement->SetAttribute("spacing", spacing.str().c_str());
@@ -117,7 +117,7 @@ void FontInfo::writeToXmlFile(const std::string &fileName) const
     commonElement->SetAttribute("scaleW", common.scaleW);
     commonElement->SetAttribute("scaleH", common.scaleH);
     commonElement->SetAttribute("pages", static_cast<int>(pages.size()));
-    commonElement->SetAttribute("packed", common.packed);
+    commonElement->SetAttribute("packed", static_cast<int>(common.packed));
     commonElement->SetAttribute("alphaChnl", common.alphaChnl);
     commonElement->SetAttribute("redChnl", common.redChnl);
     commonElement->SetAttribute("greenChnl", common.greenChnl);
@@ -413,10 +413,10 @@ void FontInfo::writeToJsonFile(const std::string &fileName) const
 
     nlohmann::json infoNode;
     infoNode["size"] = info.size;
-    infoNode["smooth"] = info.smooth;
-    infoNode["unicode"] = info.unicode;
-    infoNode["italic"] = info.bold;
-    infoNode["bold"] = info.bold;
+    infoNode["smooth"] = info.smooth ? 1 : 0;
+    infoNode["unicode"] = info.unicode ? 1 : 0;
+    infoNode["italic"] = info.italic ? 1 : 0;
+    infoNode["bold"] = info.bold ? 1 : 0;
     infoNode["charset"] = info.charset;
     infoNode["stretchH"] = info.stretchH;
     infoNode["aa"] = info.aa;
@@ -431,7 +431,7 @@ void FontInfo::writeToJsonFile(const std::string &fileName) const
     commonNode["scaleW"] = common.scaleW;
     commonNode["scaleH"] = common.scaleH;
     commonNode["pages"] = pages.size();
-    commonNode["packed"] = common.packed;
+    commonNode["packed"] = static_cast<int>(common.packed);
     commonNode["alphaChnl"] = common.alphaChnl;
     commonNode["redChnl"] = common.redChnl;
     commonNode["greenChnl"] = common.greenChnl;
