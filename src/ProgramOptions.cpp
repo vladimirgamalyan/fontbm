@@ -25,7 +25,7 @@ Config ProgramOptions::parseCommandLine(int argc, char* argv[])
         cxxopts::Options options("fontbm", "Command line bitmap font generator, compatible with bmfont");
         options.add_options()
             ("help", "produce help message")
-            ("font-file", "path to ttf file, required", cxxopts::value<std::string>(config.fontFile))
+            ("font-file", "path to ttf file, required (may appear several times)", cxxopts::value<std::vector<std::string>>(config.fontFile))
             (charsOptionName,
              "required characters, for example: 32-64,92,120-126\ndefault value is 32-127 if 'chars-file' option is not defined",
              cxxopts::value<std::string>(chars))

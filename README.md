@@ -22,7 +22,7 @@ Available options (**bold** options are required):
 
 option  | default | comment
 ------|-----|---------------
-**--font-file** |  | path to ttf file, required
+**--font-file** |  | path to ttf file, required (can be set several times for fallback fonts)
 **--output** | | output files name without extension, required
 --font-size | 32 | font size
 --color | 255,255,255 | foreground RGB color, for example: 32,255,255 (without spaces)
