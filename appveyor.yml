@@ -10,8 +10,8 @@ platform:
 install:
   - vcpkg install freetype
   
-cache:
-  - c:\tools\vcpkg\installed\  
+# cache:
+#  - c:\tools\vcpkg\installed\  
 
 before_build:
   - cmake -G "Visual Studio 14 2015" -DCMAKE_TOOLCHAIN_FILE=c:/tools/vcpkg/scripts/buildsystems/vcpkg.cmake
