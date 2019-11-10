@@ -27,7 +27,7 @@ option  | default | comment
 --font-size | 32 | font size
 --color | 255,255,255 | foreground RGB color, for example: 32,255,255 (without spaces)
 --background-color | | background RGB color, for example: 0,0,128 (without spaces), transparent by default
---chars | 32-127 | required characters, for example 32-64,92,120-126 (without spaces), default value is 32-126 if 'chars-file' option is not defined
+--chars | 32-126 | required characters, for example 32-64,92,120-126 (without spaces), default value is 32-126 if 'chars-file' option is not defined
 --chars-file | | optional path to UTF-8 text file with additional required characters (will be combined with 'chars' option).
 --data-format | txt | output data file format: txt, xml, bin, json
 --include-kerning-pairs | | include kerning pairs to output file
