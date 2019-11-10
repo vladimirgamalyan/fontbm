@@ -27,7 +27,7 @@ Config ProgramOptions::parseCommandLine(int argc, char* argv[])
             ("help", "produce help message")
             ("font-file", "path to ttf file, required (may appear several times)", cxxopts::value<std::vector<std::string>>(config.fontFile))
             (charsOptionName,
-             "required characters, for example: 32-64,92,120-126\ndefault value is 32-127 if 'chars-file' option is not defined",
+             "required characters, for example: 32-64,92,120-126\ndefault value is 32-126 if 'chars-file' option is not defined",
              cxxopts::value<std::string>(chars))
             (charsFileOptionName,
              "optional path to UTF-8 text file with required characters (will be combined with 'chars' option)",
@@ -72,7 +72,7 @@ Config ProgramOptions::parseCommandLine(int argc, char* argv[])
             throw std::runtime_error("--output required");
 
         if (!result.count(charsOptionName) && !result.count(charsFileOptionName))
-            chars = "32-127";
+            chars = "32-126";
         config.chars = parseCharsString(chars);
         if (result.count(charsFileOptionName))
             getCharsFromFile(charsFile, config.chars);
