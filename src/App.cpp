@@ -219,12 +219,11 @@ void App::writeFontInfoFile(const Glyphs& glyphs, const Config& config, const st
 
     if (config.includeKerningPairs)
     {
-        //TODO: test if getKerning(font, ch0, ch1) != getKerning(font, ch1, ch0) (and change logic if so)
-        auto glyphCodes2(config.chars);
-        //TODO: remove bruteforcing
+        auto chars(config.chars);
+
         for (const auto& ch0 : config.chars)
         {
-            for (const auto& ch1 : glyphCodes2)
+            for (const auto& ch1 : chars)
             {
                 const auto k = static_cast<std::int16_t>(fonts[0].getKerning(ch0, ch1));
                 if (k)
@@ -236,7 +235,6 @@ void App::writeFontInfoFile(const Glyphs& glyphs, const Config& config, const st
                     f.kernings.push_back(kerning);
                 }
             }
-            glyphCodes2.erase(ch0);
         }
     }
 
