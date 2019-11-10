@@ -42,11 +42,11 @@ App::Glyphs App::collectGlyphInfo(const std::vector<ft::Font>& fonts, const std:
             }
         }
 
+        //TODO: add more checks for glyph.
         if (glyphInfo.fontIndex == -1)
             std::cout << "warning: glyph " << id << " not found." << std::endl;
-
-        //TODO: add more checks for glyph.
-        result[id] = glyphInfo;
+        else
+            result[id] = glyphInfo;
     }
 
     return result;
