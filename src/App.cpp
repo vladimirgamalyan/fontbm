@@ -7,7 +7,7 @@
 #include "external/lodepng/lodepng.h"
 #include "utils/getNumberLen.h"
 
-std::vector<rbp::RectSize> App::getGlyphRectangles(const Glyphs &glyphs, const std::uint32_t additionalWidth, const std::uint32_t additionalHeight)
+std::vector<rbp::RectSize> App::getGlyphRectangles(const Glyphs &glyphs, const std::uint32_t additionalWidth, const std::uint32_t additionalHeight) const
 {
     std::vector<rbp::RectSize> result;
     for (const auto& kv : glyphs)
@@ -19,7 +19,7 @@ std::vector<rbp::RectSize> App::getGlyphRectangles(const Glyphs &glyphs, const s
     return result;
 }
 
-App::Glyphs App::collectGlyphInfo(const std::vector<ft::Font>& fonts, const std::set<std::uint32_t>& codes)
+App::Glyphs App::collectGlyphInfo(const std::vector<ft::Font>& fonts, const std::set<std::uint32_t>& codes) const
 {
     Glyphs result;
 
@@ -44,7 +44,12 @@ App::Glyphs App::collectGlyphInfo(const std::vector<ft::Font>& fonts, const std:
 
         //TODO: add more checks for glyph.
         if (glyphInfo.fontIndex == -1)
-            std::cout << "warning: glyph " << id << " not found." << std::endl;
+        {
+            std::cout << "warning: glyph " << id << " not found";
+            if (id == 65279)
+                std::cout << " (it looks like Unicode byte order mark (BOM))";
+            std::cout << "." << std::endl;
+        }
         else
             result[id] = glyphInfo;
     }
@@ -52,7 +57,7 @@ App::Glyphs App::collectGlyphInfo(const std::vector<ft::Font>& fonts, const std:
     return result;
 }
 
-std::uint32_t App::arrangeGlyphs(Glyphs& glyphs, const Config& config)
+std::uint32_t App::arrangeGlyphs(Glyphs& glyphs, const Config& config) const
 {
     const auto additionalWidth = config.spacing.hor + config.padding.left + config.padding.right;
     const auto additionalHeight = config.spacing.ver + config.padding.up + config.padding.down;
@@ -90,7 +95,7 @@ std::uint32_t App::arrangeGlyphs(Glyphs& glyphs, const Config& config)
     return pageCount;
 }
 
-void App::savePng(const std::string& fileName, const std::uint32_t* buffer, const std::uint32_t w, const std::uint32_t h, const bool withAlpha)
+void App::savePng(const std::string& fileName, const std::uint32_t* buffer, const std::uint32_t w, const std::uint32_t h, const bool withAlpha) const
 {
     std::vector<std::uint8_t> png;
     lodepng::State state;
@@ -113,7 +118,8 @@ void App::savePng(const std::string& fileName, const std::uint32_t* buffer, cons
         throw std::runtime_error("png save to file error " + std::to_string(error) + ": " + lodepng_error_text(error));
 }
 
-std::vector<std::string> App::renderTextures(const Glyphs& glyphs, const Config& config, const std::vector<ft::Font>& fonts, const std::uint32_t pageCount){
+std::vector<std::string> App::renderTextures(const Glyphs& glyphs, const Config& config, const std::vector<ft::Font>& fonts, const std::uint32_t pageCount) const
+{
     std::vector<std::string> fileNames;
 
     //TODO: should we decrement pageCount before calculate?
@@ -173,7 +179,7 @@ std::vector<std::string> App::renderTextures(const Glyphs& glyphs, const Config&
     return fileNames;
 }
 
-void App::writeFontInfoFile(const Glyphs& glyphs, const Config& config, const std::vector<ft::Font>& fonts, const std::vector<std::string>& fileNames)
+void App::writeFontInfoFile(const Glyphs& glyphs, const Config& config, const std::vector<ft::Font>& fonts, const std::vector<std::string>& fileNames) const
 {
     FontInfo f;
 
@@ -255,9 +261,10 @@ void App::writeFontInfoFile(const Glyphs& glyphs, const Config& config, const st
     }
 }
 
-void App::execute(const int argc, char* argv[]) 
+void App::execute(const int argc, char* argv[]) const
 {
-    const auto config = ProgramOptions::parseCommandLine(argc, argv);
+    ProgramOptions po;
+    const auto config = po.parseCommandLine(argc, argv);
 
     ft::Library library;
 

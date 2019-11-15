@@ -4,10 +4,10 @@
 class ProgramOptions
 {
 public:
-    static Config parseCommandLine(int argc, char* argv[]);
+    Config parseCommandLine(int argc, char* argv[]) const;
 
-    static std::set<std::uint32_t> parseCharsString(std::string str);
-    static Config::Color parseColor(const std::string& str);
+    std::set<std::uint32_t> parseCharsString(std::string str) const;
+    Config::Color parseColor(const std::string& str) const;
 private:
-    static void getCharsFromFile(const std::string& fileName, std::set<std::uint32_t>& result);
+    void getCharsFromFile(const std::string& fileName, std::set<std::uint32_t>& result) const;
 };
