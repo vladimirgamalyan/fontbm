@@ -4,6 +4,7 @@
 
 [![Build Status](https://travis-ci.org/vladimirgamalyan/fontbm.svg)](https://travis-ci.org/vladimirgamalyan/fontbm)
 [![Build status](https://ci.appveyor.com/api/projects/status/boq0olngopfabaac?svg=true)](https://ci.appveyor.com/project/vladimirgamalyan/fontbm)
+[![Codacy Badge](https://api.codacy.com/project/badge/Grade/1771a443586e472393c33f3c5fddaf3a)](https://www.codacy.com/manual/vladimirgamalyan/fontbm?utm_source=github.com&amp;utm_medium=referral&amp;utm_content=vladimirgamalyan/fontbm&amp;utm_campaign=Badge_Grade)
 
 [BMFont](http://www.angelcode.com/products/bmfont/) compatible, cross-platform command line bitmap font generator.
 
