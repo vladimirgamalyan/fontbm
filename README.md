@@ -16,9 +16,9 @@
 Download compiled version (fontbm.zip for Windows, fontbm for Linux) from [Releases](https://github.com/vladimirgamalyan/fontbm/releases). Run:
 
 ```
-fontbm --font-file Vera.ttf --output vera
+fontbm --font-file FreeSans.ttf --output myfont
 ```
-It will produce vera.fnt ([file format](http://www.angelcode.com/products/bmfont/doc/file_format.html)) and vera.png ([how to render text](http://www.angelcode.com/products/bmfont/doc/render_text.html)).
+It will produce myfont.fnt ([file format](http://www.angelcode.com/products/bmfont/doc/file_format.html)) and myfont.png ([how to render text](http://www.angelcode.com/products/bmfont/doc/render_text.html)).
 
 Available options (**bold** options are required):
 
