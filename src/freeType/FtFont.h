@@ -156,7 +156,16 @@ public:
             for (std::uint32_t row = 0; row < glyphMetrics.height; ++row)
             {
                 std::uint32_t *dst = buffer + (y + row) * surfaceW + x;
-                std::uint8_t *src = slot->bitmap.buffer + slot->bitmap.pitch * row;
+                std::uint8_t const *src = slot->bitmap.buffer + slot->bitmap.pitch * row;
+
+                std::vector<std::uint8_t> unpacked;
+                if (slot->bitmap.pixel_mode == FT_PIXEL_MODE_MONO) {
+                    unpacked.reserve(slot->bitmap.width);
+                    for (int byte = 0; byte < slot->bitmap.pitch; ++byte)
+                        for (std::uint8_t mask = 0x80; mask; mask = mask >> 1)
+                            unpacked.push_back(src[byte] & mask ? 0xff : 0x00);
+                    src = unpacked.data();
+                }
 
                 for (auto col = glyphMetrics.width; col > 0 && dst < dst_check; --col) {
                     const std::uint32_t alpha = *src++;
