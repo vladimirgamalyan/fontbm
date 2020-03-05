@@ -78,6 +78,10 @@ cmake -G "Visual Studio 14 2015"
 
 Open .sln file in Visual Studio 2015, configure paths to FreeType and rebuild all.
 
+## Contributors
+
+* [cherniid](https://github.com/cherniid)
+
 ## License
 
 [MIT License](http://opensource.org/licenses/MIT)
