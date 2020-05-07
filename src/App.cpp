@@ -153,13 +153,13 @@ std::vector<std::string> App::renderTextures(const Glyphs& glyphs, const Config&
 
             while (cur <= end)
             {
-                const std::uint32_t a0 = (*cur) >> 24;
+                const std::uint32_t a0 = (*cur) >> 24u;
                 const std::uint32_t a1 = 256 - a0;
-                const std::uint32_t rb1 = (a1 * (bgColor & 0xFF00FF)) >> 8;
-                const std::uint32_t rb2 = (a0 * (fgColor & 0xFF00FF)) >> 8;
-                const std::uint32_t g1  = (a1 * (bgColor & 0x00FF00)) >> 8;
-                const std::uint32_t g2  = (a0 * (fgColor & 0x00FF00)) >> 8;
-                *cur =  ((rb1 | rb2) & 0xFF00FF) + ((g1 | g2) & 0x00FF00);
+                const std::uint32_t rb1 = (a1 * (bgColor & 0xFF00FFu)) >> 8u;
+                const std::uint32_t rb2 = (a0 * (fgColor & 0xFF00FFu)) >> 8u;
+                const std::uint32_t g1  = (a1 * (bgColor & 0x00FF00u)) >> 8u;
+                const std::uint32_t g2  = (a0 * (fgColor & 0x00FF00u)) >> 8u;
+                *cur =  ((rb1 | rb2) & 0xFF00FFu) + ((g1 | g2) & 0x00FF00u);
                 ++cur;
             }
         }
@@ -259,8 +259,7 @@ void App::writeFontInfoFile(const Glyphs& glyphs, const Config& config, const st
 
 void App::execute(const int argc, char* argv[])
 {
-    ProgramOptions po;
-    const auto config = po.parseCommandLine(argc, argv);
+    const auto config = ProgramOptions::parseCommandLine(argc, argv);
 
     ft::Library library;
 

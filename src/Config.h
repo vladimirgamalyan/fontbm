@@ -23,7 +23,7 @@ struct Config
 
         std::uint32_t getBGR() const
         {
-            return r + (g << 8) + (b << 16);
+            return r + (g << 8u) + (b << 16u);
         }
 
         bool operator == (const Color& other) const

@@ -8,7 +8,7 @@
 #include "external/utf8cpp/utf8.h"
 #include "utils/splitStrByDelim.h"
 
-Config ProgramOptions::parseCommandLine(int argc, char* argv[]) const
+Config ProgramOptions::parseCommandLine(int argc, char* argv[])
 {
     try
     {
