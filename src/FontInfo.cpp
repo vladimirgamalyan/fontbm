@@ -313,9 +313,10 @@ void FontInfo::writeToBinFile(const std::string &fileName) const
     f << "BMF";
     f << '\3';
 
-    InfoBlock infoBlock{};
+    InfoBlock infoBlock;
     infoBlock.blockSize = sizeof(InfoBlock) - sizeof(InfoBlock::blockSize) + info.face.length() + 1;
     infoBlock.fontSize = info.size;
+    infoBlock.reserved = 0;
     infoBlock.bold = info.bold;
     infoBlock.italic = info.italic;
     infoBlock.unicode = info.unicode;
@@ -335,7 +336,7 @@ void FontInfo::writeToBinFile(const std::string &fileName) const
     f.write((const char*)&infoBlock, sizeof(infoBlock));
     f.write(info.face.c_str(), info.face.length() + 1);
 
-    CommonBlock commonBlock{};
+    CommonBlock commonBlock;
     commonBlock.blockSize = sizeof(CommonBlock) - sizeof(CommonBlock::blockSize);
     commonBlock.lineHeight = common.lineHeight;
     commonBlock.base = common.base;
@@ -343,6 +344,7 @@ void FontInfo::writeToBinFile(const std::string &fileName) const
     commonBlock.scaleH = common.scaleH;
     commonBlock.pages = static_cast<std::uint16_t>(pages.size());
     commonBlock.packed = common.packed;
+    commonBlock.reserved = 0;
     commonBlock.alphaChnl = common.alphaChnl;
     commonBlock.redChnl = common.redChnl;
     commonBlock.greenChnl = common.greenChnl;
@@ -362,7 +364,7 @@ void FontInfo::writeToBinFile(const std::string &fileName) const
     f << charsBlockSize;
     for (auto c: chars)
     {
-        CharBlock charBlock{};
+        CharBlock charBlock;
         charBlock.id = c.id;
         charBlock.x = c.x;
         charBlock.y = c.y;
@@ -385,7 +387,7 @@ void FontInfo::writeToBinFile(const std::string &fileName) const
 
         for (auto k: kernings)
         {
-            KerningPairsBlock kerningPairsBlock{};
+            KerningPairsBlock kerningPairsBlock;
             kerningPairsBlock.first = k.first;
             kerningPairsBlock.second = k.second;
             kerningPairsBlock.amount = k.amount;
