@@ -6,8 +6,8 @@ class ProgramOptions
 public:
     Config parseCommandLine(int argc, char* argv[]) const;
 
-    std::set<std::uint32_t> parseCharsString(std::string str) const;
-    Config::Color parseColor(const std::string& str) const;
+    static std::set<std::uint32_t> parseCharsString(std::string str);
+    static Config::Color parseColor(const std::string& str);
 private:
-    void getCharsFromFile(const std::string& fileName, std::set<std::uint32_t>& result) const;
+    static void getCharsFromFile(const std::string& fileName, std::set<std::uint32_t>& result);
 };

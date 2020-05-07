@@ -106,7 +106,7 @@ Config ProgramOptions::parseCommandLine(int argc, char* argv[]) const
     }
 }
 
-std::set<std::uint32_t> ProgramOptions::parseCharsString(std::string str) const
+std::set<std::uint32_t> ProgramOptions::parseCharsString(std::string str)
 {
     str.erase(remove_if(str.begin(), str.end(), ::isspace), str.end());
 
@@ -147,7 +147,7 @@ std::set<std::uint32_t> ProgramOptions::parseCharsString(std::string str) const
     return result;
 }
 
-void ProgramOptions::getCharsFromFile(const std::string& fileName, std::set<std::uint32_t>& result) const
+void ProgramOptions::getCharsFromFile(const std::string& fileName, std::set<std::uint32_t>& result)
 {
     std::ifstream fs(fileName, std::ifstream::binary);
     if (!fs)
@@ -159,7 +159,7 @@ void ProgramOptions::getCharsFromFile(const std::string& fileName, std::set<std:
         result.insert(utf8::next(it, str.end()));
 }
 
-Config::Color ProgramOptions::parseColor(const std::string& str) const
+Config::Color ProgramOptions::parseColor(const std::string& str)
 {
     const std::regex e(R"(^\s*\d{1,3}\s*,\s*\d{1,3}\s*,\s*\d{1,3}\s*$)");
     if (!std::regex_match(str, e))

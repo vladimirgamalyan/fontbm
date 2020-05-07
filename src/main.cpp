@@ -7,8 +7,7 @@ int main(const int argc, char* argv[])
 {
     try
     {
-        App app;
-        app.execute(argc, argv);
+        App::execute(argc, argv);
     }
     catch (HelpException&)
     {
