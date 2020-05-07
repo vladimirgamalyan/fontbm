@@ -7,7 +7,7 @@
 #include "external/lodepng/lodepng.h"
 #include "utils/getNumberLen.h"
 
-std::vector<rbp::RectSize> App::getGlyphRectangles(const Glyphs &glyphs, const std::uint32_t additionalWidth, const std::uint32_t additionalHeight) const
+std::vector<rbp::RectSize> App::getGlyphRectangles(const Glyphs &glyphs, const std::uint32_t additionalWidth, const std::uint32_t additionalHeight)
 {
     std::vector<rbp::RectSize> result;
     for (const auto& kv : glyphs)
@@ -19,7 +19,7 @@ std::vector<rbp::RectSize> App::getGlyphRectangles(const Glyphs &glyphs, const s
     return result;
 }
 
-App::Glyphs App::collectGlyphInfo(const std::vector<ft::Font>& fonts, const std::set<std::uint32_t>& codes) const
+App::Glyphs App::collectGlyphInfo(const std::vector<ft::Font>& fonts, const std::set<std::uint32_t>& codes)
 {
     Glyphs result;
 
@@ -57,7 +57,7 @@ App::Glyphs App::collectGlyphInfo(const std::vector<ft::Font>& fonts, const std:
     return result;
 }
 
-std::uint32_t App::arrangeGlyphs(Glyphs& glyphs, const Config& config) const
+std::uint32_t App::arrangeGlyphs(Glyphs& glyphs, const Config& config)
 {
     const auto additionalWidth = config.spacing.hor + config.padding.left + config.padding.right;
     const auto additionalHeight = config.spacing.ver + config.padding.up + config.padding.down;
@@ -95,7 +95,7 @@ std::uint32_t App::arrangeGlyphs(Glyphs& glyphs, const Config& config) const
     return pageCount;
 }
 
-void App::savePng(const std::string& fileName, const std::uint32_t* buffer, const std::uint32_t w, const std::uint32_t h, const bool withAlpha) const
+void App::savePng(const std::string& fileName, const std::uint32_t* buffer, const std::uint32_t w, const std::uint32_t h, const bool withAlpha)
 {
     std::vector<std::uint8_t> png;
     lodepng::State state;
@@ -103,11 +103,7 @@ void App::savePng(const std::string& fileName, const std::uint32_t* buffer, cons
     state.encoder.add_id = 0; // Don't add LodePNG version chunk to save more bytes
     state.encoder.auto_convert = 0;
     state.info_png.color.colortype = withAlpha ? LCT_RGBA : LCT_RGB;
-
-    ///state.encoder.text_compression = 1; //Not needed because we don't add text chunks, but this demonstrates another optimization setting
-    //state.encoder.zlibsettings.nicematch = 258; //Set this to the max possible, otherwise it can hurt compression
-    //state.encoder.zlibsettings.lazymatching = 1; //Definitely use lazy matching for better compression
-    //state.encoder.zlibsettings.windowsize = 32768; //Use maximum possible window size for best compression
+    state.encoder.zlibsettings.windowsize = 32768; // Use maximum possible window size for best compression
 
     auto error = lodepng::encode(png, reinterpret_cast<const unsigned char*>(buffer), w, h, state);
     if (error)
@@ -118,7 +114,7 @@ void App::savePng(const std::string& fileName, const std::uint32_t* buffer, cons
         throw std::runtime_error("png save to file error " + std::to_string(error) + ": " + lodepng_error_text(error));
 }
 
-std::vector<std::string> App::renderTextures(const Glyphs& glyphs, const Config& config, const std::vector<ft::Font>& fonts, const std::uint32_t pageCount) const
+std::vector<std::string> App::renderTextures(const Glyphs& glyphs, const Config& config, const std::vector<ft::Font>& fonts, const std::uint32_t pageCount)
 {
     std::vector<std::string> fileNames;
 
@@ -157,13 +153,13 @@ std::vector<std::string> App::renderTextures(const Glyphs& glyphs, const Config&
 
             while (cur <= end)
             {
-                const std::uint32_t a0 = (*cur) >> 24;
+                const std::uint32_t a0 = (*cur) >> 24u;
                 const std::uint32_t a1 = 256 - a0;
-                const std::uint32_t rb1 = (a1 * (bgColor & 0xFF00FF)) >> 8;
-                const std::uint32_t rb2 = (a0 * (fgColor & 0xFF00FF)) >> 8;
-                const std::uint32_t g1  = (a1 * (bgColor & 0x00FF00)) >> 8;
-                const std::uint32_t g2  = (a0 * (fgColor & 0x00FF00)) >> 8;
-                *cur =  ((rb1 | rb2) & 0xFF00FF) + ((g1 | g2) & 0x00FF00);
+                const std::uint32_t rb1 = (a1 * (bgColor & 0xFF00FFu)) >> 8u;
+                const std::uint32_t rb2 = (a0 * (fgColor & 0xFF00FFu)) >> 8u;
+                const std::uint32_t g1  = (a1 * (bgColor & 0x00FF00u)) >> 8u;
+                const std::uint32_t g2  = (a0 * (fgColor & 0x00FF00u)) >> 8u;
+                *cur =  ((rb1 | rb2) & 0xFF00FFu) + ((g1 | g2) & 0x00FF00u);
                 ++cur;
             }
         }
@@ -179,7 +175,7 @@ std::vector<std::string> App::renderTextures(const Glyphs& glyphs, const Config&
     return fileNames;
 }
 
-void App::writeFontInfoFile(const Glyphs& glyphs, const Config& config, const std::vector<ft::Font>& fonts, const std::vector<std::string>& fileNames) const
+void App::writeFontInfoFile(const Glyphs& glyphs, const Config& config, const std::vector<ft::Font>& fonts, const std::vector<std::string>& fileNames)
 {
     FontInfo f;
 
@@ -261,10 +257,9 @@ void App::writeFontInfoFile(const Glyphs& glyphs, const Config& config, const st
     }
 }
 
-void App::execute(const int argc, char* argv[]) const
+void App::execute(const int argc, char* argv[])
 {
-    ProgramOptions po;
-    const auto config = po.parseCommandLine(argc, argv);
+    const auto config = ProgramOptions::parseCommandLine(argc, argv);
 
     ft::Library library;
 
@@ -274,6 +269,8 @@ void App::execute(const int argc, char* argv[]) const
 
     auto glyphs = collectGlyphInfo(fonts, config.chars);
     const auto pageCount = arrangeGlyphs(glyphs, config);
+    if (config.maxTextureCount != 0 && pageCount > config.maxTextureCount)
+        throw std::runtime_error("too many generated textures (more than --max-texture-count)");
 
     const auto fileNames = renderTextures(glyphs, config, fonts, pageCount);
     writeFontInfoFile(glyphs, config, fonts, fileNames);

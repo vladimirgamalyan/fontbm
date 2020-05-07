@@ -62,6 +62,15 @@ def main(argv):
         '--texture-width', '32', '--texture-height', '32'])
     check_diff('expected/test3.fnt', 'generated/test3.fnt')
 
+    process = subprocess.Popen([font_exe, '--font-file', 'fonts/FreeSans.ttf', '--chars', '32-126',
+                                '--output', 'generated/test3', '--include-kerning-pairs',
+                                '--texture-width', '32', '--texture-height', '32',
+                                '--max-texture-count', '4'], stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+    out, err = process.communicate()
+    assert out == ''
+    assert err.strip() == 'too many generated textures (more than --max-texture-count)'
+    assert process.returncode == 1
+
 
 if __name__ == "__main__":
     main(sys.argv)

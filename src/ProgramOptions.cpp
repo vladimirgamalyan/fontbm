@@ -8,7 +8,7 @@
 #include "external/utf8cpp/utf8.h"
 #include "utils/splitStrByDelim.h"
 
-Config ProgramOptions::parseCommandLine(int argc, char* argv[]) const
+Config ProgramOptions::parseCommandLine(int argc, char* argv[])
 {
     try
     {
@@ -56,7 +56,8 @@ Config ProgramOptions::parseCommandLine(int argc, char* argv[]) const
             ("output", "output files name without extension, required", cxxopts::value<std::string>(config.output))
             ("data-format", R"(output data file format, "xml" or "txt", default "xml")",
              cxxopts::value<std::string>(dataFormat)->default_value("txt"))
-            ("include-kerning-pairs", "include kerning pairs to output file", cxxopts::value<bool>(config.includeKerningPairs));
+            ("include-kerning-pairs", "include kerning pairs to output file", cxxopts::value<bool>(config.includeKerningPairs))
+            ("max-texture-count", "maximum generated textures", cxxopts::value<std::uint32_t>(config.maxTextureCount)->default_value("0"));
 
         auto result = options.parse(argc, argv);
 
@@ -105,7 +106,7 @@ Config ProgramOptions::parseCommandLine(int argc, char* argv[]) const
     }
 }
 
-std::set<std::uint32_t> ProgramOptions::parseCharsString(std::string str) const
+std::set<std::uint32_t> ProgramOptions::parseCharsString(std::string str)
 {
     str.erase(remove_if(str.begin(), str.end(), ::isspace), str.end());
 
@@ -146,7 +147,7 @@ std::set<std::uint32_t> ProgramOptions::parseCharsString(std::string str) const
     return result;
 }
 
-void ProgramOptions::getCharsFromFile(const std::string& fileName, std::set<std::uint32_t>& result) const
+void ProgramOptions::getCharsFromFile(const std::string& fileName, std::set<std::uint32_t>& result)
 {
     std::ifstream fs(fileName, std::ifstream::binary);
     if (!fs)
@@ -158,7 +159,7 @@ void ProgramOptions::getCharsFromFile(const std::string& fileName, std::set<std:
         result.insert(utf8::next(it, str.end()));
 }
 
-Config::Color ProgramOptions::parseColor(const std::string& str) const
+Config::Color ProgramOptions::parseColor(const std::string& str)
 {
     const std::regex e(R"(^\s*\d{1,3}\s*,\s*\d{1,3}\s*,\s*\d{1,3}\s*$)");
     if (!std::regex_match(str, e))
