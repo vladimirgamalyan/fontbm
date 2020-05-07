@@ -25,24 +25,24 @@ Available options (**bold** options are required):
 
 option  | default | comment
 ------|-----|---------------
-**--font-file** |  | path to ttf file, required (can be set several times for fallback fonts)
-**--output** | | output files name without extension, required
---font-size | 32 | font size
---color | 255,255,255 | foreground RGB color, for example: 32,255,255 (without spaces)
---background-color | | background RGB color, for example: 0,0,128 (without spaces), transparent by default
---chars | 32-126 | required characters, for example 32-64,92,120-126 (without spaces), default value is 32-126 if 'chars-file' option is not defined
---chars-file | | optional path to UTF-8 text file with additional required characters (will be combined with 'chars' option).
---data-format | txt | output data file format: txt, xml, bin, json
---include-kerning-pairs | | include kerning pairs to output file
---padding-up | 0 | padding up
---padding-right | 0 | padding right
---padding-down | 0 | padding down
---padding-left | 0 | padding left
---spacing-vert | 0 | spacing vertical
---spacing-horiz | 0 | spacing horizontal
---texture-width | 256 | texture width
---texture-height | 256 | texture height
---max-texture-count | | maximum generated texture count (unlimited if not defined)
+<nobr>**--font-file**</nobr> |  | path to ttf file, required (can be set several times for fallback fonts)
+<nobr>**--output**</nobr> | | output files name without extension, required
+<nobr>--font-size</nobr> | 32 | font size
+<nobr>--color</nobr> | 255,255,255 | foreground RGB color, for example: 32,255,255 (without spaces)
+<nobr>--background-color</nobr> | | background RGB color, for example: 0,0,128 (without spaces), transparent by default
+<nobr>--chars</nobr> | 32-126 | required characters, for example 32-64,92,120-126 (without spaces), default value is 32-126 if 'chars-file' option is not defined
+<nobr>--chars-file</nobr> | | optional path to UTF-8 text file with additional required characters (will be combined with 'chars' option).
+<nobr>--data-format</nobr> | txt | output data file format: txt, xml, bin, json
+<nobr>--include-kerning-pairs</nobr> | | include kerning pairs to output file
+<nobr>--padding-up</nobr> | 0 | padding up
+<nobr>--padding-right</nobr> | 0 | padding right
+<nobr>--padding-down</nobr> | 0 | padding down
+<nobr>--padding-left</nobr> | 0 | padding left
+<nobr>--spacing-vert</nobr> | 0 | spacing vertical
+<nobr>--spacing-horiz</nobr> | 0 | spacing horizontal
+<nobr>--texture-width</nobr> | 256 | texture width
+<nobr>--texture-height</nobr> | 256 | texture height
+<nobr>--max-texture-count</nobr> | | maximum generated texture count (unlimited if not defined)
 
 ## Building Linux
 
