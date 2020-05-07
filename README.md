@@ -42,6 +42,7 @@ option  | default | comment
 --spacing-horiz | 0 | spacing horizontal
 --texture-width | 256 | texture width
 --texture-height | 256 | texture height
+--max-texture-count | | maximum generated texture count (unlimited if not defined)
 
 ## Building Linux
 
