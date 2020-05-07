@@ -103,11 +103,7 @@ void App::savePng(const std::string& fileName, const std::uint32_t* buffer, cons
     state.encoder.add_id = 0; // Don't add LodePNG version chunk to save more bytes
     state.encoder.auto_convert = 0;
     state.info_png.color.colortype = withAlpha ? LCT_RGBA : LCT_RGB;
-
-    ///state.encoder.text_compression = 1; //Not needed because we don't add text chunks, but this demonstrates another optimization setting
-    //state.encoder.zlibsettings.nicematch = 258; //Set this to the max possible, otherwise it can hurt compression
-    //state.encoder.zlibsettings.lazymatching = 1; //Definitely use lazy matching for better compression
-    //state.encoder.zlibsettings.windowsize = 32768; //Use maximum possible window size for best compression
+    state.encoder.zlibsettings.windowsize = 32768; // Use maximum possible window size for best compression
 
     auto error = lodepng::encode(png, reinterpret_cast<const unsigned char*>(buffer), w, h, state);
     if (error)
