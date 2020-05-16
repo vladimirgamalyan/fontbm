@@ -182,6 +182,8 @@ void App::writeFontInfoFile(const Glyphs& glyphs, const Config& config, const st
     f.info.face = fonts[0].getFamilyNameOr("unknown");
     f.info.size = config.fontSize;
     f.info.unicode = true;
+    f.info.bold = fonts[0].isBold();
+    f.info.italic = fonts[0].isItalic();
     f.info.aa = 1;
     f.info.padding.up = static_cast<std::uint8_t>(config.padding.up);
     f.info.padding.right = static_cast<std::uint8_t>(config.padding.right);

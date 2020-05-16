@@ -151,7 +151,7 @@ public:
         if (buffer)
         {
             const auto dst_check = buffer + surfaceW * surfaceH;
-            color &= 0xffffff;
+            color &= 0xffffffu;
 
             for (std::uint32_t row = 0; row < glyphMetrics.height; ++row)
             {
@@ -162,14 +162,14 @@ public:
                 if (slot->bitmap.pixel_mode == FT_PIXEL_MODE_MONO) {
                     unpacked.reserve(slot->bitmap.width);
                     for (int byte = 0; byte < slot->bitmap.pitch; ++byte)
-                        for (std::uint8_t mask = 0x80; mask; mask = mask >> 1)
+                        for (std::uint8_t mask = 0x80; mask; mask = mask >> 1u)
                             unpacked.push_back(src[byte] & mask ? 0xff : 0x00);
                     src = unpacked.data();
                 }
 
                 for (auto col = glyphMetrics.width; col > 0 && dst < dst_check; --col) {
                     const std::uint32_t alpha = *src++;
-                    *dst++ = color | (alpha << 24);
+                    *dst++ = color | (alpha << 24u);
                 }
             }
         }
@@ -195,7 +195,7 @@ public:
         const auto error = FT_Get_Kerning(face, indexLeft, indexRight, ft_kerning_default, &delta);
         if (error)
             throw std::runtime_error("Couldn't find glyphs kerning");
-        return delta.x >> 6;
+        return delta.x >> 6u;
     }
 
     void debugInfo() const {
@@ -213,6 +213,16 @@ public:
         if (!face->family_name)
             return defaultName;
         return std::string(face->family_name);
+    }
+
+    bool isBold() const
+    {
+        return (style & TTF_STYLE_BOLD) != 0;
+    }
+
+    bool isItalic() const
+    {
+        return (style & TTF_STYLE_ITALIC) != 0;
     }
 
     Library& library;
