@@ -259,7 +259,7 @@ void FontInfo::writeToBinFile(const std::string &fileName) const
     struct InfoBlock
     {
         std::int32_t blockSize;
-        std::uint16_t fontSize;
+        std::int16_t fontSize;
         std::int8_t reserved:4;
         std::int8_t bold:1;
         std::int8_t italic:1;

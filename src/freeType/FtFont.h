@@ -65,7 +65,7 @@ public:
 
         if (FT_IS_SCALABLE(face)) {
             /* Set the character size and use default DPI (72) */
-            error = FT_Set_Char_Size(face, 0, ptsize * 64, 0, 0);
+            error = FT_Set_Pixel_Sizes(face, ptsize, ptsize);
             if (error) {
                 FT_Done_Face(face);
                 throw Exception("Couldn't set font size", error);

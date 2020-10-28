@@ -7,6 +7,8 @@
 #include "external/lodepng/lodepng.h"
 #include "utils/getNumberLen.h"
 
+//TODO: read .bmfc files (BMFont configuration file)
+
 std::vector<rbp::RectSize> App::getGlyphRectangles(const Glyphs &glyphs, const std::uint32_t additionalWidth, const std::uint32_t additionalHeight)
 {
     std::vector<rbp::RectSize> result;
@@ -179,7 +181,7 @@ void App::writeFontInfoFile(const Glyphs& glyphs, const Config& config, const st
     FontInfo f;
 
     f.info.face = fonts[0].getFamilyNameOr("unknown");
-    f.info.size = config.fontSize;
+    f.info.size = -static_cast<std::int16_t>(config.fontSize);
     f.info.unicode = true;
     f.info.bold = fonts[0].isBold();
     f.info.italic = fonts[0].isItalic();
