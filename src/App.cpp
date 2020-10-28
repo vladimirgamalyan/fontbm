@@ -123,8 +123,7 @@ std::vector<std::string> App::renderTextures(const Glyphs& glyphs, const Config&
 
     for (std::uint32_t page = 0; page < pageCount; ++page)
     {
-        std::vector<std::uint32_t> surface(config.textureSize.w * config.textureSize.h);
-        memset(&surface[0], 0, surface.size() * sizeof(std::uint32_t));
+        std::vector<std::uint32_t> surface(config.textureSize.w * config.textureSize.h, config.color.getBGR());
 
         // Render every glyph
         //TODO: do not repeat same glyphs (with same index)
@@ -184,6 +183,7 @@ void App::writeFontInfoFile(const Glyphs& glyphs, const Config& config, const st
     f.info.unicode = true;
     f.info.bold = fonts[0].isBold();
     f.info.italic = fonts[0].isItalic();
+    f.info.stretchH = 100;
     f.info.aa = 1;
     f.info.padding.up = static_cast<std::uint8_t>(config.padding.up);
     f.info.padding.right = static_cast<std::uint8_t>(config.padding.right);
@@ -196,6 +196,10 @@ void App::writeFontInfoFile(const Glyphs& glyphs, const Config& config, const st
     f.common.base = static_cast<std::uint16_t>(fonts[0].ascent);
     f.common.scaleW = static_cast<std::uint16_t>(config.textureSize.w);
     f.common.scaleH = static_cast<std::uint16_t>(config.textureSize.h);
+    f.common.alphaChnl = 0;
+    f.common.redChnl = 4;
+    f.common.greenChnl = 4;
+    f.common.blueChnl = 4;
 
     f.pages = fileNames;
 
