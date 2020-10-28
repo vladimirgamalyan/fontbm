@@ -1,6 +1,7 @@
 #include <stdexcept>
 #include <fstream>
 #include <iostream>
+#include <iomanip>
 #include "FontInfo.h"
 #include "external/tinyxml2/tinyxml2.h"
 #include "external/json.hpp"
@@ -217,21 +218,23 @@ void FontInfo::writeToTextFile(const std::string &fileName) const
         f << "page id=" << i << " file=\"" << pages[i] << "\"" << std::endl;
 
     f << "chars count=" << chars.size() << std::endl;
+    f << std::left;
     for(auto c: chars)
     {
         f << "char"
-            << " id=" << c.id
-            << " x=" << c.x
-            << " y=" << c.y
-            << " width=" << c.width
-            << " height=" << c.height
-            << " xoffset=" << c.xoffset
-            << " yoffset=" << c.yoffset
-            << " xadvance=" << c.xadvance
-            << " page=" << static_cast<int>(c.page)
-            << " chnl=" << static_cast<int>(c.chnl)
+            << " id=" <<  std::setw(4) << c.id
+            << " x=" << std::setw(5) << c.x
+            << " y=" << std::setw(5) << c.y
+            << " width=" << std::setw(5) << c.width
+            << " height=" << std::setw(5) << c.height
+            << " xoffset=" << std::setw(5) << c.xoffset
+            << " yoffset=" << std::setw(5) << c.yoffset
+            << " xadvance=" << std::setw(5) << c.xadvance
+            << " page=" << std::setw(2) << static_cast<int>(c.page)
+            << " chnl=" << std::setw(2) << static_cast<int>(c.chnl)
             << std::endl;
     }
+    f << std::right;
     if (!kernings.empty())
     {
         f << "kernings count=" << kernings.size() << std::endl;
