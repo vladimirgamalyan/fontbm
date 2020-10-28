@@ -232,15 +232,17 @@ void FontInfo::writeToTextFile(const std::string &fileName) const
             << " chnl=" << static_cast<int>(c.chnl)
             << std::endl;
     }
-
-    f << "kernings count=" << kernings.size() << std::endl;
-    for(auto k: kernings)
+    if (!kernings.empty())
     {
-        f << "kerning "
-            << "first=" << k.first
-            << " second=" << k.second
-            << " amount=" << k.amount
-            << std::endl;
+        f << "kernings count=" << kernings.size() << std::endl;
+        for(auto k: kernings)
+        {
+            f << "kerning "
+              << "first=" << k.first
+              << " second=" << k.second
+              << " amount=" << k.amount
+              << std::endl;
+        }
     }
 }
 
