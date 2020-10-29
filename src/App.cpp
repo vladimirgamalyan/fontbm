@@ -39,7 +39,7 @@ App::Glyphs App::collectGlyphInfo(const std::vector<ft::Font>& fonts, const std:
                 glyphInfo.height = glyphMetrics.height;
                 glyphInfo.xAdvance = glyphMetrics.horiAdvance;
                 glyphInfo.xOffset = glyphMetrics.horiBearingX;
-                glyphInfo.yOffset = fonts[i].ascent - glyphMetrics.horiBearingY;
+                glyphInfo.yOffset = fonts[i].yMax - glyphMetrics.horiBearingY;
                 break;
             }
         }
@@ -194,8 +194,8 @@ void App::writeFontInfoFile(const Glyphs& glyphs, const Config& config, const st
     f.info.spacing.horizontal = static_cast<std::uint8_t>(config.spacing.hor);
     f.info.spacing.vertical = static_cast<std::uint8_t>(config.spacing.ver);
 
-    f.common.lineHeight = static_cast<std::uint16_t>(fonts[0].lineskip);
-    f.common.base = static_cast<std::uint16_t>(fonts[0].ascent);
+    f.common.lineHeight = static_cast<std::uint16_t>(fonts[0].height);
+    f.common.base = static_cast<std::uint16_t>(fonts[0].yMax);
     f.common.scaleW = static_cast<std::uint16_t>(config.textureSize.w);
     f.common.scaleH = static_cast<std::uint16_t>(config.textureSize.h);
     f.common.alphaChnl = 0;
