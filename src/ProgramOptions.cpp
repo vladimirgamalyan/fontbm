@@ -8,6 +8,8 @@
 #include "external/utf8cpp/utf8.h"
 #include "utils/splitStrByDelim.h"
 
+//TODO: warn about unknown options
+
 Config ProgramOptions::parseCommandLine(int argc, char* argv[])
 {
     try

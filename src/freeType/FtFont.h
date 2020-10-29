@@ -65,7 +65,7 @@ public:
 
         if (FT_IS_SCALABLE(face)) {
             /* Set the character size and use default DPI (72) */
-            error = FT_Set_Char_Size(face, 0, ptsize * 64, 0, 0);
+            error = FT_Set_Pixel_Sizes(face, ptsize, ptsize);
             if (error) {
                 FT_Done_Face(face);
                 throw Exception("Couldn't set font size", error);
@@ -73,12 +73,8 @@ public:
 
             /* Get the scalable font metrics for this font */
             const auto scale = face->size->metrics.y_scale;
-            ascent  = FT_CEIL(FT_MulFix(face->ascender, scale));
-            descent = FT_CEIL(FT_MulFix(face->descender, scale));
-            height  = ascent - descent + /* baseline */ 1;
-            lineskip = FT_CEIL(FT_MulFix(face->height, scale));
-            underline_offset = FT_FLOOR(FT_MulFix(face->underline_position, scale));
-            underline_height = FT_FLOOR(FT_MulFix(face->underline_thickness, scale));
+            yMax  = FT_CEIL(FT_MulFix(face->bbox.yMax, scale));
+            height  = FT_CEIL(FT_MulFix(face->height, scale));
         } else {
             /* Non-scalable font case.  ptsize determines which family
              * or series of fonts to grab from the non-scalable format.
@@ -97,16 +93,8 @@ public:
              * non-scalable fonts must be determined differently
              * or sometimes cannot be determined.
              * */
-            ascent = face->available_sizes[ptsize].height;
-            descent = 0;
+            yMax = face->available_sizes[ptsize].height;
             height = face->available_sizes[ptsize].height;
-            lineskip = FT_CEIL(ascent);
-            underline_offset = FT_FLOOR(face->underline_position);
-            underline_height = FT_FLOOR(face->underline_thickness);
-        }
-
-        if ( underline_height < 1 ) {
-            underline_height = 1;
         }
 
         /* Initialize the font face style */
@@ -228,11 +216,8 @@ public:
     Library& library;
     FT_Face face = nullptr;
     int height;
-    int ascent;
-    int descent;
-    int lineskip;
-    int underline_offset;
-    int underline_height;
+    int yMax;
+
 
     /* For non-scalable formats, we must remember which font index size */
     int font_size_family;

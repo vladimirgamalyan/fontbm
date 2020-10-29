@@ -23,7 +23,7 @@ struct FontInfo
             std::uint8_t vertical = 0;
         };
 
-        std::uint16_t size = 0;
+        std::int16_t size = 0;
         bool smooth = false;
         bool unicode = false;
         bool italic = false;

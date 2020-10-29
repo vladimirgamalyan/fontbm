@@ -7,6 +7,8 @@
 #include "external/lodepng/lodepng.h"
 #include "utils/getNumberLen.h"
 
+//TODO: read .bmfc files (BMFont configuration file)
+
 std::vector<rbp::RectSize> App::getGlyphRectangles(const Glyphs &glyphs, const std::uint32_t additionalWidth, const std::uint32_t additionalHeight)
 {
     std::vector<rbp::RectSize> result;
@@ -37,7 +39,7 @@ App::Glyphs App::collectGlyphInfo(const std::vector<ft::Font>& fonts, const std:
                 glyphInfo.height = glyphMetrics.height;
                 glyphInfo.xAdvance = glyphMetrics.horiAdvance;
                 glyphInfo.xOffset = glyphMetrics.horiBearingX;
-                glyphInfo.yOffset = fonts[i].ascent - glyphMetrics.horiBearingY;
+                glyphInfo.yOffset = fonts[i].yMax - glyphMetrics.horiBearingY;
                 break;
             }
         }
@@ -123,8 +125,7 @@ std::vector<std::string> App::renderTextures(const Glyphs& glyphs, const Config&
 
     for (std::uint32_t page = 0; page < pageCount; ++page)
     {
-        std::vector<std::uint32_t> surface(config.textureSize.w * config.textureSize.h);
-        memset(&surface[0], 0, surface.size() * sizeof(std::uint32_t));
+        std::vector<std::uint32_t> surface(config.textureSize.w * config.textureSize.h, config.color.getBGR());
 
         // Render every glyph
         //TODO: do not repeat same glyphs (with same index)
@@ -180,10 +181,11 @@ void App::writeFontInfoFile(const Glyphs& glyphs, const Config& config, const st
     FontInfo f;
 
     f.info.face = fonts[0].getFamilyNameOr("unknown");
-    f.info.size = config.fontSize;
+    f.info.size = -static_cast<std::int16_t>(config.fontSize);
     f.info.unicode = true;
     f.info.bold = fonts[0].isBold();
     f.info.italic = fonts[0].isItalic();
+    f.info.stretchH = 100;
     f.info.aa = 1;
     f.info.padding.up = static_cast<std::uint8_t>(config.padding.up);
     f.info.padding.right = static_cast<std::uint8_t>(config.padding.right);
@@ -192,10 +194,14 @@ void App::writeFontInfoFile(const Glyphs& glyphs, const Config& config, const st
     f.info.spacing.horizontal = static_cast<std::uint8_t>(config.spacing.hor);
     f.info.spacing.vertical = static_cast<std::uint8_t>(config.spacing.ver);
 
-    f.common.lineHeight = static_cast<std::uint16_t>(fonts[0].lineskip);
-    f.common.base = static_cast<std::uint16_t>(fonts[0].ascent);
+    f.common.lineHeight = static_cast<std::uint16_t>(fonts[0].height);
+    f.common.base = static_cast<std::uint16_t>(fonts[0].yMax);
     f.common.scaleW = static_cast<std::uint16_t>(config.textureSize.w);
     f.common.scaleH = static_cast<std::uint16_t>(config.textureSize.h);
+    f.common.alphaChnl = 0;
+    f.common.redChnl = 4;
+    f.common.greenChnl = 4;
+    f.common.blueChnl = 4;
 
     f.pages = fileNames;
 
