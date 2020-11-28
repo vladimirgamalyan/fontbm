@@ -38,3 +38,5 @@
 /unit_tests.dir
 /fontbm.VC.db
 /tests/tmp
+/tests/venv
+/tests/.idea
