@@ -29,7 +29,7 @@ def check_diff(expected, generated, binary=False):
     assert os.path.isfile(generated)
     different = (not filecmp.cmp(expected, generated)) if binary else diff(expected, generated)
     if different:
-        raise RuntimeError('generated data not equal expected for ' + generated)
+        raise RuntimeError('generated data is not equal for expected ' + generated)
 
 
 def main(argv):
