@@ -32,6 +32,38 @@ def check_diff(expected, generated, binary=False):
         raise RuntimeError('generated data is not equal for expected ' + generated)
 
 
+def test_expected(font_exe, env):
+    subprocess.run([font_exe, '--font-file', 'fonts/FreeSans.ttf', '--chars', '32-126',
+        '--padding-up', '8', '--padding-right', '7', '--padding-down', '6', '--padding-left', '5',
+        '--output', 'generated/test0', '--include-kerning-pairs'], check=True, env=env)
+    check_diff('expected/test0.fnt', 'generated/test0.fnt')
+
+    subprocess.run([font_exe, '--font-file', 'fonts/FreeSans.ttf', '--chars', '32-126',
+        '--output', 'generated/test1', '--include-kerning-pairs',
+        '--padding-up', '8', '--padding-right', '7',
+        '--data-format', 'xml'], check=True, env=env)
+    check_diff('expected/test1.fnt', 'generated/test1.fnt')
+
+    subprocess.run([font_exe, '--font-file', 'fonts/FreeSans.ttf', '--chars', '32-126',
+        '--output', 'generated/test2', '--include-kerning-pairs',
+        '--spacing-vert', '4', '--spacing-horiz', '5',
+        '--data-format', 'bin'], check=True, env=env)
+    check_diff('expected/test2.fnt', 'generated/test2.fnt', True)
+
+
+def test_too_many_textures(font_exe, env):
+    process = subprocess.Popen([font_exe, '--font-file', 'fonts/FreeSans.ttf', '--chars', '32-126',
+                                '--output', 'generated/test3', '--include-kerning-pairs',
+                                '--texture-width', '128', '--texture-height', '128',
+                                '--max-texture-count', '1'],
+                               stdout=subprocess.PIPE, stderr=subprocess.PIPE,
+                               env=env, text=True)
+    out, err = process.communicate()
+    assert out == ''
+    assert err.strip() == 'too many generated textures (more than --max-texture-count)'
+    assert process.returncode == 1
+
+
 def main(argv):
     assert len(argv) == 3
     font_exe = argv[1]
@@ -42,37 +74,12 @@ def main(argv):
     shutil.rmtree('generated', ignore_errors=True)
     os.makedirs('generated')
 
-    my_env = os.environ.copy()
-    my_env['PATH'] = os.pathsep.join((runtime_lib_dir, my_env.get('PATH', '')))
+    env = os.environ.copy()
+    env['PATH'] = os.pathsep.join((runtime_lib_dir, env.get('PATH', '')))
 
-    subprocess.run([font_exe, '--font-file', 'fonts/FreeSans.ttf', '--chars', '32-126',
-        '--padding-up', '8', '--padding-right', '7', '--padding-down', '6', '--padding-left', '5',
-        '--output', 'generated/test0', '--include-kerning-pairs'], check=True, env=my_env)
-    check_diff('expected/test0.fnt', 'generated/test0.fnt')
-
-    subprocess.run([font_exe, '--font-file', 'fonts/FreeSans.ttf', '--chars', '32-126',
-        '--output', 'generated/test1', '--include-kerning-pairs',
-        '--padding-up', '8', '--padding-right', '7',
-        '--data-format', 'xml'], check=True, env=my_env)
-    check_diff('expected/test1.fnt', 'generated/test1.fnt')
-
-    subprocess.run([font_exe, '--font-file', 'fonts/FreeSans.ttf', '--chars', '32-126',
-        '--output', 'generated/test2', '--include-kerning-pairs',
-        '--spacing-vert', '4', '--spacing-horiz', '5',
-        '--data-format', 'bin'], check=True, env=my_env)
-    check_diff('expected/test2.fnt', 'generated/test2.fnt', True)
-
-    process = subprocess.Popen([font_exe, '--font-file', 'fonts/FreeSans.ttf', '--chars', '32-126',
-                                '--output', 'generated/test3', '--include-kerning-pairs',
-                                '--texture-width', '128', '--texture-height', '128',
-                                '--max-texture-count', '1'],
-                               stdout=subprocess.PIPE, stderr=subprocess.PIPE,
-                               env=my_env, text=True)
-    out, err = process.communicate()
-    assert out == ''
-    assert err.strip() == 'too many generated textures (more than --max-texture-count)'
-    assert process.returncode == 1
+    test_expected(font_exe, env)
+    test_too_many_textures(font_exe, env)
 
 
-if __name__ == "__main__":
+if __name__ == '__main__':
     main(sys.argv)
