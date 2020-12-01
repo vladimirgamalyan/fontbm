@@ -359,14 +359,25 @@ void FontInfo::writeToBinFile(const std::string &fileName) const
     f.write((const char*)&commonBlock, sizeof(commonBlock));
 
     f << '\3';
-    std::int32_t pageBlockSize = pages.empty() ? 0 : pages[0].length() * pages.size();
-    f << pageBlockSize;
-    for (const auto& s: pages)
-        f << s;
+    std::int32_t pageBlockSize = pages.empty() ? 1 : (pages[0].length() + 1) * pages.size();
+    f.write((const char*)&pageBlockSize, sizeof(pageBlockSize));
+    if (pages.empty())
+    {
+        //TODO: check if we need this byte when there are no pages
+        f << '\0';
+    }
+    else
+    {
+        for (const auto& s: pages)
+        {
+            f << s;
+            f << '\0';
+        }
+    }
 
     f << '\4';
     std::int32_t charsBlockSize = chars.size() * sizeof(CharBlock);
-    f << charsBlockSize;
+    f.write((const char*)&charsBlockSize, sizeof(charsBlockSize));
     for (auto c: chars)
     {
         CharBlock charBlock;
@@ -388,7 +399,7 @@ void FontInfo::writeToBinFile(const std::string &fileName) const
     {
         f << '\5';
         std::int32_t kerningPairsBlockSize = kernings.size() * sizeof(KerningPairsBlock);
-        f << kerningPairsBlockSize;
+        f.write((const char*)&kerningPairsBlockSize, sizeof(kerningPairsBlockSize));
 
         for (auto k: kernings)
         {

@@ -246,6 +246,15 @@ def get_charset_name(char_set):
     return d[char_set]
 
 
+def read_bin_string(b):
+    r = ''
+    i = 0
+    while b[i] != 0:
+        r += chr(b[i])
+        i += 1
+    return b[i + 1:], r
+
+
 def read_bin(path):
     result = {}
     with open(path, mode='rb') as f:
@@ -274,15 +283,9 @@ def read_bin(path):
     d['italic'] = 1 if d['bit_field'] & (1 << 2) else 0
     d['bold'] = 1 if d['bit_field'] & (1 << 3) else 0
     del d['bit_field']
-    font_name = ''
-    i = 0
-    while b[i] != 0:
-        font_name += chr(b[i])
-        i += 1
-    d['face'] = font_name
+    b, d['face'] = read_bin_string(b)
     d['charset'] = '' if d['unicode'] else get_charset_name(d['charset'])
     result['info'] = d
-    b = b[i + 1:]
     block_type, block_size = struct.unpack('<Bi', b[:5])
     assert block_type == 2
     b = b[5:]
@@ -295,7 +298,54 @@ def read_bin(path):
     del d['bit_field']
     result['common'] = d
     block_type, block_size = struct.unpack('<Bi', b[:5])
+    b = b[5:]
     assert block_type == 3
+    pages = []
+    i = 0
+    while True:
+        b, file_name = read_bin_string(b)
+        # TODO: check if there is \0 when there are no pages
+        if not file_name:
+            break
+        pages.append({
+            'id': i,
+            'file': file_name
+        })
+        block_size -= len(file_name)
+        if block_size < len(file_name):
+            break
+        i += 1
+    result['pages'] = pages
+    block_type, block_size = struct.unpack('<Bi', b[:5])
+    b = b[5:]
+    # print(block_type, block_size)
+    assert block_type == 4
+    assert block_size % 20 == 0
+    char_count = block_size // 20
+    chars = []
+    for i in range(char_count):
+        names = ('id', 'x', 'y', 'width', 'height', 'xoffset',
+                 'yoffset', 'xadvance', 'page', 'chnl')
+        data = struct.unpack('<IHHHHhhhBB', b[:20])
+        b = b[20:]
+        chars.append(dict(zip(names, data)))
+    result['chars'] = chars
+    assert not b''
+    assert b'A'
+    if b:
+        block_type, block_size = struct.unpack('<Bi', b[:5])
+        assert block_type == 5
+        b = b[5:]
+        assert block_size % 10 == 0
+        kerning_count = block_size // 10
+        kernings = []
+        for i in range(kerning_count):
+            names = ('first', 'second', 'amount')
+            data = struct.unpack('<IIh', b[:10])
+            b = b[10:]
+            kernings.append(dict(zip(names, data)))
+        result['kernings'] = kernings
+        assert not b
     return result
 
 
@@ -334,6 +384,7 @@ def test_fnt_formats(font_exe, env):
 
     assert data_txt == data_json
     assert data_txt == data_xml
+    assert data_txt == data_bin
 
 
 def main(argv):
