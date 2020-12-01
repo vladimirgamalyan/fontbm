@@ -81,7 +81,9 @@ Open .sln file in Visual Studio 2015, configure paths to FreeType and rebuild al
 
 ## Contributors
 
+* [AMDmi3](https://github.com/AMDmi3)
 * [cherniid](https://github.com/cherniid)
+* [Radfordhound](https://github.com/Radfordhound)
 
 ## License
 
