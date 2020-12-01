@@ -32,7 +32,7 @@ option  | default | comment
 --background-color | | background RGB color, for example: 0,0,128 (without spaces), transparent by default
 --chars | 32-126 | required characters, for example 32-64,92,120-126 (without spaces), default value is 32-126 if 'chars-file' option is not defined
 --chars-file | | optional path to UTF-8 text file with additional required characters (will be combined with 'chars' option).
---data-format | txt | output data file format: txt, xml, bin, json
+--data-format | txt | output data file format: txt, xml, bin, [json](https://github.com/Jam3/load-bmfont/blob/master/json-spec.md)
 --include-kerning-pairs | | include kerning pairs to output file
 --padding-up | 0 | padding up
 --padding-right | 0 | padding right
