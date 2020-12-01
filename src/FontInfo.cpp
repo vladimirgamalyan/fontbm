@@ -260,11 +260,11 @@ void FontInfo::writeToBinFile(const std::string &fileName) const
     {
         std::int32_t blockSize;
         std::int16_t fontSize;
-        std::int8_t reserved:4;
-        std::int8_t bold:1;
-        std::int8_t italic:1;
-        std::int8_t unicode:1;
         std::int8_t smooth:1;
+        std::int8_t unicode:1;
+        std::int8_t italic:1;
+        std::int8_t bold:1;
+        std::int8_t reserved:4;
         std::uint8_t charSet;
         std::uint16_t stretchH;
         std::int8_t aa;
@@ -285,8 +285,8 @@ void FontInfo::writeToBinFile(const std::string &fileName) const
         std::uint16_t scaleW;
         std::uint16_t scaleH;
         std::uint16_t pages;
-        std::uint8_t packed:1;
         std::uint8_t reserved:7;
+        std::uint8_t packed:1;
         std::uint8_t alphaChnl;
         std::uint8_t redChnl;
         std::uint8_t greenChnl;
@@ -321,11 +321,11 @@ void FontInfo::writeToBinFile(const std::string &fileName) const
     InfoBlock infoBlock;
     infoBlock.blockSize = sizeof(InfoBlock) - sizeof(InfoBlock::blockSize) + info.face.length() + 1;
     infoBlock.fontSize = info.size;
-    infoBlock.reserved = 0;
-    infoBlock.bold = info.bold;
-    infoBlock.italic = info.italic;
-    infoBlock.unicode = info.unicode;
     infoBlock.smooth = info.smooth;
+    infoBlock.unicode = info.unicode;
+    infoBlock.italic = info.italic;
+    infoBlock.bold = info.bold;
+    infoBlock.reserved = 0;
     infoBlock.charSet = info.unicode ? 0 : info.charset;
     infoBlock.stretchH = info.stretchH;
     infoBlock.aa = info.aa;
@@ -408,27 +408,17 @@ void FontInfo::writeToJsonFile(const std::string &fileName) const
 
     nlohmann::json j;
 
-    nlohmann::json infoNodePadding;
-    infoNodePadding["up"] = info.padding.up;
-    infoNodePadding["right"] = info.padding.right;
-    infoNodePadding["down"] = info.padding.down;
-    infoNodePadding["left"] = info.padding.left;
-
-    nlohmann::json infoNodeSpacing;
-    infoNodeSpacing["horizontal"] = info.spacing.horizontal;
-    infoNodeSpacing["vertical"] = info.spacing.vertical;
-
     nlohmann::json infoNode;
     infoNode["size"] = info.size;
     infoNode["smooth"] = info.smooth ? 1 : 0;
     infoNode["unicode"] = info.unicode ? 1 : 0;
     infoNode["italic"] = info.italic ? 1 : 0;
     infoNode["bold"] = info.bold ? 1 : 0;
-    infoNode["charset"] = info.charset;
+    infoNode["charset"] = info.unicode ? "" : getCharSetName(info.charset);
     infoNode["stretchH"] = info.stretchH;
     infoNode["aa"] = info.aa;
-    infoNode["padding"] = infoNodePadding;
-    infoNode["spacing"] = infoNodeSpacing;
+    infoNode["padding"] = {info.padding.up, info.padding.right, info.padding.down, info.padding.left};
+    infoNode["spacing"] = {info.spacing.horizontal, info.spacing.vertical};
     infoNode["outline"] = info.outline;
     infoNode["face"] = info.face;
 
