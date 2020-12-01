@@ -300,12 +300,13 @@ def read_bin(path):
 
 
 def test_fnt_formats(font_exe, env):
-    # clear_work_dir()
+    clear_work_dir()
     args = [font_exe, '--font-file', 'fonts/FreeSans.ttf', '--output', 'generated/format_test',
             '--chars', '32-126', '--font-size', '16',
             '--include-kerning-pairs',
             '--padding-up', '1', '--padding-right', '2', '--padding-down', '3', '--padding-left', '4',
-            '--spacing-horiz', '5', '--spacing-vert', '6']
+            '--spacing-horiz', '5', '--spacing-vert', '6',
+            '--texture-width', '128', '--texture-height', '128']
 
     subprocess.run(args + ['--data-format', 'txt'], check=True, env=env)
     data_txt = read_txt('generated/format_test.fnt')
