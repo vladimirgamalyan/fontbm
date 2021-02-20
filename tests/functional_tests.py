@@ -11,6 +11,8 @@ import shlex
 import xml.etree.ElementTree as ET
 import json
 import struct
+# from collections.abc import Iterable
+from collections import abc
 
 
 def diff(expected, generated):
@@ -74,10 +76,6 @@ def test_too_many_textures(font_exe, env):
     assert process.returncode == 1
 
 
-def text_to_value(v):
-    return v
-
-
 def read_xml(path):
     font_info = {
         'pages': [],
@@ -85,34 +83,16 @@ def read_xml(path):
         'kernings': [],
     }
     tree = ET.parse(path)
+
     info_tag = tree.find('info')
-    font_info['info'] = {
-        'face': info_tag.attrib['face'],
-        'size': int(info_tag.attrib['size']),
-        'bold': int(info_tag.attrib['bold']),
-        'italic': int(info_tag.attrib['italic']),
-        'charset': info_tag.attrib['charset'],
-        'unicode': int(info_tag.attrib['unicode']),
-        'stretchH': int(info_tag.attrib['stretchH']),
-        'smooth': int(info_tag.attrib['smooth']),
-        'aa': int(info_tag.attrib['aa']),
-        'padding': [int(n) for n in info_tag.attrib['padding'].split(',')],
-        'spacing': [int(n) for n in info_tag.attrib['spacing'].split(',')],
-        'outline': int(info_tag.attrib['outline'])
-    }
-    common_tag = tree.find('common')
-    font_info['common'] = {
-        'lineHeight': int(common_tag.attrib['lineHeight']),
-        'base': int(common_tag.attrib['base']),
-        'scaleW': int(common_tag.attrib['scaleW']),
-        'scaleH': int(common_tag.attrib['scaleH']),
-        'pages': int(common_tag.attrib['pages']),
-        'packed': int(common_tag.attrib['packed']),
-        'alphaChnl': int(common_tag.attrib['alphaChnl']),
-        'redChnl': int(common_tag.attrib['redChnl']),
-        'greenChnl': int(common_tag.attrib['greenChnl']),
-        'blueChnl': int(common_tag.attrib['blueChnl'])
-    }
+    font_info['info'] = {k: int(v) for (k, v) in info_tag.attrib.items() if k not in ['face', 'charset',
+                                                                                      'padding', 'spacing']}
+    font_info['info']['face'] = info_tag.attrib['face']
+    font_info['info']['charset'] = info_tag.attrib['charset']
+    font_info['info']['padding'] = [int(n) for n in info_tag.attrib['padding'].split(',')]
+    font_info['info']['spacing'] = [int(n) for n in info_tag.attrib['spacing'].split(',')]
+
+    font_info['common'] = {k: int(v) for (k, v) in tree.find('common').attrib.items()}
 
     for elem in tree.iterfind('pages/page'):
         font_info['pages'].append({
@@ -121,25 +101,10 @@ def read_xml(path):
         })
 
     for char in tree.iterfind('chars/char'):
-        font_info['chars'].append({
-            'id': int(char.attrib['id']),
-            'x': int(char.attrib['x']),
-            'y': int(char.attrib['y']),
-            'width': int(char.attrib['width']),
-            'height': int(char.attrib['height']),
-            'xoffset': int(char.attrib['xoffset']),
-            'yoffset': int(char.attrib['yoffset']),
-            'xadvance': int(char.attrib['xadvance']),
-            'page': int(char.attrib['page']),
-            'chnl': int(char.attrib['chnl'])
-        })
+        font_info['chars'].append({k: int(v) for (k, v) in char.attrib.items()})
 
-    for char in tree.iterfind('kernings/kerning'):
-        font_info['kernings'].append({
-            'first': int(char.attrib['first']),
-            'second': int(char.attrib['second']),
-            'amount': int(char.attrib['amount'])
-        })
+    for kerning in tree.iterfind('kernings/kerning'):
+        font_info['kernings'].append({k: int(v) for (k, v) in kerning.attrib.items()})
 
     return font_info
 
@@ -159,57 +124,23 @@ def read_txt(path):
             tag, text_dict = line.strip().split(' ', 1)
             text_dict = dict(item.split('=') for item in shlex.split(text_dict) if item)
             if tag == 'info':
-                font_info[tag] = {
-                    'face': text_dict['face'],
-                    'size': int(text_dict['size']),
-                    'bold': int(text_dict['bold']),
-                    'italic': int(text_dict['italic']),
-                    'charset': text_dict['charset'],
-                    'unicode': int(text_dict['unicode']),
-                    'stretchH': int(text_dict['stretchH']),
-                    'smooth': int(text_dict['smooth']),
-                    'aa':  int(text_dict['aa']),
-                    'padding': [int(n) for n in text_dict['padding'].split(',')],
-                    'spacing': [int(n) for n in text_dict['spacing'].split(',')],
-                    'outline': int(text_dict['outline'])
-                }
+                font_info[tag] = {k: int(v) for (k, v) in text_dict.items() if k not in ['face', 'charset',
+                                                                                         'padding', 'spacing']}
+                font_info[tag]['face'] = text_dict['face']
+                font_info[tag]['charset'] = text_dict['charset']
+                font_info[tag]['padding'] = [int(n) for n in text_dict['padding'].split(',')]
+                font_info[tag]['spacing'] = [int(n) for n in text_dict['spacing'].split(',')]
             if tag == 'common':
-                font_info[tag] = {
-                    'lineHeight': int(text_dict['lineHeight']),
-                    'base': int(text_dict['base']),
-                    'scaleW': int(text_dict['scaleW']),
-                    'scaleH': int(text_dict['scaleH']),
-                    'pages': int(text_dict['pages']),
-                    'packed': int(text_dict['packed']),
-                    'alphaChnl': int(text_dict['alphaChnl']),
-                    'redChnl': int(text_dict['redChnl']),
-                    'greenChnl': int(text_dict['greenChnl']),
-                    'blueChnl': int(text_dict['blueChnl'])
-                }
+                font_info[tag] = {k: int(v) for (k, v) in text_dict.items()}
             elif tag == 'page':
                 font_info['pages'].append({
                     'id': int(text_dict['id']),
                     'file': text_dict['file']
                 })
             elif tag == 'char':
-                font_info['chars'].append({
-                    'id': int(text_dict['id']),
-                    'x': int(text_dict['x']),
-                    'y': int(text_dict['y']),
-                    'width': int(text_dict['width']),
-                    'height': int(text_dict['height']),
-                    'xoffset': int(text_dict['xoffset']),
-                    'yoffset': int(text_dict['yoffset']),
-                    'xadvance': int(text_dict['xadvance']),
-                    'page': int(text_dict['page']),
-                    'chnl': int(text_dict['chnl'])
-                })
+                font_info['chars'].append({k: int(v) for (k, v) in text_dict.items()})
             elif tag == 'kerning':
-                font_info['kernings'].append({
-                    'first': int(text_dict['first']),
-                    'second': int(text_dict['second']),
-                    'amount': int(text_dict['amount']),
-                })
+                font_info['kernings'].append({k: int(v) for (k, v) in text_dict.items()})
     return font_info
 
 
@@ -349,6 +280,24 @@ def read_bin(path):
     return result
 
 
+def flatten(path, el):
+    if isinstance(el, abc.Mapping):
+        for key, value in el.items():
+            yield from flatten(path + [key], value)
+    elif isinstance(el, abc.Iterable) and not isinstance(el, (str, bytes)):
+        for i, value in enumerate(el):
+            yield from flatten(path + [i], value)
+    else:
+        yield path, el
+
+
+def flatten_data(path):
+    with open(path) as f:
+        data = json.load(f)
+        for i in flatten([], data):
+            print(i)
+
+
 def test_fnt_formats(font_exe, env):
     clear_work_dir()
     args = [font_exe, '--font-file', 'fonts/FreeSans.ttf', '--output', 'generated/format_test',
@@ -400,6 +349,7 @@ def main(argv):
     test_expected(font_exe, env)
     test_too_many_textures(font_exe, env)
     test_fnt_formats(font_exe, env)
+    # flatten_data('generated/test_txt.json')
 
 
 if __name__ == '__main__':
