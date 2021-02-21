@@ -1,13 +1,13 @@
 # fontbm
 
-[BMFont](http://www.angelcode.com/products/bmfont/) compatible, cross-platform command line bitmap font generator.
+[BMFont](http://www.angelcode.com/products/bmfont/) compatible, cross-platform (lin/win/mac) command line bitmap font generator.
 
 ![sample](/.github/img/sample0.png?raw=true)
 ![sample](/.github/img/sample1.png?raw=true)
 
 ## Status
 
-| Linux | Windows | Quality |
+| Linux/macOS | Windows | Quality |
 |-------|---------|---------|
 | [![Build Status](https://travis-ci.org/vladimirgamalyan/fontbm.svg)](https://travis-ci.org/vladimirgamalyan/fontbm) | [![Build status](https://ci.appveyor.com/api/projects/status/boq0olngopfabaac?svg=true)](https://ci.appveyor.com/project/vladimirgamalyan/fontbm) | [![Codacy Badge](https://api.codacy.com/project/badge/Grade/1771a443586e472393c33f3c5fddaf3a)](https://www.codacy.com/manual/vladimirgamalyan/fontbm?utm_source=github.com&amp;utm_medium=referral&amp;utm_content=vladimirgamalyan/fontbm&amp;utm_campaign=Badge_Grade) |
 
@@ -78,6 +78,18 @@ cmake -G "Visual Studio 14 2015"
 ```
 
 Open .sln file in Visual Studio 2015, configure paths to FreeType and rebuild all.
+
+## Building macOS
+
+(thanx to @andycarle https://github.com/Moddable-OpenSource/moddable/issues/325#issuecomment-769615337)
+
+```
+brew install freetype
+git clone https://github.com/vladimirgamalyan/fontbm.git
+cd fontbm
+cmake .
+make
+```
 
 ## Contributors
 
