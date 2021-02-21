@@ -81,7 +81,7 @@ Open .sln file in Visual Studio 2015, configure paths to FreeType and rebuild al
 
 ## Building macOS
 
-(thanx to @andycarle https://github.com/Moddable-OpenSource/moddable/issues/325#issuecomment-769615337)
+(thanx to [andycarle](https://github.com/andycarle) https://github.com/Moddable-OpenSource/moddable/issues/325#issuecomment-769615337)
 
 ```
 brew install freetype
