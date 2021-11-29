@@ -53,7 +53,8 @@ public:
             throw std::runtime_error("Font doesn't contain a Unicode charmap");
         }
 
-        if (FT_IS_SCALABLE(face)) {
+        if (FT_IS_SCALABLE(face))
+        {
             /* Set the character size and use default DPI (72) */
             error = FT_Set_Pixel_Sizes(face, ptsize, ptsize);
             if (error) {
@@ -65,7 +66,9 @@ public:
             const auto scale = face->size->metrics.y_scale;
             yMax  = FT_CEIL(FT_MulFix(face->bbox.yMax, scale));
             height  = FT_CEIL(FT_MulFix(face->height, scale));
-        } else {
+        }
+        else
+        {
             /* Non-scalable font case.  ptsize determines which family
              * or series of fonts to grab from the non-scalable format.
              * It is not the point size of the font.
@@ -89,12 +92,11 @@ public:
 
         /* Initialize the font face style */
         face_style = TTF_STYLE_NORMAL;
-        if ( face->style_flags & FT_STYLE_FLAG_BOLD ) {
+        if (face->style_flags & FT_STYLE_FLAG_BOLD)
             face_style |= TTF_STYLE_BOLD;
-        }
-        if ( face->style_flags & FT_STYLE_FLAG_ITALIC ) {
+
+        if (face->style_flags & FT_STYLE_FLAG_ITALIC)
             face_style |= TTF_STYLE_ITALIC;
-        }
 
         /* Set the default font style */
         style = face_style;
@@ -106,7 +108,8 @@ public:
         glyph_italics *= height;
     }
 
-    ~Font() {
+    ~Font()
+    {
         FT_Done_Face(face);
     }
 
@@ -145,7 +148,8 @@ public:
                     src = unpacked.data();
                 }
 
-                for (auto col = glyphMetrics.width; col > 0 && dst < dst_check; --col) {
+                for (auto col = glyphMetrics.width; col > 0 && dst < dst_check; --col)
+                {
                     const std::uint32_t alpha = *src++;
                     *dst++ = color | (alpha << 24u);
                 }
@@ -176,7 +180,8 @@ public:
         return delta.x >> 6u;
     }
 
-    void debugInfo() const {
+    void debugInfo() const
+    {
         std::cout << "num_charmaps " << face->num_charmaps << std::endl;
         std::cout << "num_glyphs " << face->num_glyphs << std::endl;
 
@@ -208,7 +213,6 @@ public:
     int height;
     int yMax;
 
-
     /* For non-scalable formats, we must remember which font index size */
     int font_size_family;
 
@@ -219,7 +223,6 @@ public:
 
     /* Whether kerning is desired */
     int kerning;
-
 
     /* Extra width in glyph bounds for text styles */
     int glyph_overhang;

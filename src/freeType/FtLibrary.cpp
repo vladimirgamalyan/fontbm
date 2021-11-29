@@ -19,11 +19,14 @@ Library::Library()
 
 Library::~Library()
 {
-    if (initialized) {
-        if (--initialized == 0) {
+    if (initialized)
+    {
+        if (--initialized == 0)
+        {
             FT_Done_FreeType(library);
             library = nullptr;
         }
     }
 }
+
 }
