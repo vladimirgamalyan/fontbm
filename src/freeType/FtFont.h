@@ -47,20 +47,10 @@ public:
         if (error)
             throw Exception("Couldn't load font file", error);
 
-        FT_CharMap found = nullptr;
-        for (auto i = 0; i < face->num_charmaps; i++) {
-            const auto charmap = face->charmaps[i];
-            if ((charmap->platform_id == 3 && charmap->encoding_id == 1) /* Windows Unicode */
-                || (charmap->platform_id == 3 && charmap->encoding_id == 0) /* Windows Symbol */
-                || (charmap->platform_id == 2 && charmap->encoding_id == 1) /* ISO Unicode */
-                || (charmap->platform_id == 0)) { /* Apple Unicode */
-                found = charmap;
-                break;
-            }
-        }
-        if (found) {
-            /* If this fails, continue using the default charmap */
-            FT_Set_Charmap(face, found);
+        if (!face->charmap)
+        {
+            FT_Done_Face(face);
+            throw std::runtime_error("Font doesn't contain a Unicode charmap");
         }
 
         if (FT_IS_SCALABLE(face)) {
