@@ -65,6 +65,7 @@ struct Config
     DataFormat dataFormat = DataFormat::Text;
     bool includeKerningPairs = false;
     std::uint32_t maxTextureCount = 0;
+    bool monochrome = false;
 
     void validate() const
     {

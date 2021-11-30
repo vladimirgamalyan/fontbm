@@ -47,23 +47,14 @@ public:
         if (error)
             throw Exception("Couldn't load font file", error);
 
-        FT_CharMap found = nullptr;
-        for (auto i = 0; i < face->num_charmaps; i++) {
-            const auto charmap = face->charmaps[i];
-            if ((charmap->platform_id == 3 && charmap->encoding_id == 1) /* Windows Unicode */
-                || (charmap->platform_id == 3 && charmap->encoding_id == 0) /* Windows Symbol */
-                || (charmap->platform_id == 2 && charmap->encoding_id == 1) /* ISO Unicode */
-                || (charmap->platform_id == 0)) { /* Apple Unicode */
-                found = charmap;
-                break;
-            }
-        }
-        if (found) {
-            /* If this fails, continue using the default charmap */
-            FT_Set_Charmap(face, found);
+        if (!face->charmap)
+        {
+            FT_Done_Face(face);
+            throw std::runtime_error("Font doesn't contain a Unicode charmap");
         }
 
-        if (FT_IS_SCALABLE(face)) {
+        if (FT_IS_SCALABLE(face))
+        {
             /* Set the character size and use default DPI (72) */
             error = FT_Set_Pixel_Sizes(face, ptsize, ptsize);
             if (error) {
@@ -75,7 +66,9 @@ public:
             const auto scale = face->size->metrics.y_scale;
             yMax  = FT_CEIL(FT_MulFix(face->bbox.yMax, scale));
             height  = FT_CEIL(FT_MulFix(face->height, scale));
-        } else {
+        }
+        else
+        {
             /* Non-scalable font case.  ptsize determines which family
              * or series of fonts to grab from the non-scalable format.
              * It is not the point size of the font.
@@ -99,12 +92,11 @@ public:
 
         /* Initialize the font face style */
         face_style = TTF_STYLE_NORMAL;
-        if ( face->style_flags & FT_STYLE_FLAG_BOLD ) {
+        if (face->style_flags & FT_STYLE_FLAG_BOLD)
             face_style |= TTF_STYLE_BOLD;
-        }
-        if ( face->style_flags & FT_STYLE_FLAG_ITALIC ) {
+
+        if (face->style_flags & FT_STYLE_FLAG_ITALIC)
             face_style |= TTF_STYLE_ITALIC;
-        }
 
         /* Set the default font style */
         style = face_style;
@@ -116,13 +108,18 @@ public:
         glyph_italics *= height;
     }
 
-    ~Font() {
+    ~Font()
+    {
         FT_Done_Face(face);
     }
 
-    GlyphMetrics renderGlyph(std::uint32_t* buffer, std::uint32_t surfaceW, std::uint32_t surfaceH, int x, int y, std::uint32_t ch, std::uint32_t color) const
+    GlyphMetrics renderGlyph(std::uint32_t* buffer, std::uint32_t surfaceW, std::uint32_t surfaceH, int x, int y,
+            std::uint32_t ch, std::uint32_t color, bool monochrome = false) const
     {
-        const auto error = FT_Load_Char(face, ch, FT_LOAD_RENDER);
+        FT_Int32 loadFlags = FT_LOAD_RENDER;
+        if (monochrome)
+            loadFlags |= FT_LOAD_MONOCHROME;
+        const auto error = FT_Load_Char(face, ch, loadFlags);
         if (error)
             throw std::runtime_error("Load glyph error");
 
@@ -155,7 +152,8 @@ public:
                     src = unpacked.data();
                 }
 
-                for (auto col = glyphMetrics.width; col > 0 && dst < dst_check; --col) {
+                for (auto col = glyphMetrics.width; col > 0 && dst < dst_check; --col)
+                {
                     const std::uint32_t alpha = *src++;
                     *dst++ = color | (alpha << 24u);
                 }
@@ -186,7 +184,8 @@ public:
         return delta.x >> 6u;
     }
 
-    void debugInfo() const {
+    void debugInfo() const
+    {
         std::cout << "num_charmaps " << face->num_charmaps << std::endl;
         std::cout << "num_glyphs " << face->num_glyphs << std::endl;
 
@@ -194,6 +193,15 @@ public:
             const auto charmap = face->charmaps[i];
             std::cout << charmap->platform_id << ", " << charmap->encoding_id << std::endl;
         }
+
+        const auto scale = face->size->metrics.y_scale;
+        std::cout << "face->size->metrics.y_scale " << scale << " (" << face->size->metrics.y_scale / 64.0 << ")" << "\n";
+        std::cout << "face->size->metrics.y_ppem " << face->size->metrics.x_ppem << "\n";
+        std::cout << "face->bbox.yMax " << FT_CEIL(FT_MulFix(face->bbox.yMax, scale)) << "\n";
+        std::cout << "face->bbox.yMin " << FT_FLOOR(FT_MulFix(face->bbox.yMin, scale)) << "\n";
+        std::cout << "face->ascender " << FT_CEIL(FT_MulFix(face->ascender, scale)) << "\n";
+        std::cout << "face->descender " << FT_FLOOR(FT_MulFix(face->descender, scale)) << "\n";
+        std::cout << "face->height " << FT_CEIL(FT_MulFix(face->height, scale)) << "\n";
     }
 
     std::string getFamilyNameOr(const std::string& defaultName) const
@@ -218,7 +226,6 @@ public:
     int height;
     int yMax;
 
-
     /* For non-scalable formats, we must remember which font index size */
     int font_size_family;
 
@@ -229,7 +236,6 @@ public:
 
     /* Whether kerning is desired */
     int kerning;
-
 
     /* Extra width in glyph bounds for text styles */
     int glyph_overhang;

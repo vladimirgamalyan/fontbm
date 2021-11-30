@@ -21,7 +21,7 @@ std::vector<rbp::RectSize> App::getGlyphRectangles(const Glyphs &glyphs, const s
     return result;
 }
 
-App::Glyphs App::collectGlyphInfo(const std::vector<ft::Font>& fonts, const std::set<std::uint32_t>& codes)
+App::Glyphs App::collectGlyphInfo(const std::vector<ft::Font>& fonts, const std::set<std::uint32_t>& codes, const Config& config)
 {
     Glyphs result;
 
@@ -33,7 +33,7 @@ App::Glyphs App::collectGlyphInfo(const std::vector<ft::Font>& fonts, const std:
         {
             if (fonts[i].isGlyphProvided(id))
             {
-                ft::Font::GlyphMetrics glyphMetrics = fonts[i].renderGlyph(nullptr, 0, 0, 0, 0, id, 0);
+                ft::Font::GlyphMetrics glyphMetrics = fonts[i].renderGlyph(nullptr, 0, 0, 0, 0, id, 0, config.monochrome);
                 glyphInfo.fontIndex = i;
                 glyphInfo.width = glyphMetrics.width;
                 glyphInfo.height = glyphMetrics.height;
@@ -140,7 +140,8 @@ std::vector<std::string> App::renderTextures(const Glyphs& glyphs, const Config&
                 const auto x = glyph.x + config.padding.left;
                 const auto y = glyph.y + config.padding.up;
 
-                fonts[glyph.fontIndex].renderGlyph(&surface[0], config.textureSize.w, config.textureSize.h, x, y, kv.first, config.color.getBGR());
+                fonts[glyph.fontIndex].renderGlyph(&surface[0], config.textureSize.w, config.textureSize.h, x, y,
+                        kv.first, config.color.getBGR(), config.monochrome);
             }
         }
 
@@ -275,7 +276,7 @@ void App::execute(const int argc, char* argv[])
     for (auto& f: config.fontFile)
         fonts.emplace_back(library, f, config.fontSize);
 
-    auto glyphs = collectGlyphInfo(fonts, config.chars);
+    auto glyphs = collectGlyphInfo(fonts, config.chars, config);
     const auto pageCount = arrangeGlyphs(glyphs, config);
     if (config.maxTextureCount != 0 && pageCount > config.maxTextureCount)
         throw std::runtime_error("too many generated textures (more than --max-texture-count)");
