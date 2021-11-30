@@ -59,6 +59,7 @@ Config ProgramOptions::parseCommandLine(int argc, char* argv[])
             ("data-format", R"(output data file format, "xml" or "txt", default "xml")",
              cxxopts::value<std::string>(dataFormat)->default_value("txt"))
             ("include-kerning-pairs", "include kerning pairs to output file", cxxopts::value<bool>(config.includeKerningPairs))
+            ("monochrome", "disable antialiasing", cxxopts::value<bool>(config.monochrome))
             ("max-texture-count", "maximum generated textures", cxxopts::value<std::uint32_t>(config.maxTextureCount)->default_value("0"));
 
         auto result = options.parse(argc, argv);

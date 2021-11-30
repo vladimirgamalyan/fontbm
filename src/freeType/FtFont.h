@@ -113,9 +113,13 @@ public:
         FT_Done_Face(face);
     }
 
-    GlyphMetrics renderGlyph(std::uint32_t* buffer, std::uint32_t surfaceW, std::uint32_t surfaceH, int x, int y, std::uint32_t ch, std::uint32_t color) const
+    GlyphMetrics renderGlyph(std::uint32_t* buffer, std::uint32_t surfaceW, std::uint32_t surfaceH, int x, int y,
+            std::uint32_t ch, std::uint32_t color, bool monochrome = false) const
     {
-        const auto error = FT_Load_Char(face, ch, FT_LOAD_RENDER);
+        FT_Int32 loadFlags = FT_LOAD_RENDER;
+        if (monochrome)
+            loadFlags |= FT_LOAD_MONOCHROME;
+        const auto error = FT_Load_Char(face, ch, loadFlags);
         if (error)
             throw std::runtime_error("Load glyph error");
 
@@ -189,6 +193,15 @@ public:
             const auto charmap = face->charmaps[i];
             std::cout << charmap->platform_id << ", " << charmap->encoding_id << std::endl;
         }
+
+        const auto scale = face->size->metrics.y_scale;
+        std::cout << "face->size->metrics.y_scale " << scale << " (" << face->size->metrics.y_scale / 64.0 << ")" << "\n";
+        std::cout << "face->size->metrics.y_ppem " << face->size->metrics.x_ppem << "\n";
+        std::cout << "face->bbox.yMax " << FT_CEIL(FT_MulFix(face->bbox.yMax, scale)) << "\n";
+        std::cout << "face->bbox.yMin " << FT_FLOOR(FT_MulFix(face->bbox.yMin, scale)) << "\n";
+        std::cout << "face->ascender " << FT_CEIL(FT_MulFix(face->ascender, scale)) << "\n";
+        std::cout << "face->descender " << FT_FLOOR(FT_MulFix(face->descender, scale)) << "\n";
+        std::cout << "face->height " << FT_CEIL(FT_MulFix(face->height, scale)) << "\n";
     }
 
     std::string getFamilyNameOr(const std::string& defaultName) const
