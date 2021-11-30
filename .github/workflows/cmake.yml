@@ -16,8 +16,8 @@ jobs:
     - name: make
       run: make
 
-  - name: Release
-    uses: softprops/action-gh-release@v1
-    if: startsWith(github.ref, 'refs/tags/')
-    with:
-    files: fontbm
+    - name: Release
+      uses: softprops/action-gh-release@v1
+      if: startsWith(github.ref, 'refs/tags/')
+      with:
+      files: fontbm
