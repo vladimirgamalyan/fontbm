@@ -1,6 +1,6 @@
 # fontbm
 
-[BMFont](http://www.angelcode.com/products/bmfont/) compatible, cross-platform (lin/win/mac) command line bitmap font generator.
+[BMFont](http://www.angelcode.com/products/bmfont/) compatible, cross-platform (linux/windows/mac) command line bitmap font generator.
 
 ![sample](/.github/img/sample0.png?raw=true)
 ![sample](/.github/img/sample1.png?raw=true)
