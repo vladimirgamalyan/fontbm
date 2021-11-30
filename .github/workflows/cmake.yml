@@ -1,0 +1,23 @@
+name: ci
+
+on: [push]
+
+jobs:
+  build:
+
+    runs-on: ubuntu-latest
+    
+    steps:
+    - uses: actions/checkout@v2
+
+    - name: cmake
+      run: cmake -DCMAKE_CXX_FLAGS=-Werror .
+
+    - name: make
+      run: make
+
+    - name: release
+      uses: softprops/action-gh-release@v1
+      if: startsWith(github.ref, 'refs/tags/v')
+      with:
+        files: fontbm
