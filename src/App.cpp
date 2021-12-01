@@ -182,6 +182,7 @@ void App::writeFontInfoFile(const Glyphs& glyphs, const Config& config, const st
 
     f.info.face = fonts[0].getFamilyNameOr("unknown");
     f.info.size = -static_cast<std::int16_t>(config.fontSize);
+    f.info.smooth = config.monochrome;
     f.info.unicode = true;
     f.info.bold = fonts[0].isBold();
     f.info.italic = fonts[0].isItalic();
