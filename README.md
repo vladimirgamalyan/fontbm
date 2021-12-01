@@ -44,7 +44,8 @@ option  | default | comment
 --texture-height | 256 | texture height
 --monochrome | | disable anti-aliasing
 --extra-info | | write extra information to data file
---max-texture-count | | maximum generated texture count (unlimited if not defined)
+--disable-texture-name-zero-padding | | disable texture name zero padding
+--max-texture-count | 0 | maximum generated texture count (unlimited if zero)
 
 ## Building Linux
 

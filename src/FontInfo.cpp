@@ -79,8 +79,6 @@ std::string FontInfo::getCharSetName(std::uint8_t charSet)
 
 void FontInfo::writeToXmlFile(const std::string &fileName) const
 {
-    testPages();
-
     tinyxml2::XMLDocument doc;
     tinyxml2::XMLDeclaration* declaration = doc.NewDeclaration("xml version=\"1.0\"");
     doc.InsertFirstChild(declaration);
@@ -178,8 +176,6 @@ void FontInfo::writeToXmlFile(const std::string &fileName) const
 
 void FontInfo::writeToTextFile(const std::string &fileName) const
 {
-    testPages();
-
     std::ofstream f(fileName);
 
     f << "info"
@@ -255,8 +251,6 @@ void FontInfo::writeToTextFile(const std::string &fileName) const
 
 void FontInfo::writeToBinFile(const std::string &fileName) const
 {
-    testPages();
-
     std::ofstream f(fileName, std::ios::binary);
 
 #pragma pack(push, 1)
@@ -486,17 +480,4 @@ void FontInfo::writeToJsonFile(const std::string &fileName) const
 
     std::ofstream f(fileName);
     f << j.dump(4);
-}
-
-void FontInfo::testPages() const
-{
-    if (!pages.empty())
-    {
-        size_t l = pages[0].length();
-        if (!l)
-            throw std::runtime_error("page name is empty");
-        for (size_t i = 1; i < pages.size(); ++i)
-            if (l != pages[i].length())
-                throw std::runtime_error("page names have different length");
-    }
 }

@@ -120,8 +120,7 @@ std::vector<std::string> App::renderTextures(const Glyphs& glyphs, const Config&
 {
     std::vector<std::string> fileNames;
 
-    //TODO: should we decrement pageCount before calculate?
-    const auto pageNameDigits = getNumberLen(pageCount);
+    const auto pageNameDigits = config.disableTextureNameZeroPadding ? 0 : getNumberLen(pageCount - 1);
 
     for (std::uint32_t page = 0; page < pageCount; ++page)
     {

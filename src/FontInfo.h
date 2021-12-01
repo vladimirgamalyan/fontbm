@@ -86,6 +86,5 @@ struct FontInfo
     void writeToJsonFile(const std::string &fileName) const;
 
 private:
-    void testPages() const;
     static std::string getCharSetName(std::uint8_t charSet);
 };

@@ -61,6 +61,7 @@ Config ProgramOptions::parseCommandLine(int argc, char* argv[])
             ("include-kerning-pairs", "include kerning pairs to output file", cxxopts::value<bool>(config.includeKerningPairs))
             ("monochrome", "disable antialiasing", cxxopts::value<bool>(config.monochrome))
             ("extra-info", "write extra information to data file", cxxopts::value<bool>(config.extraInfo))
+            ("disable-texture-name-zero-padding", "disable texture name zero padding", cxxopts::value<bool>(config.disableTextureNameZeroPadding))
             ("max-texture-count", "maximum generated textures", cxxopts::value<std::uint32_t>(config.maxTextureCount)->default_value("0"));
 
         auto result = options.parse(argc, argv);
