@@ -37,7 +37,9 @@ public:
         std::int32_t horiAdvance; // For horizontal text layouts, this is the horizontal distance to increment the pen position when the glyph is drawn as part of a string of text.
     };
 
-    Font(Library& library, const std::string& fontFile, int ptsize, const int faceIndex = 0) : library(library) {
+    Font(Library& library, const std::string& fontFile, int ptsize, const int faceIndex, const bool monochrome)
+        : library(library), monochrome_(monochrome)
+    {
         if (!library.library)
             throw std::runtime_error("Library is not initialized");
 
@@ -64,7 +66,6 @@ public:
 
             /* Get the scalable font metrics for this font */
             const auto scale = face->size->metrics.y_scale;
-            yMax  = FT_CEIL(FT_MulFix(face->bbox.yMax, scale));
             height  = FT_CEIL(FT_MulFix(face->height, scale));
         }
         else
@@ -86,7 +87,6 @@ public:
              * non-scalable fonts must be determined differently
              * or sometimes cannot be determined.
              * */
-            yMax = face->available_sizes[ptsize].height;
             height = face->available_sizes[ptsize].height;
         }
 
@@ -106,6 +106,25 @@ public:
         /* x offset = cos(((90.0-12)/360)*2*M_PI), or 12 degree angle */
         glyph_italics = 0.207f;
         glyph_italics *= height;
+
+        {
+            std::int32_t yMin = 0;
+            FT_UInt gindex;
+            FT_ULong charcode = FT_Get_First_Char(face, &gindex);
+            yMax = 0;
+            while (gindex)
+            {
+                GlyphMetrics glyphMetrics = renderGlyph(nullptr, 0, 0, 0, 0, charcode, 0);
+                if (yMax < glyphMetrics.horiBearingY)
+                    yMax = glyphMetrics.horiBearingY;
+                std::int32_t bottom = glyphMetrics.horiBearingY - glyphMetrics.height;
+                if (bottom < yMin)
+                    yMin = bottom;
+                charcode = FT_Get_Next_Char(face, charcode, &gindex);
+            }
+
+            totalHeight = yMax - yMin;
+        }
     }
 
     ~Font()
@@ -114,10 +133,10 @@ public:
     }
 
     GlyphMetrics renderGlyph(std::uint32_t* buffer, std::uint32_t surfaceW, std::uint32_t surfaceH, int x, int y,
-            std::uint32_t ch, std::uint32_t color, bool monochrome = false) const
+            std::uint32_t ch, std::uint32_t color) const
     {
         FT_Int32 loadFlags = FT_LOAD_RENDER;
-        if (monochrome)
+        if (monochrome_)
             loadFlags |= FT_LOAD_MONOCHROME;
         const auto error = FT_Load_Char(face, ch, loadFlags);
         if (error)
@@ -189,6 +208,15 @@ public:
         std::cout << "num_charmaps " << face->num_charmaps << std::endl;
         std::cout << "num_glyphs " << face->num_glyphs << std::endl;
 
+        /*
+            platform id         encoding id
+            3                   1               Windows Unicode
+            3                   0               Windows Symbol
+            2                   1               ISO Unicode
+            0                                   Apple Unicode
+            Other constants can be found in file FT_TRUETYPE_IDS_H
+         */
+
         for (auto i = 0; i < face->num_charmaps; i++) {
             const auto charmap = face->charmaps[i];
             std::cout << charmap->platform_id << ", " << charmap->encoding_id << std::endl;
@@ -202,6 +230,33 @@ public:
         std::cout << "face->ascender " << FT_CEIL(FT_MulFix(face->ascender, scale)) << "\n";
         std::cout << "face->descender " << FT_FLOOR(FT_MulFix(face->descender, scale)) << "\n";
         std::cout << "face->height " << FT_CEIL(FT_MulFix(face->height, scale)) << "\n";
+
+        FT_UInt gindex;
+        FT_ULong charcode = FT_Get_First_Char(face, &gindex);
+        std::int32_t maxHoriBearingY = 0;
+        std::uint32_t glyphCount = 0;
+        std::int32_t minY = 0;
+        FT_ULong charcodeMaxHoriBearingY = 0;
+        FT_ULong charcodeMinY = 0;
+        while (gindex)
+        {
+            GlyphMetrics glyphMetrics = renderGlyph(nullptr, 0, 0, 0, 0, charcode, 0);
+            if (glyphMetrics.horiBearingY > maxHoriBearingY) {
+                maxHoriBearingY = glyphMetrics.horiBearingY;
+                charcodeMaxHoriBearingY = charcode;
+            }
+            std::int32_t bottom = glyphMetrics.horiBearingY - glyphMetrics.height;
+            if (bottom < minY) {
+                charcodeMinY = charcode;
+                minY = bottom;
+            }
+            ++glyphCount;
+
+            charcode = FT_Get_Next_Char(face, charcode, &gindex);
+        }
+        std::cout << "maxHoriBearingY " << maxHoriBearingY << ", charcode " << charcodeMaxHoriBearingY << "\n";
+        std::cout << "minY " << minY << ", charcode " << charcodeMinY << "\n";
+        std::cout << "glyphCount " << glyphCount << "\n";
     }
 
     std::string getFamilyNameOr(const std::string& defaultName) const
@@ -225,6 +280,7 @@ public:
     FT_Face face = nullptr;
     int height;
     int yMax;
+    int totalHeight = 0;
 
     /* For non-scalable formats, we must remember which font index size */
     int font_size_family;
@@ -233,6 +289,7 @@ public:
     int face_style;
     int style;
     int outline;
+    bool monochrome_;
 
     /* Whether kerning is desired */
     int kerning;

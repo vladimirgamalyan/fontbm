@@ -79,8 +79,6 @@ std::string FontInfo::getCharSetName(std::uint8_t charSet)
 
 void FontInfo::writeToXmlFile(const std::string &fileName) const
 {
-    testPages();
-
     tinyxml2::XMLDocument doc;
     tinyxml2::XMLDeclaration* declaration = doc.NewDeclaration("xml version=\"1.0\"");
     doc.InsertFirstChild(declaration);
@@ -123,6 +121,8 @@ void FontInfo::writeToXmlFile(const std::string &fileName) const
     commonElement->SetAttribute("redChnl", common.redChnl);
     commonElement->SetAttribute("greenChnl", common.greenChnl);
     commonElement->SetAttribute("blueChnl", common.blueChnl);
+    if (extraInfo)
+        commonElement->SetAttribute("totalHeight", common.totalHeight);
     root->InsertEndChild(commonElement);
 
     tinyxml2::XMLElement* pagesElement = doc.NewElement("pages");
@@ -176,8 +176,6 @@ void FontInfo::writeToXmlFile(const std::string &fileName) const
 
 void FontInfo::writeToTextFile(const std::string &fileName) const
 {
-    testPages();
-
     std::ofstream f(fileName);
 
     f << "info"
@@ -211,8 +209,10 @@ void FontInfo::writeToTextFile(const std::string &fileName) const
         << " alphaChnl=" << static_cast<int>(common.alphaChnl)
         << " redChnl=" << static_cast<int>(common.redChnl)
         << " greenChnl=" << static_cast<int>(common.greenChnl)
-        << " blueChnl=" << static_cast<int>(common.blueChnl)
-        << std::endl;
+        << " blueChnl=" << static_cast<int>(common.blueChnl);
+    if (extraInfo)
+        f << " totalHeight=" << common.totalHeight;
+    f << std::endl;
 
     for (size_t i = 0; i < pages.size(); ++i)
         f << "page id=" << i << " file=\"" << pages[i] << "\"" << std::endl;
@@ -251,8 +251,6 @@ void FontInfo::writeToTextFile(const std::string &fileName) const
 
 void FontInfo::writeToBinFile(const std::string &fileName) const
 {
-    testPages();
-
     std::ofstream f(fileName, std::ios::binary);
 
 #pragma pack(push, 1)
@@ -444,6 +442,8 @@ void FontInfo::writeToJsonFile(const std::string &fileName) const
     commonNode["redChnl"] = common.redChnl;
     commonNode["greenChnl"] = common.greenChnl;
     commonNode["blueChnl"] = common.blueChnl;
+    if (extraInfo)
+        commonNode["totalHeight"] = common.totalHeight;
 
     nlohmann::json charsNode = nlohmann::json::array();
     for(auto c: chars)
@@ -480,17 +480,4 @@ void FontInfo::writeToJsonFile(const std::string &fileName) const
 
     std::ofstream f(fileName);
     f << j.dump(4);
-}
-
-void FontInfo::testPages() const
-{
-    if (!pages.empty())
-    {
-        size_t l = pages[0].length();
-        if (!l)
-            throw std::runtime_error("page name is empty");
-        for (size_t i = 1; i < pages.size(); ++i)
-            if (l != pages[i].length())
-                throw std::runtime_error("page names have different length");
-    }
 }

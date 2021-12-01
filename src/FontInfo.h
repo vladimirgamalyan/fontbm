@@ -48,6 +48,7 @@ struct FontInfo
         std::uint8_t redChnl = 0;
         std::uint8_t greenChnl = 0;
         std::uint8_t blueChnl = 0;
+        std::uint16_t totalHeight = 0;  // non bmfont
     };
 
     struct Char
@@ -77,12 +78,13 @@ struct FontInfo
     std::vector<Char> chars;
     std::vector<Kerning> kernings;
 
+    bool extraInfo = false;
+
     void writeToXmlFile(const std::string &fileName) const;
     void writeToTextFile(const std::string &fileName) const;
     void writeToBinFile(const std::string &fileName) const;
     void writeToJsonFile(const std::string &fileName) const;
 
 private:
-    void testPages() const;
     static std::string getCharSetName(std::uint8_t charSet);
 };

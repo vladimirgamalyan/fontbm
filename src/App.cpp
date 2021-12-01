@@ -21,7 +21,7 @@ std::vector<rbp::RectSize> App::getGlyphRectangles(const Glyphs &glyphs, const s
     return result;
 }
 
-App::Glyphs App::collectGlyphInfo(const std::vector<ft::Font>& fonts, const std::set<std::uint32_t>& codes, const Config& config)
+App::Glyphs App::collectGlyphInfo(const std::vector<ft::Font>& fonts, const std::set<std::uint32_t>& codes)
 {
     Glyphs result;
 
@@ -33,7 +33,7 @@ App::Glyphs App::collectGlyphInfo(const std::vector<ft::Font>& fonts, const std:
         {
             if (fonts[i].isGlyphProvided(id))
             {
-                ft::Font::GlyphMetrics glyphMetrics = fonts[i].renderGlyph(nullptr, 0, 0, 0, 0, id, 0, config.monochrome);
+                ft::Font::GlyphMetrics glyphMetrics = fonts[i].renderGlyph(nullptr, 0, 0, 0, 0, id, 0);
                 glyphInfo.fontIndex = i;
                 glyphInfo.width = glyphMetrics.width;
                 glyphInfo.height = glyphMetrics.height;
@@ -120,8 +120,7 @@ std::vector<std::string> App::renderTextures(const Glyphs& glyphs, const Config&
 {
     std::vector<std::string> fileNames;
 
-    //TODO: should we decrement pageCount before calculate?
-    const auto pageNameDigits = getNumberLen(pageCount);
+    const auto pageNameDigits = config.disableTextureNameZeroPadding ? 0 : getNumberLen(pageCount - 1);
 
     for (std::uint32_t page = 0; page < pageCount; ++page)
     {
@@ -141,7 +140,7 @@ std::vector<std::string> App::renderTextures(const Glyphs& glyphs, const Config&
                 const auto y = glyph.y + config.padding.up;
 
                 fonts[glyph.fontIndex].renderGlyph(&surface[0], config.textureSize.w, config.textureSize.h, x, y,
-                        kv.first, config.color.getBGR(), config.monochrome);
+                        kv.first, config.color.getBGR());
             }
         }
 
@@ -203,6 +202,7 @@ void App::writeFontInfoFile(const Glyphs& glyphs, const Config& config, const st
     f.common.redChnl = 4;
     f.common.greenChnl = 4;
     f.common.blueChnl = 4;
+    f.common.totalHeight = static_cast<std::uint16_t>(fonts[0].totalHeight);
 
     f.pages = fileNames;
 
@@ -249,6 +249,8 @@ void App::writeFontInfoFile(const Glyphs& glyphs, const Config& config, const st
         }
     }
 
+    f.extraInfo = config.extraInfo;
+
     const auto dataFileName = config.output + ".fnt";
     switch (config.dataFormat) {
         case Config::DataFormat::Xml:
@@ -274,9 +276,11 @@ void App::execute(const int argc, char* argv[])
 
     std::vector<ft::Font> fonts;
     for (auto& f: config.fontFile)
-        fonts.emplace_back(library, f, config.fontSize);
+        fonts.emplace_back(library, f, config.fontSize, 0, config.monochrome);
 
-    auto glyphs = collectGlyphInfo(fonts, config.chars, config);
+    fonts.front().debugInfo();
+
+    auto glyphs = collectGlyphInfo(fonts, config.chars);
     const auto pageCount = arrangeGlyphs(glyphs, config);
     if (config.maxTextureCount != 0 && pageCount > config.maxTextureCount)
         throw std::runtime_error("too many generated textures (more than --max-texture-count)");
