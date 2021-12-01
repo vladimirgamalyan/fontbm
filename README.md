@@ -43,6 +43,7 @@ option  | default | comment
 --texture-width | 256 | texture width
 --texture-height | 256 | texture height
 --monochrome | | disable anti-aliasing
+--extra-info | | write extra information to data file
 --max-texture-count | | maximum generated texture count (unlimited if not defined)
 
 ## Building Linux

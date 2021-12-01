@@ -123,6 +123,8 @@ void FontInfo::writeToXmlFile(const std::string &fileName) const
     commonElement->SetAttribute("redChnl", common.redChnl);
     commonElement->SetAttribute("greenChnl", common.greenChnl);
     commonElement->SetAttribute("blueChnl", common.blueChnl);
+    if (extraInfo)
+        commonElement->SetAttribute("totalHeight", common.totalHeight);
     root->InsertEndChild(commonElement);
 
     tinyxml2::XMLElement* pagesElement = doc.NewElement("pages");
@@ -211,8 +213,10 @@ void FontInfo::writeToTextFile(const std::string &fileName) const
         << " alphaChnl=" << static_cast<int>(common.alphaChnl)
         << " redChnl=" << static_cast<int>(common.redChnl)
         << " greenChnl=" << static_cast<int>(common.greenChnl)
-        << " blueChnl=" << static_cast<int>(common.blueChnl)
-        << std::endl;
+        << " blueChnl=" << static_cast<int>(common.blueChnl);
+    if (extraInfo)
+        f << " totalHeight=" << common.totalHeight;
+    f << std::endl;
 
     for (size_t i = 0; i < pages.size(); ++i)
         f << "page id=" << i << " file=\"" << pages[i] << "\"" << std::endl;
@@ -444,6 +448,8 @@ void FontInfo::writeToJsonFile(const std::string &fileName) const
     commonNode["redChnl"] = common.redChnl;
     commonNode["greenChnl"] = common.greenChnl;
     commonNode["blueChnl"] = common.blueChnl;
+    if (extraInfo)
+        commonNode["totalHeight"] = common.totalHeight;
 
     nlohmann::json charsNode = nlohmann::json::array();
     for(auto c: chars)

@@ -203,6 +203,7 @@ void App::writeFontInfoFile(const Glyphs& glyphs, const Config& config, const st
     f.common.redChnl = 4;
     f.common.greenChnl = 4;
     f.common.blueChnl = 4;
+    f.common.totalHeight = static_cast<std::uint16_t>(fonts[0].totalHeight);
 
     f.pages = fileNames;
 
@@ -248,6 +249,8 @@ void App::writeFontInfoFile(const Glyphs& glyphs, const Config& config, const st
             }
         }
     }
+
+    f.extraInfo = config.extraInfo;
 
     const auto dataFileName = config.output + ".fnt";
     switch (config.dataFormat) {

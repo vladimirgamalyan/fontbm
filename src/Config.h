@@ -66,6 +66,7 @@ struct Config
     bool includeKerningPairs = false;
     std::uint32_t maxTextureCount = 0;
     bool monochrome = false;
+    bool extraInfo = false;
 
     void validate() const
     {

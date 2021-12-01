@@ -108,6 +108,7 @@ public:
         glyph_italics *= height;
 
         {
+            std::int32_t yMin = 0;
             FT_UInt gindex;
             FT_ULong charcode = FT_Get_First_Char(face, &gindex);
             yMax = 0;
@@ -116,8 +117,13 @@ public:
                 GlyphMetrics glyphMetrics = renderGlyph(nullptr, 0, 0, 0, 0, charcode, 0);
                 if (yMax < glyphMetrics.horiBearingY)
                     yMax = glyphMetrics.horiBearingY;
+                std::int32_t bottom = glyphMetrics.horiBearingY - glyphMetrics.height;
+                if (bottom < yMin)
+                    yMin = bottom;
                 charcode = FT_Get_Next_Char(face, charcode, &gindex);
             }
+
+            totalHeight = yMax - yMin;
         }
     }
 
@@ -231,6 +237,7 @@ public:
         std::uint32_t glyphCount = 0;
         std::int32_t minY = 0;
         FT_ULong charcodeMaxHoriBearingY = 0;
+        FT_ULong charcodeMinY = 0;
         while (gindex)
         {
             GlyphMetrics glyphMetrics = renderGlyph(nullptr, 0, 0, 0, 0, charcode, 0);
@@ -239,14 +246,16 @@ public:
                 charcodeMaxHoriBearingY = charcode;
             }
             std::int32_t bottom = glyphMetrics.horiBearingY - glyphMetrics.height;
-            if (bottom < minY)
+            if (bottom < minY) {
+                charcodeMinY = charcode;
                 minY = bottom;
+            }
             ++glyphCount;
 
             charcode = FT_Get_Next_Char(face, charcode, &gindex);
         }
         std::cout << "maxHoriBearingY " << maxHoriBearingY << ", charcode " << charcodeMaxHoriBearingY << "\n";
-        std::cout << "minY " << minY << "\n";
+        std::cout << "minY " << minY << ", charcode " << charcodeMinY << "\n";
         std::cout << "glyphCount " << glyphCount << "\n";
     }
 
@@ -271,6 +280,7 @@ public:
     FT_Face face = nullptr;
     int height;
     int yMax;
+    int totalHeight = 0;
 
     /* For non-scalable formats, we must remember which font index size */
     int font_size_family;
