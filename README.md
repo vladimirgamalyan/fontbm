@@ -27,7 +27,7 @@ option  | default | comment
 ------|-----|---------------
 **--font-file** |  | path to ttf file, required (can be set several times for fallback fonts)
 **--output** | | output files name without extension, required
---font-size | 32 | font size
+--font-size | 32 | font size (it matches to BMFont size, when "Match char height" option in Font Settings dialog is ticked) 
 --color | 255,255,255 | foreground RGB color, for example: 32,255,255 (without spaces)
 --background-color | | background RGB color, for example: 0,0,128 (without spaces), transparent by default
 --chars | 32-126 | required characters, for example 32-64,92,120-126 (without spaces), default value is 32-126 if 'chars-file' option is not defined
