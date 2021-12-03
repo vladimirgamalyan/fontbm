@@ -1,5 +1,6 @@
 #pragma once
 #include <iostream>
+#include <cmath>
 #include "FtInclude.h"
 #include "FtException.h"
 
@@ -35,6 +36,8 @@ public:
         std::int32_t horiBearingX; // For horizontal text layouts, this is the horizontal distance from the current cursor position to the leftmost border of the glyph image's bounding box.
         std::int32_t horiBearingY; // For horizontal text layouts, this is the vertical distance from the current cursor position (on the baseline) to the topmost border of the glyph image's bounding box.
         std::int32_t horiAdvance; // For horizontal text layouts, this is the horizontal distance to increment the pen position when the glyph is drawn as part of a string of text.
+        std::int32_t lsbDelta;
+        std::int32_t rsbDelta;
     };
 
     Font(Library& library, const std::string& fontFile, int ptsize, const int faceIndex, const bool monochrome)
@@ -135,9 +138,10 @@ public:
     GlyphMetrics renderGlyph(std::uint32_t* buffer, std::uint32_t surfaceW, std::uint32_t surfaceH, int x, int y,
             std::uint32_t ch, std::uint32_t color) const
     {
-        FT_Int32 loadFlags = FT_LOAD_RENDER;
+        FT_Int32 loadFlags = FT_LOAD_RENDER | FT_LOAD_FORCE_AUTOHINT;
         if (monochrome_)
             loadFlags |= FT_LOAD_MONOCHROME;
+
         const auto error = FT_Load_Char(face, ch, loadFlags);
         if (error)
             throw std::runtime_error("Load glyph error");
@@ -151,6 +155,8 @@ public:
         glyphMetrics.horiBearingX = FT_FLOOR(metrics->horiBearingX);
         glyphMetrics.horiBearingY = FT_FLOOR(metrics->horiBearingY);
         glyphMetrics.horiAdvance = FT_CEIL(metrics->horiAdvance);
+        glyphMetrics.lsbDelta = slot->lsb_delta;
+        glyphMetrics.rsbDelta = slot->rsb_delta;
 
         if (buffer)
         {
@@ -160,7 +166,7 @@ public:
             for (std::uint32_t row = 0; row < glyphMetrics.height; ++row)
             {
                 std::uint32_t *dst = buffer + (y + row) * surfaceW + x;
-                std::uint8_t const *src = slot->bitmap.buffer + slot->bitmap.pitch * row;
+                const std::uint8_t *src = slot->bitmap.buffer + slot->bitmap.pitch * row;
 
                 std::vector<std::uint8_t> unpacked;
                 if (slot->bitmap.pixel_mode == FT_PIXEL_MODE_MONO) {
@@ -192,15 +198,23 @@ public:
         if (!FT_HAS_KERNING(face))
             return 0;
 
-        FT_Vector delta;
+        FT_Vector kerning;
 
         const auto indexLeft = FT_Get_Char_Index(face, left);
         const auto indexRight = FT_Get_Char_Index(face, right);
 
-        const auto error = FT_Get_Kerning(face, indexLeft, indexRight, ft_kerning_default, &delta);
+        const auto error = FT_Get_Kerning(face, indexLeft, indexRight, FT_KERNING_UNFITTED, &kerning);
         if (error)
             throw std::runtime_error("Couldn't find glyphs kerning");
-        return delta.x >> 6u;
+
+        // X advance is already in pixels for bitmap fonts
+        if (!FT_IS_SCALABLE(face))
+            return static_cast<float>(kerning.x);
+
+        float firstRsbDelta = renderGlyph(nullptr, 0, 0, 0, 0, left, 0).rsbDelta;
+        float secondLsbDelta = renderGlyph(nullptr, 0, 0, 0, 0, right, 0).lsbDelta;
+
+        return std::floor((secondLsbDelta - firstRsbDelta + static_cast<float>(kerning.x) + 32) / static_cast<float>(1 << 6));
     }
 
     void debugInfo() const
