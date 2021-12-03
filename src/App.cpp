@@ -279,7 +279,7 @@ void App::execute(const int argc, char* argv[])
     for (auto& f: config.fontFile)
         fonts.emplace_back(library, f, config.fontSize, 0, config.monochrome);
 
-    fonts.front().debugInfo();
+    //fonts.front().debugInfo();
 
     auto glyphs = collectGlyphInfo(fonts, config.chars);
     const auto pageCount = arrangeGlyphs(glyphs, config);
