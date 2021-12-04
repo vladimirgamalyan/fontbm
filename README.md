@@ -7,9 +7,9 @@
 
 ## Status
 
-| Linux | Windows | macOS |
+| Linux | macOS | Windows |
 |-------|---------|-------|
-| [![Actions Status](https://github.com/vladimirgamalyan/fontbm/workflows/linux_build.yml/badge.svg)](https://github.com/vladimirgamalyan/fontbm/workflows/linux_build.yml) | [![Actions Status](https://github.com/vladimirgamalyan/fontbm/workflows/mac_build.yml/badge.svg)](https://github.com/vladimirgamalyan/fontbm/workflows/mac_build.yml) | [![Build status](https://ci.appveyor.com/api/projects/status/boq0olngopfabaac?svg=true)](https://ci.appveyor.com/project/vladimirgamalyan/fontbm) |
+| [![Actions Status](https://github.com/vladimirgamalyan/fontbm/actions/workflows/linux_build.yml/badge.svg)](https://github.com/vladimirgamalyan/fontbm/actions/workflows/linux_build.yml) | [![Actions Status](https://github.com/vladimirgamalyan/fontbm/actions/workflows/mac_build.yml/badge.svg)](https://github.com/vladimirgamalyan/fontbm/actions/workflows/mac_build.yml) | [![Build status](https://ci.appveyor.com/api/projects/status/boq0olngopfabaac?svg=true)](https://ci.appveyor.com/project/vladimirgamalyan/fontbm) |
 
 ## Usage
 
