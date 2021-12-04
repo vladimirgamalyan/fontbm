@@ -21,7 +21,7 @@ std::vector<rbp::RectSize> App::getGlyphRectangles(const Glyphs &glyphs, const s
     return result;
 }
 
-App::Glyphs App::collectGlyphInfo(const std::vector<ft::Font>& fonts, const std::set<std::uint32_t>& codes)
+App::Glyphs App::collectGlyphInfo(const ft::Font& font, const std::set<std::uint32_t>& codes)
 {
     Glyphs result;
 
@@ -29,31 +29,23 @@ App::Glyphs App::collectGlyphInfo(const std::vector<ft::Font>& fonts, const std:
     {
         GlyphInfo glyphInfo;
 
-        for (size_t i = 0; i < fonts.size(); ++i)
+        if (font.isGlyphProvided(id))
         {
-            if (fonts[i].isGlyphProvided(id))
-            {
-                ft::Font::GlyphMetrics glyphMetrics = fonts[i].renderGlyph(nullptr, 0, 0, 0, 0, id, 0);
-                glyphInfo.fontIndex = i;
-                glyphInfo.width = glyphMetrics.width;
-                glyphInfo.height = glyphMetrics.height;
-                glyphInfo.xAdvance = glyphMetrics.horiAdvance;
-                glyphInfo.xOffset = glyphMetrics.horiBearingX;
-                glyphInfo.yOffset = fonts[i].yMax - glyphMetrics.horiBearingY;
-                break;
-            }
+            ft::Font::GlyphMetrics glyphMetrics = font.renderGlyph(nullptr, 0, 0, 0, 0, id, 0);
+            glyphInfo.width = glyphMetrics.width;
+            glyphInfo.height = glyphMetrics.height;
+            glyphInfo.xAdvance = glyphMetrics.horiAdvance;
+            glyphInfo.xOffset = glyphMetrics.horiBearingX;
+            glyphInfo.yOffset = font.yMax - glyphMetrics.horiBearingY;
+            result[id] = glyphInfo;
         }
-
-        //TODO: add more checks for glyph.
-        if (glyphInfo.fontIndex == -1)
+        else
         {
             std::cout << "warning: glyph " << id << " not found";
             if (id == 65279)
                 std::cout << " (it looks like Unicode byte order mark (BOM))";
             std::cout << "." << std::endl;
         }
-        else
-            result[id] = glyphInfo;
     }
 
     return result;
@@ -143,7 +135,7 @@ void App::savePng(const std::string& fileName, const std::uint32_t* buffer, cons
         throw std::runtime_error("png save to file error " + std::to_string(error) + ": " + lodepng_error_text(error));
 }
 
-std::vector<std::string> App::renderTextures(const Glyphs& glyphs, const Config& config, const std::vector<ft::Font>& fonts, const std::vector<Config::Size>& pages)
+std::vector<std::string> App::renderTextures(const Glyphs& glyphs, const Config& config, const ft::Font& font, const std::vector<Config::Size>& pages)
 {
     std::vector<std::string> fileNames;
     if (pages.empty())
@@ -169,7 +161,7 @@ std::vector<std::string> App::renderTextures(const Glyphs& glyphs, const Config&
                 const auto x = glyph.x + config.padding.left;
                 const auto y = glyph.y + config.padding.up;
 
-                fonts[glyph.fontIndex].renderGlyph(&surface[0], s.w, s.h, x, y,
+                font.renderGlyph(&surface[0], s.w, s.h, x, y,
                         kv.first, config.color.getBGR());
             }
         }
@@ -206,7 +198,7 @@ std::vector<std::string> App::renderTextures(const Glyphs& glyphs, const Config&
     return fileNames;
 }
 
-void App::writeFontInfoFile(const Glyphs& glyphs, const Config& config, const std::vector<ft::Font>& fonts,
+void App::writeFontInfoFile(const Glyphs& glyphs, const Config& config, const ft::Font& font,
         const std::vector<std::string>& fileNames, const std::vector<Config::Size>& pages)
 {
     bool pagesHaveDifferentSize = false;
@@ -224,12 +216,12 @@ void App::writeFontInfoFile(const Glyphs& glyphs, const Config& config, const st
 
     FontInfo f;
 
-    f.info.face = fonts[0].getFamilyNameOr("unknown");
+    f.info.face = font.getFamilyNameOr("unknown");
     f.info.size = -static_cast<std::int16_t>(config.fontSize);
     f.info.smooth = config.monochrome;
     f.info.unicode = true;
-    f.info.bold = fonts[0].isBold();
-    f.info.italic = fonts[0].isItalic();
+    f.info.bold = font.isBold();
+    f.info.italic = font.isItalic();
     f.info.stretchH = 100;
     f.info.aa = 1;
     f.info.padding.up = static_cast<std::uint8_t>(config.padding.up);
@@ -239,8 +231,8 @@ void App::writeFontInfoFile(const Glyphs& glyphs, const Config& config, const st
     f.info.spacing.horizontal = static_cast<std::uint8_t>(config.spacing.hor);
     f.info.spacing.vertical = static_cast<std::uint8_t>(config.spacing.ver);
 
-    f.common.lineHeight = static_cast<std::uint16_t>(fonts[0].height);
-    f.common.base = static_cast<std::uint16_t>(fonts[0].yMax);
+    f.common.lineHeight = static_cast<std::uint16_t>(font.height);
+    f.common.base = static_cast<std::uint16_t>(font.yMax);
     if (!pagesHaveDifferentSize)
     {
         f.common.scaleW = static_cast<std::uint16_t>(pages.front().w);
@@ -250,7 +242,7 @@ void App::writeFontInfoFile(const Glyphs& glyphs, const Config& config, const st
     f.common.redChnl = 4;
     f.common.greenChnl = 4;
     f.common.blueChnl = 4;
-    f.common.totalHeight = static_cast<std::uint16_t>(fonts[0].totalHeight);
+    f.common.totalHeight = static_cast<std::uint16_t>(font.totalHeight);
 
     f.pages = fileNames;
 
@@ -284,7 +276,7 @@ void App::writeFontInfoFile(const Glyphs& glyphs, const Config& config, const st
         {
             for (const auto& ch1 : chars)
             {
-                const auto k = static_cast<std::int16_t>(fonts[0].getKerning(ch0, ch1));
+                const auto k = static_cast<std::int16_t>(font.getKerning(ch0, ch1));
                 if (k)
                 {
                     FontInfo::Kerning kerning;
@@ -321,18 +313,13 @@ void App::execute(const int argc, char* argv[])
     const auto config = ProgramOptions::parseCommandLine(argc, argv);
 
     ft::Library library;
+    ft::Font font(library, config.fontFile, config.fontSize, 0, config.monochrome);
 
-    std::vector<ft::Font> fonts;
-    for (auto& f: config.fontFile)
-        fonts.emplace_back(library, f, config.fontSize, 0, config.monochrome);
-
-    //fonts.front().debugInfo();
-
-    auto glyphs = collectGlyphInfo(fonts, config.chars);
+    auto glyphs = collectGlyphInfo(font, config.chars);
     const auto pages = arrangeGlyphs(glyphs, config);
     if (config.maxTextureCount != 0 && pages.size() > config.maxTextureCount)
         throw std::runtime_error("too many generated textures (more than --max-texture-count)");
 
-    const auto fileNames = renderTextures(glyphs, config, fonts, pages);
-    writeFontInfoFile(glyphs, config, fonts, fileNames, pages);
+    const auto fileNames = renderTextures(glyphs, config, font, pages);
+    writeFontInfoFile(glyphs, config, font, fileNames, pages);
 }

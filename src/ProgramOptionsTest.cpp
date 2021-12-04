@@ -32,17 +32,7 @@ TEST_CASE( "parseCmdLine")
     {
         Args args({"--font-file", "vera.ttf", "--output", "vera"});
         Config config = ProgramOptions::parseCommandLine(args.argc(), args.argv());
-        REQUIRE(config.fontFile.size() == 1);
-        REQUIRE(config.fontFile[0] == "vera.ttf");
-        REQUIRE(config.output == "vera");
-    }
-
-    {
-        Args args({"--font-file", "vera.ttf", "--output", "vera", "--font-file", "default.ttf"});
-        Config config = ProgramOptions::parseCommandLine(args.argc(), args.argv());
-        REQUIRE(config.fontFile.size() == 2);
-        REQUIRE(config.fontFile[0] == "vera.ttf");
-        REQUIRE(config.fontFile[1] == "default.ttf");
+        REQUIRE(config.fontFile == "vera.ttf");
         REQUIRE(config.output == "vera");
     }
 

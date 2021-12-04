@@ -54,7 +54,7 @@ struct Config
         std::uint32_t hor = 0;
     };
 
-    std::vector<std::string> fontFile;
+    std::string fontFile;
     std::set<std::uint32_t> chars;
     Color color;
     Color backgroundColor;
