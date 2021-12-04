@@ -254,7 +254,7 @@ void App::writeFontInfoFile(const Glyphs& glyphs, const Config& config, const st
 
     f.pages = fileNames;
 
-    for (const auto kv: glyphs)
+    for (const auto& kv: glyphs)
     {
         //TODO: page = 0 for empty glyphs.
         const auto &glyph = kv.second;
