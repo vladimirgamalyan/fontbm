@@ -8,7 +8,7 @@
 ## Status
 
 Linux | macOS | Windows
-------|-------|-0------
+------|-------|--------
 [![Actions Status](https://github.com/vladimirgamalyan/fontbm/actions/workflows/linux_build.yml/badge.svg)](https://github.com/vladimirgamalyan/fontbm/actions/workflows/linux_build.yml) | [![Actions Status](https://github.com/vladimirgamalyan/fontbm/actions/workflows/mac_build.yml/badge.svg)](https://github.com/vladimirgamalyan/fontbm/actions/workflows/mac_build.yml) | [![Build status](https://ci.appveyor.com/api/projects/status/boq0olngopfabaac?svg=true)](https://ci.appveyor.com/project/vladimirgamalyan/fontbm)
 
 ## Usage
@@ -24,7 +24,7 @@ Available options (**bold** options are required):
 
 
 option  | default | comment
-------|-----|---------------
+--------|---------|--------
 **--font-file** |  | path to ttf file, required (can be set several times for fallback fonts)
 **--output** | | output files name without extension, required
 --font-size | 32 | font size (it matches to BMFont size, when "Match char height" option in Font Settings dialog is ticked)
