@@ -69,6 +69,8 @@ public:
 
             /* Get the scalable font metrics for this font */
             const auto scale = face->size->metrics.y_scale;
+            yMin = FT_FLOOR(FT_MulFix(face->bbox.yMin, scale));
+            yMax  = FT_CEIL(FT_MulFix(face->bbox.yMax, scale));
             height  = FT_CEIL(FT_MulFix(face->height, scale));
         }
         else
@@ -90,6 +92,8 @@ public:
              * non-scalable fonts must be determined differently
              * or sometimes cannot be determined.
              * */
+            yMin = 0;
+            yMax = face->available_sizes[ptsize].height;
             height = face->available_sizes[ptsize].height;
         }
 
@@ -110,24 +114,7 @@ public:
         glyph_italics = 0.207f;
         glyph_italics *= height;
 
-        {
-            std::int32_t yMin = 0;
-            FT_UInt gindex;
-            FT_ULong charcode = FT_Get_First_Char(face, &gindex);
-            yMax = 0;
-            while (gindex)
-            {
-                GlyphMetrics glyphMetrics = renderGlyph(nullptr, 0, 0, 0, 0, charcode, 0);
-                if (yMax < glyphMetrics.horiBearingY)
-                    yMax = glyphMetrics.horiBearingY;
-                std::int32_t bottom = glyphMetrics.horiBearingY - glyphMetrics.height;
-                if (bottom < yMin)
-                    yMin = bottom;
-                charcode = FT_Get_Next_Char(face, charcode, &gindex);
-            }
-
-            totalHeight = yMax - yMin;
-        }
+        totalHeight = yMax - yMin;
     }
 
     ~Font()
@@ -294,6 +281,7 @@ public:
     FT_Face face = nullptr;
     int height;
     int yMax;
+    int yMin;
     int totalHeight = 0;
 
     /* For non-scalable formats, we must remember which font index size */
