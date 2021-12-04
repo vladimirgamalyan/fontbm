@@ -149,7 +149,7 @@ std::vector<std::string> App::renderTextures(const Glyphs& glyphs, const Config&
     if (pages.empty())
         return {};
 
-    const auto pageNameDigits = config.disableTextureNameZeroPadding ? 0 : getNumberLen(pages.size() - 1);
+    const auto pageNameDigits = getNumberLen(pages.size() - 1);
 
     for (std::uint32_t page = 0; page < pages.size(); ++page)
     {

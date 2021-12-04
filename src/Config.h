@@ -69,7 +69,6 @@ struct Config
     std::uint32_t maxTextureCount = 0;
     bool monochrome = false;
     bool extraInfo = false;
-    bool disableTextureNameZeroPadding = false;
     bool cropTexturesWidth = false;
     bool cropTexturesHeight = false;
 };
