@@ -16,3 +16,5 @@ inline std::vector<std::string> splitStrByDelim(const std::string& str, const ch
     }
     return result;
 }
+
+std::vector<std::string> string_split(const std::string& s, const std::string& delimiters, bool skipEmpty = true);

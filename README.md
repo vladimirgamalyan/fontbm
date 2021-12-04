@@ -40,8 +40,7 @@ option  | default | comment
 --padding-left | 0 | padding left
 --spacing-vert | 0 | spacing vertical
 --spacing-horiz | 0 | spacing horizontal
---texture-width | 256 | texture width
---texture-height | 256 | texture height
+--texture-size | 256 | comma separated list of allowed texure sizes, for example: 128x128,256x256 (without spaces), the first suitable size will be used 
 --monochrome | | disable anti-aliasing
 --extra-info | | write extra information to data file
 --disable-texture-name-zero-padding | | disable texture name zero padding

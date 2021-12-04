@@ -34,6 +34,8 @@ struct Config
 
     struct Size
     {
+        Size() = default;
+        Size(std::uint32_t w, std::uint32_t h) : w(w), h(h) {}
         std::uint32_t w = 0;
         std::uint32_t h = 0;
     };
@@ -60,7 +62,7 @@ struct Config
     std::uint16_t fontSize = 16;
     Padding padding;
     Spacing spacing;
-    Size textureSize;
+    std::vector<Size> textureSizeList;
     std::string output;
     DataFormat dataFormat = DataFormat::Text;
     bool includeKerningPairs = false;
@@ -68,10 +70,4 @@ struct Config
     bool monochrome = false;
     bool extraInfo = false;
     bool disableTextureNameZeroPadding = false;
-
-    void validate() const
-    {
-        if (textureSize.w > 65536 || textureSize.h > 65536)
-            throw std::runtime_error("too big texture size (width or height greater than 65536)");
-    }
 };

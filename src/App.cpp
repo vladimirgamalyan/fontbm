@@ -59,42 +59,54 @@ App::Glyphs App::collectGlyphInfo(const std::vector<ft::Font>& fonts, const std:
     return result;
 }
 
-std::uint32_t App::arrangeGlyphs(Glyphs& glyphs, const Config& config)
+std::vector<Config::Size> App::arrangeGlyphs(Glyphs& glyphs, const Config& config)
 {
     const auto additionalWidth = config.spacing.hor + config.padding.left + config.padding.right;
     const auto additionalHeight = config.spacing.ver + config.padding.up + config.padding.down;
-    //TODO: check workAreaW,H
-    const auto workAreaW = config.textureSize.w - config.spacing.hor;
-    const auto workAreaH = config.textureSize.h - config.spacing.ver;
+    std::vector<Config::Size> result;
 
     auto glyphRectangles = getGlyphRectangles(glyphs, additionalWidth, additionalHeight);
 
     rbp::MaxRectsBinPack mrbp;
-    std::uint32_t pageCount = 0;
+
     for (;;)
     {
-        mrbp.Init(workAreaW, workAreaH);
-
         std::vector<rbp::Rect> arrangedRectangles;
-        mrbp.Insert( glyphRectangles, arrangedRectangles, rbp::MaxRectsBinPack::RectBestAreaFit );
-        if ( arrangedRectangles.empty() )
+        auto glyphRectanglesCopy = glyphRectangles;
+        Config::Size lastSize;
+
+        for (const auto& ss: config.textureSizeList) {
+            lastSize = ss;
+            glyphRectangles = glyphRectanglesCopy;
+
+            //TODO: check workAreaW,H
+            const auto workAreaW = ss.w - config.spacing.hor;       // config.textureSize.w
+            const auto workAreaH = ss.h - config.spacing.ver;       // config.textureSize.h
+
+            mrbp.Init(workAreaW, workAreaH);
+            mrbp.Insert(glyphRectangles, arrangedRectangles, rbp::MaxRectsBinPack::RectBestAreaFit);
+
+            if (glyphRectangles.empty())
+                break;
+        }
+
+        if (arrangedRectangles.empty())
         {
-            if ( !glyphRectangles.empty() )
+            if (!glyphRectangles.empty())
                 throw std::runtime_error("can not fit glyphs into texture");
             break;
         }
-
-        for ( const auto& r: arrangedRectangles )
+        for (const auto& r: arrangedRectangles)
         {
             glyphs[r.tag].x = r.x + config.spacing.hor;
             glyphs[r.tag].y = r.y + config.spacing.ver;
-            glyphs[r.tag].page = pageCount;
+            glyphs[r.tag].page = static_cast<std::uint32_t>(result.size());
         }
 
-        ++pageCount;
+        result.push_back(lastSize);
     }
 
-    return pageCount;
+    return result;
 }
 
 void App::savePng(const std::string& fileName, const std::uint32_t* buffer, const std::uint32_t w, const std::uint32_t h, const bool withAlpha)
@@ -116,15 +128,18 @@ void App::savePng(const std::string& fileName, const std::uint32_t* buffer, cons
         throw std::runtime_error("png save to file error " + std::to_string(error) + ": " + lodepng_error_text(error));
 }
 
-std::vector<std::string> App::renderTextures(const Glyphs& glyphs, const Config& config, const std::vector<ft::Font>& fonts, const std::uint32_t pageCount)
+std::vector<std::string> App::renderTextures(const Glyphs& glyphs, const Config& config, const std::vector<ft::Font>& fonts, const std::vector<Config::Size>& pages)
 {
     std::vector<std::string> fileNames;
+    if (pages.empty())
+        return {};
 
-    const auto pageNameDigits = config.disableTextureNameZeroPadding ? 0 : getNumberLen(pageCount - 1);
+    const auto pageNameDigits = config.disableTextureNameZeroPadding ? 0 : getNumberLen(pages.size() - 1);
 
-    for (std::uint32_t page = 0; page < pageCount; ++page)
+    for (std::uint32_t page = 0; page < pages.size(); ++page)
     {
-        std::vector<std::uint32_t> surface(config.textureSize.w * config.textureSize.h, config.color.getBGR());
+        const Config::Size& s = pages[page];
+        std::vector<std::uint32_t> surface(s.w * s.h, config.color.getBGR());
 
         // Render every glyph
         //TODO: do not repeat same glyphs (with same index)
@@ -139,7 +154,7 @@ std::vector<std::string> App::renderTextures(const Glyphs& glyphs, const Config&
                 const auto x = glyph.x + config.padding.left;
                 const auto y = glyph.y + config.padding.up;
 
-                fonts[glyph.fontIndex].renderGlyph(&surface[0], config.textureSize.w, config.textureSize.h, x, y,
+                fonts[glyph.fontIndex].renderGlyph(&surface[0], s.w, s.h, x, y,
                         kv.first, config.color.getBGR());
             }
         }
@@ -170,14 +185,28 @@ std::vector<std::string> App::renderTextures(const Glyphs& glyphs, const Config&
         const auto fileName = ss.str();
         fileNames.push_back(extractFileName(fileName));
 
-        savePng(fileName, &surface[0], config.textureSize.w, config.textureSize.h, config.backgroundTransparent);
+        savePng(fileName, &surface[0], s.w, s.h, config.backgroundTransparent);
     }
 
     return fileNames;
 }
 
-void App::writeFontInfoFile(const Glyphs& glyphs, const Config& config, const std::vector<ft::Font>& fonts, const std::vector<std::string>& fileNames)
+void App::writeFontInfoFile(const Glyphs& glyphs, const Config& config, const std::vector<ft::Font>& fonts,
+        const std::vector<std::string>& fileNames, const std::vector<Config::Size>& pages)
 {
+    bool pagesHaveDifferentSize = false;
+    if (pages.size() > 1)
+    {
+        for (size_t i = 1; i < pages.size(); ++i)
+        {
+            if (pages[0].w != pages[i].w || pages[0].h != pages[i].h)
+            {
+                pagesHaveDifferentSize = true;
+                break;
+            }
+        }
+    }
+
     FontInfo f;
 
     f.info.face = fonts[0].getFamilyNameOr("unknown");
@@ -197,8 +226,11 @@ void App::writeFontInfoFile(const Glyphs& glyphs, const Config& config, const st
 
     f.common.lineHeight = static_cast<std::uint16_t>(fonts[0].height);
     f.common.base = static_cast<std::uint16_t>(fonts[0].yMax);
-    f.common.scaleW = static_cast<std::uint16_t>(config.textureSize.w);
-    f.common.scaleH = static_cast<std::uint16_t>(config.textureSize.h);
+    if (!pagesHaveDifferentSize)
+    {
+        f.common.scaleW = static_cast<std::uint16_t>(pages.front().w);
+        f.common.scaleH = static_cast<std::uint16_t>(pages.front().h);
+    }
     f.common.alphaChnl = 0;
     f.common.redChnl = 4;
     f.common.greenChnl = 4;
@@ -282,10 +314,10 @@ void App::execute(const int argc, char* argv[])
     //fonts.front().debugInfo();
 
     auto glyphs = collectGlyphInfo(fonts, config.chars);
-    const auto pageCount = arrangeGlyphs(glyphs, config);
-    if (config.maxTextureCount != 0 && pageCount > config.maxTextureCount)
+    const auto pages = arrangeGlyphs(glyphs, config);
+    if (config.maxTextureCount != 0 && pages.size() > config.maxTextureCount)
         throw std::runtime_error("too many generated textures (more than --max-texture-count)");
 
-    const auto fileNames = renderTextures(glyphs, config, fonts, pageCount);
-    writeFontInfoFile(glyphs, config, fonts, fileNames);
+    const auto fileNames = renderTextures(glyphs, config, fonts, pages);
+    writeFontInfoFile(glyphs, config, fonts, fileNames, pages);
 }
