@@ -1,11 +1,11 @@
-name: ci
+name: macOS build
 
 on: [push]
 
 jobs:
   build:
 
-    runs-on: macos-latest
+    runs-on: macos-10.15
     
     steps:
     - uses: actions/checkout@v2
