@@ -36,8 +36,6 @@ TEST_CASE( "parseCmdLine")
         REQUIRE(config.fontFile.size() == 1);
         REQUIRE(config.fontFile[0] == "vera.ttf");
         REQUIRE(config.output == "vera");
-        REQUIRE(config.textureSize.w == 256);
-        REQUIRE(config.textureSize.h == 256);
     }
 
     {
