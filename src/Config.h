@@ -70,4 +70,6 @@ struct Config
     bool monochrome = false;
     bool extraInfo = false;
     bool disableTextureNameZeroPadding = false;
+    bool cropTexturesWidth = false;
+    bool cropTexturesHeight = false;
 };

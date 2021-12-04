@@ -80,8 +80,8 @@ std::vector<Config::Size> App::arrangeGlyphs(Glyphs& glyphs, const Config& confi
             glyphRectangles = glyphRectanglesCopy;
 
             //TODO: check workAreaW,H
-            const auto workAreaW = ss.w - config.spacing.hor;       // config.textureSize.w
-            const auto workAreaH = ss.h - config.spacing.ver;       // config.textureSize.h
+            const auto workAreaW = ss.w - config.spacing.hor;
+            const auto workAreaH = ss.h - config.spacing.ver;
 
             mrbp.Init(workAreaW, workAreaH);
             mrbp.Insert(glyphRectangles, arrangedRectangles, rbp::MaxRectsBinPack::RectBestAreaFit);
@@ -96,12 +96,27 @@ std::vector<Config::Size> App::arrangeGlyphs(Glyphs& glyphs, const Config& confi
                 throw std::runtime_error("can not fit glyphs into texture");
             break;
         }
+
+        std::uint32_t maxX = 0;
+        std::uint32_t maxY = 0;
         for (const auto& r: arrangedRectangles)
         {
-            glyphs[r.tag].x = r.x + config.spacing.hor;
-            glyphs[r.tag].y = r.y + config.spacing.ver;
+            std::uint32_t x = r.x + config.spacing.hor;
+            std::uint32_t y = r.y + config.spacing.ver;
+
+            glyphs[r.tag].x = x;
+            glyphs[r.tag].y = y;
             glyphs[r.tag].page = static_cast<std::uint32_t>(result.size());
+
+            if (maxX < x + r.width)
+                maxX = x + r.width;
+            if (maxY < y + r.height)
+                maxY = y + r.height;
         }
+        if (config.cropTexturesWidth)
+            lastSize.w = maxX;
+        if (config.cropTexturesHeight)
+            lastSize.h = maxY;
 
         result.push_back(lastSize);
     }

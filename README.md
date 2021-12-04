@@ -41,6 +41,8 @@ option  | default | comment
 --spacing-vert | 0 | spacing vertical
 --spacing-horiz | 0 | spacing horizontal
 --texture-size | 32x32,64x32,64x64,128x64, 128x128,256x128,256x256, 512x256,512x512,1024x512, 1024x1024,2048x1024,2048x2048 | comma separated list of allowed texture sizes (without spaces), the first suitable size will be used
+--texture-crop-width | | crop unused parts of output textures (width)
+--texture-crop-height | | crop unused parts of output textures (height)
 --monochrome | | disable anti-aliasing
 --extra-info | | write extra information to data file
 --disable-texture-name-zero-padding | | disable texture name zero padding
