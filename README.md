@@ -45,7 +45,6 @@ option  | default | comment
 --texture-crop-height | | crop unused parts of output textures (height)
 --monochrome | | disable anti-aliasing
 --extra-info | | write extra information to data file
---disable-texture-name-zero-padding | | disable texture name zero padding
 --max-texture-count | 0 | maximum generated texture count (unlimited if zero)
 
 ## Building Linux
