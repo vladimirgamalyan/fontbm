@@ -7,9 +7,9 @@
 
 ## Status
 
-| Linux | macOS | Windows |
-|-------|---------|-------|
-| [![Actions Status](https://github.com/vladimirgamalyan/fontbm/actions/workflows/linux_build.yml/badge.svg)](https://github.com/vladimirgamalyan/fontbm/actions/workflows/linux_build.yml) | [![Actions Status](https://github.com/vladimirgamalyan/fontbm/actions/workflows/mac_build.yml/badge.svg)](https://github.com/vladimirgamalyan/fontbm/actions/workflows/mac_build.yml) | [![Build status](https://ci.appveyor.com/api/projects/status/boq0olngopfabaac?svg=true)](https://ci.appveyor.com/project/vladimirgamalyan/fontbm) |
+Linux | macOS | Windows
+------|-------|-0------
+[![Actions Status](https://github.com/vladimirgamalyan/fontbm/actions/workflows/linux_build.yml/badge.svg)](https://github.com/vladimirgamalyan/fontbm/actions/workflows/linux_build.yml) | [![Actions Status](https://github.com/vladimirgamalyan/fontbm/actions/workflows/mac_build.yml/badge.svg)](https://github.com/vladimirgamalyan/fontbm/actions/workflows/mac_build.yml) | [![Build status](https://ci.appveyor.com/api/projects/status/boq0olngopfabaac?svg=true)](https://ci.appveyor.com/project/vladimirgamalyan/fontbm)
 
 ## Usage
 
@@ -27,10 +27,13 @@ option  | default | comment
 ------|-----|---------------
 **--font-file** |  | path to ttf file, required (can be set several times for fallback fonts)
 **--output** | | output files name without extension, required
---font-size | 32 | font size (it matches to BMFont size, when "Match char height" option in Font Settings dialog is ticked) 
+--font-size | 32 | font size (it matches to BMFont size, when "Match char height" option in Font Settings dialog is ticked)
+--chars | 32-126 | required characters, for example 32-64,92,120-126 (without spaces), default value is 32-126 if 'chars-file' option is not defined
+--texture-size | 32x32,64x32,64x64,128x64, 128x128,256x128,256x256, 512x256,512x512,1024x512, 1024x1024,2048x1024,2048x2048 | comma separated list of allowed texture sizes (without spaces), the first suitable size will be used
+--texture-crop-width | | crop unused parts of output textures (width)
+--texture-crop-height | | crop unused parts of output textures (height)
 --color | 255,255,255 | foreground RGB color, for example: 32,255,255 (without spaces)
 --background-color | | background RGB color, for example: 0,0,128 (without spaces), transparent by default
---chars | 32-126 | required characters, for example 32-64,92,120-126 (without spaces), default value is 32-126 if 'chars-file' option is not defined
 --chars-file | | optional path to UTF-8 text file with additional required characters (will be combined with 'chars' option).
 --data-format | txt | output data file format: txt, xml, bin, [json](https://github.com/Jam3/load-bmfont/blob/master/json-spec.md)
 --include-kerning-pairs | | include kerning pairs to output file
@@ -40,9 +43,6 @@ option  | default | comment
 --padding-left | 0 | padding left
 --spacing-vert | 0 | spacing vertical
 --spacing-horiz | 0 | spacing horizontal
---texture-size | 32x32,64x32,64x64,128x64, 128x128,256x128,256x256, 512x256,512x512,1024x512, 1024x1024,2048x1024,2048x2048 | comma separated list of allowed texture sizes (without spaces), the first suitable size will be used
---texture-crop-width | | crop unused parts of output textures (width)
---texture-crop-height | | crop unused parts of output textures (height)
 --monochrome | | disable anti-aliasing
 --extra-info | | write extra information to data file
 --max-texture-count | 0 | maximum generated texture count (unlimited if zero)
