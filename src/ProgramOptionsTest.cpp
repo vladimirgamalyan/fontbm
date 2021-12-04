@@ -4,7 +4,7 @@
 class Args
 {
 public:
-    explicit Args(const std::vector<std::string>& args) : arg0("foo"), arguments(args)
+    explicit Args(std::vector<std::string> args) : arg0("foo"), arguments(std::move(args))
     {
         pointers.push_back(const_cast<char*>(arg0.data()));
         for (auto& s : arguments)
@@ -31,8 +31,7 @@ TEST_CASE( "parseCmdLine")
 {
     {
         Args args({"--font-file", "vera.ttf", "--output", "vera"});
-        ProgramOptions po;
-        Config config = po.parseCommandLine(args.argc(), args.argv());
+        Config config = ProgramOptions::parseCommandLine(args.argc(), args.argv());
         REQUIRE(config.fontFile.size() == 1);
         REQUIRE(config.fontFile[0] == "vera.ttf");
         REQUIRE(config.output == "vera");
@@ -40,8 +39,7 @@ TEST_CASE( "parseCmdLine")
 
     {
         Args args({"--font-file", "vera.ttf", "--output", "vera", "--font-file", "default.ttf"});
-        ProgramOptions po;
-        Config config = po.parseCommandLine(args.argc(), args.argv());
+        Config config = ProgramOptions::parseCommandLine(args.argc(), args.argv());
         REQUIRE(config.fontFile.size() == 2);
         REQUIRE(config.fontFile[0] == "vera.ttf");
         REQUIRE(config.fontFile[1] == "default.ttf");
@@ -50,38 +48,35 @@ TEST_CASE( "parseCmdLine")
 
     {
         Args args({"--font-file", "vera.ttf"});
-        ProgramOptions po;
-        REQUIRE_THROWS_AS(po.parseCommandLine(args.argc(), args.argv()), std::runtime_error);
+        REQUIRE_THROWS_AS(ProgramOptions::parseCommandLine(args.argc(), args.argv()), std::runtime_error);
     }
 }
 
 TEST_CASE("parseColor")
 {
-    ProgramOptions po;
-    REQUIRE((po.parseColor("0,0,0") == Config::Color{0, 0, 0}));
-    REQUIRE((po.parseColor("255,255,255") == Config::Color{255, 255, 255}));
-    REQUIRE((po.parseColor(" 255 , 255    ,  255  ") == Config::Color{255, 255, 255}));
+    REQUIRE((ProgramOptions::parseColor("0,0,0") == Config::Color{0, 0, 0}));
+    REQUIRE((ProgramOptions::parseColor("255,255,255") == Config::Color{255, 255, 255}));
+    REQUIRE((ProgramOptions::parseColor(" 255 , 255    ,  255  ") == Config::Color{255, 255, 255}));
 
-    REQUIRE_THROWS_AS(po.parseColor(""), std::logic_error);
-    REQUIRE_THROWS_AS(po.parseColor("foo"), std::logic_error);
-    REQUIRE_THROWS_AS(po.parseColor("0,1"), std::logic_error);
-    REQUIRE_THROWS_AS(po.parseColor("0,1,2,3"), std::logic_error);
-    REQUIRE_THROWS_AS(po.parseColor("0,a,1"), std::logic_error);
-    REQUIRE_THROWS_AS(po.parseColor("0,1,256"), std::logic_error);
-    REQUIRE_THROWS_AS(po.parseColor("0,1,-1"), std::logic_error);
+    REQUIRE_THROWS_AS(ProgramOptions::parseColor(""), std::logic_error);
+    REQUIRE_THROWS_AS(ProgramOptions::parseColor("foo"), std::logic_error);
+    REQUIRE_THROWS_AS(ProgramOptions::parseColor("0,1"), std::logic_error);
+    REQUIRE_THROWS_AS(ProgramOptions::parseColor("0,1,2,3"), std::logic_error);
+    REQUIRE_THROWS_AS(ProgramOptions::parseColor("0,a,1"), std::logic_error);
+    REQUIRE_THROWS_AS(ProgramOptions::parseColor("0,1,256"), std::logic_error);
+    REQUIRE_THROWS_AS(ProgramOptions::parseColor("0,1,-1"), std::logic_error);
 }
 
 TEST_CASE("parseCharsString")
 {
-    ProgramOptions po;
-    REQUIRE((po.parseCharsString("") == std::set<std::uint32_t>{}));
-    REQUIRE((po.parseCharsString("0") == std::set<std::uint32_t>{0}));
-    REQUIRE((po.parseCharsString("42") == std::set<std::uint32_t>{42}));
-    REQUIRE((po.parseCharsString("0-1") == std::set<std::uint32_t>{0,1}));
-    REQUIRE((po.parseCharsString("1-3") == std::set<std::uint32_t>{1,2,3}));
-    REQUIRE((po.parseCharsString(" 1 - 3 ") == std::set<std::uint32_t>{1,2,3}));
+    REQUIRE((ProgramOptions::parseCharsString("").empty()));
+    REQUIRE((ProgramOptions::parseCharsString("0") == std::set<std::uint32_t>{0}));
+    REQUIRE((ProgramOptions::parseCharsString("42") == std::set<std::uint32_t>{42}));
+    REQUIRE((ProgramOptions::parseCharsString("0-1") == std::set<std::uint32_t>{0,1}));
+    REQUIRE((ProgramOptions::parseCharsString("1-3") == std::set<std::uint32_t>{1,2,3}));
+    REQUIRE((ProgramOptions::parseCharsString(" 1 - 3 ") == std::set<std::uint32_t>{1,2,3}));
 
-    REQUIRE_THROWS_AS(po.parseCharsString("foo"), std::logic_error);
-    REQUIRE_THROWS_AS(po.parseCharsString("-1"), std::logic_error);
-    REQUIRE_THROWS_AS(po.parseCharsString("-1-2"), std::logic_error);
+    REQUIRE_THROWS_AS(ProgramOptions::parseCharsString("foo"), std::logic_error);
+    REQUIRE_THROWS_AS(ProgramOptions::parseCharsString("-1"), std::logic_error);
+    REQUIRE_THROWS_AS(ProgramOptions::parseCharsString("-1-2"), std::logic_error);
 }
