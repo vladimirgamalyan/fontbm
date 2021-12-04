@@ -18,10 +18,12 @@ Config ProgramOptions::parseCommandLine(int argc, char* argv[])
         std::string chars;
         std::string charsFile;
         std::string color;
+        std::string textureSizeList;
         std::string backgroundColor;
         const std::string backgroundColorOptionName = "background-color";
         const std::string charsFileOptionName = "chars-file";
         const std::string charsOptionName = "chars";
+        const std::string textureSizeListOptionName = "texture-size";
         std::string dataFormat;
 
         cxxopts::Options options("fontbm", "Command line bitmap font generator, compatible with bmfont");
@@ -51,17 +53,13 @@ Config ProgramOptions::parseCommandLine(int argc, char* argv[])
              cxxopts::value<std::uint32_t>(config.spacing.ver)->default_value("0"))
             ("spacing-horiz", "spacing horiz, default value is 0",
              cxxopts::value<std::uint32_t>(config.spacing.hor)->default_value("0"))
-            ("texture-width", "texture width, default value is 256",
-             cxxopts::value<std::uint32_t>(config.textureSize.w)->default_value("256"))
-            ("texture-height", "texture height, default value is 256",
-             cxxopts::value<std::uint32_t>(config.textureSize.h)->default_value("256"))
             ("output", "output files name without extension, required", cxxopts::value<std::string>(config.output))
-            ("data-format", R"(output data file format, "xml" or "txt", default "xml")",
-             cxxopts::value<std::string>(dataFormat)->default_value("txt"))
+            ("data-format", R"(output data file format, "xml" or "txt", default "xml")", cxxopts::value<std::string>(dataFormat)->default_value("txt"))
             ("include-kerning-pairs", "include kerning pairs to output file", cxxopts::value<bool>(config.includeKerningPairs))
             ("monochrome", "disable antialiasing", cxxopts::value<bool>(config.monochrome))
             ("extra-info", "write extra information to data file", cxxopts::value<bool>(config.extraInfo))
             ("disable-texture-name-zero-padding", "disable texture name zero padding", cxxopts::value<bool>(config.disableTextureNameZeroPadding))
+            (textureSizeListOptionName, "list of texture sizes (will be tried from left to right to fit glyphs)", cxxopts::value<std::string>(textureSizeList))
             ("max-texture-count", "maximum generated textures", cxxopts::value<std::uint32_t>(config.maxTextureCount)->default_value("0"));
 
         auto result = options.parse(argc, argv);
@@ -101,7 +99,24 @@ Config ProgramOptions::parseCommandLine(int argc, char* argv[])
         else
             throw std::runtime_error("unknown --data-format value");
 
-        config.validate();
+        if (result.count(textureSizeListOptionName))
+            config.textureSizeList = parseTextureSize(textureSizeList);
+        else
+            config.textureSizeList = {
+                {32, 32},
+                {64, 32},
+                {64, 64},
+                {128, 64},
+                {128, 128},
+                {256, 128},
+                {256, 256},
+                {512, 512},
+                {1024, 512},
+                {1024, 1024},
+                {2048, 1024},
+                {2048, 2048}
+        };
+
         return config;
     }
     catch (const cxxopts::OptionException& e)
@@ -166,7 +181,7 @@ void ProgramOptions::getCharsFromFile(const std::string& fileName, std::set<std:
 
 Config::Color ProgramOptions::parseColor(const std::string& str)
 {
-    const std::regex e(R"(^\s*\d{1,3}\s*,\s*\d{1,3}\s*,\s*\d{1,3}\s*$)");
+    static const std::regex e(R"(^\s*\d{1,3}\s*,\s*\d{1,3}\s*,\s*\d{1,3}\s*$)");
     if (!std::regex_match(str, e))
         throw std::logic_error("invalid color");
 
@@ -181,4 +196,41 @@ Config::Color ProgramOptions::parseColor(const std::string& str)
     };
 
     return Config::Color{colorToUint8(rgbStr[0]), colorToUint8(rgbStr[1]), colorToUint8(rgbStr[2])};
+}
+
+std::vector<Config::Size> ProgramOptions::parseTextureSize(const std::string& s)
+{
+    std::vector<Config::Size> result;
+
+    try
+    {
+        for (const auto& p: string_split(s, ",", false))
+        {
+            auto ss = string_split(p, "x", false);
+            if (ss.size() != 2)
+                throw std::exception();
+
+            static const std::regex e(R"(^[1-9]\d{0,9}$)");     // only integers > 0, no more than 10 digits (enough for 4294967295 - max uint32_t)
+            if (!std::regex_match(ss[0], e))
+                throw std::exception();
+            if (!std::regex_match(ss[1], e))
+                throw std::exception();
+
+            Config::Size size;
+            size.w = std::stoul(ss[0]);
+            size.h = std::stoul(ss[1]);
+            if (size.w  > 65536 || size.h > 65536)
+                throw std::exception();
+            result.emplace_back(size);
+        }
+
+        if (result.empty())
+            throw std::exception();
+    }
+    catch (const std::exception&)
+    {
+        throw std::runtime_error("invalid texture size argument");
+    }
+
+    return result;
 }

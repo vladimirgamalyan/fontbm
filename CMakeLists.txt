@@ -23,6 +23,7 @@ set(SOURCES
         src/HelpException.h
         src/utils/extractFileName.h
         src/utils/splitStrByDelim.h
+        src/utils/splitStrByDelim.cpp
         src/utils/getNumberLen.h
         src/freeType/FtLibrary.h
         src/freeType/FtFont.h
@@ -51,6 +52,7 @@ add_executable(unit_tests
         src/external/catch.hpp
         src/catchMain.cpp
         src/ProgramOptions.cpp
+        src/utils/splitStrByDelim.cpp
         src/utils/getNumberLenTest.cpp
         src/utils/splitStrByDelimTest.cpp
         src/utils/extractFileNameTest.cpp
