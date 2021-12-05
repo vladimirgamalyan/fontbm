@@ -18,7 +18,7 @@ Download compiled version (fontbm.zip for Windows, fontbm for Linux) from [Relea
 ```
 fontbm --font-file FreeSans.ttf --output myfont
 ```
-It will produce myfont.fnt ([file format](http://www.angelcode.com/products/bmfont/doc/file_format.html)) and myfont_0.png ([how to render text](http://www.angelcode.com/products/bmfont/doc/render_text.html)).
+It will produce myfont.fnt ([file format](https://www.angelcode.com/products/bmfont/doc/file_format.html)) and myfont_0.png ([how to render text](https://www.angelcode.com/products/bmfont/doc/render_text.html)).
 
 Available options (**bold** options are required):
 
