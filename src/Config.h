@@ -15,6 +15,12 @@ struct Config
         Json
     };
 
+    enum class TextureNameSuffix {
+        IndexAligned,
+        Index,
+        None
+    };
+
     struct Color
     {
         std::uint8_t r;
@@ -67,8 +73,10 @@ struct Config
     DataFormat dataFormat = DataFormat::Text;
     bool includeKerningPairs = false;
     std::uint32_t maxTextureCount = 0;
+    bool useMaxTextuerCount = false;
     bool monochrome = false;
     bool extraInfo = false;
     bool cropTexturesWidth = false;
     bool cropTexturesHeight = false;
+    TextureNameSuffix textureNameSuffix = TextureNameSuffix::IndexAligned;
 };

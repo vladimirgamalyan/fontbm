@@ -45,7 +45,8 @@ option  | default | comment
 --spacing-horiz | 0 | spacing horizontal
 --monochrome | | disable anti-aliasing
 --extra-info | | write extra information to data file
---max-texture-count | 0 | maximum generated texture count (unlimited if zero)
+--max-texture-count | | maximum generated texture count (unlimited if not set)
+--texture-name-suffix | index_aligned | texture name suffix: "index_aligned", "index" or "none"
 
 ## Building Linux
 

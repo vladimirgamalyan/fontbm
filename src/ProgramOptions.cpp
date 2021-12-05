@@ -25,6 +25,7 @@ Config ProgramOptions::parseCommandLine(int argc, char* argv[])
         const std::string charsOptionName = "chars";
         const std::string textureSizeListOptionName = "texture-size";
         std::string dataFormat;
+        std::string textureNameSuffix;
 
         cxxopts::Options options("fontbm", "Command line bitmap font generator, compatible with bmfont");
         options.add_options()
@@ -42,14 +43,15 @@ Config ProgramOptions::parseCommandLine(int argc, char* argv[])
             ("spacing-vert", "spacing vert, default value is 0", cxxopts::value<std::uint32_t>(config.spacing.ver)->default_value("0"))
             ("spacing-horiz", "spacing horiz, default value is 0", cxxopts::value<std::uint32_t>(config.spacing.hor)->default_value("0"))
             ("output", "output files name without extension, required", cxxopts::value<std::string>(config.output))
-            ("data-format", R"(output data file format, "xml" or "txt", default "xml")", cxxopts::value<std::string>(dataFormat)->default_value("txt"))
+            ("data-format", R"(output data file format: "txt", "xml", "json", "bin", default: "txt")", cxxopts::value<std::string>(dataFormat)->default_value("txt"))
             ("include-kerning-pairs", "include kerning pairs to output file", cxxopts::value<bool>(config.includeKerningPairs))
             ("monochrome", "disable anti-aliasing", cxxopts::value<bool>(config.monochrome))
             ("extra-info", "write extra information to data file", cxxopts::value<bool>(config.extraInfo))
             (textureSizeListOptionName, "list of texture sizes (will be tried from left to right to fit glyphs)", cxxopts::value<std::string>(textureSizeList))
             ("texture-crop-width", "crop unused parts of output textures (width)", cxxopts::value<bool>(config.cropTexturesWidth))
             ("texture-crop-height", "crop unused parts of output textures (height)", cxxopts::value<bool>(config.cropTexturesHeight))
-            ("max-texture-count", "maximum generated textures", cxxopts::value<std::uint32_t>(config.maxTextureCount)->default_value("0"))
+            ("max-texture-count", "maximum generated textures", cxxopts::value<std::uint32_t>(config.maxTextureCount))
+            ("texture-name-suffix", R"(texture name suffix: "index_aligned", "index", "none", default: "index_aligned")", cxxopts::value<std::string>(textureNameSuffix)->default_value("index_aligned"))
             ;
 
         auto result = options.parse(argc, argv);
@@ -64,6 +66,8 @@ Config ProgramOptions::parseCommandLine(int argc, char* argv[])
             throw std::runtime_error("--font-file required");
         if (!result.count("output"))
             throw std::runtime_error("--output required");
+
+        config.useMaxTextuerCount = result.count("max-texture-count");
 
         if (!result.count(charsOptionName) && !result.count(charsFileOptionName))
             chars = "32-126";
@@ -88,6 +92,15 @@ Config ProgramOptions::parseCommandLine(int argc, char* argv[])
             config.dataFormat = Config::DataFormat::Json;
         else
             throw std::runtime_error("unknown --data-format value");
+
+        if (textureNameSuffix == "index_aligned")
+            config.textureNameSuffix = Config::TextureNameSuffix::IndexAligned;
+        else if (textureNameSuffix == "index")
+            config.textureNameSuffix = Config::TextureNameSuffix::Index;
+        else if (textureNameSuffix == "none")
+            config.textureNameSuffix = Config::TextureNameSuffix::None;
+        else
+            throw std::runtime_error("unknown --texture-name-suffix value");
 
         if (result.count(textureSizeListOptionName))
             config.textureSizeList = parseTextureSize(textureSizeList);

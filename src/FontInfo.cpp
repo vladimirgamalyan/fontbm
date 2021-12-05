@@ -251,6 +251,10 @@ void FontInfo::writeToTextFile(const std::string &fileName) const
 
 void FontInfo::writeToBinFile(const std::string &fileName) const
 {
+    for (size_t i = 1; i < pages.size(); ++i)
+        if (pages[0].length() != pages[i].length())
+            throw std::runtime_error("texture names have different length");
+
     std::ofstream f(fileName, std::ios::binary);
 
 #pragma pack(push, 1)

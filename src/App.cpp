@@ -188,7 +188,15 @@ std::vector<std::string> App::renderTextures(const Glyphs& glyphs, const Config&
         }
 
         std::stringstream ss;
-        ss << config.output << "_" << std::setfill ('0') << std::setw(pageNameDigits) << page << ".png";
+        ss << config.output;
+        if (config.textureNameSuffix != Config::TextureNameSuffix::None)
+        {
+            ss << "_";
+            if (config.textureNameSuffix == Config::TextureNameSuffix::IndexAligned)
+                ss << std::setfill ('0') << std::setw(pageNameDigits);
+            ss << page;
+        }
+        ss << ".png";
         const auto fileName = ss.str();
         fileNames.push_back(extractFileName(fileName));
 
@@ -201,6 +209,11 @@ std::vector<std::string> App::renderTextures(const Glyphs& glyphs, const Config&
 void App::writeFontInfoFile(const Glyphs& glyphs, const Config& config, const ft::Font& font,
         const std::vector<std::string>& fileNames, const std::vector<Config::Size>& pages)
 {
+    for (size_t i = 0; i < fileNames.size() - 1; ++i)
+        for (size_t k = i + 1; k < fileNames.size(); ++k)
+            if (fileNames[i] == fileNames[k])
+                throw std::runtime_error("textures have the same names");
+
     bool pagesHaveDifferentSize = false;
     if (pages.size() > 1)
     {
@@ -317,7 +330,7 @@ void App::execute(const int argc, char* argv[])
 
     auto glyphs = collectGlyphInfo(font, config.chars);
     const auto pages = arrangeGlyphs(glyphs, config);
-    if (config.maxTextureCount != 0 && pages.size() > config.maxTextureCount)
+    if (config.useMaxTextuerCount && pages.size() > config.maxTextureCount)
         throw std::runtime_error("too many generated textures (more than --max-texture-count)");
 
     const auto fileNames = renderTextures(glyphs, config, font, pages);
