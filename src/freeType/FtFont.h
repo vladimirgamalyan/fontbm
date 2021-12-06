@@ -125,10 +125,7 @@ public:
     GlyphMetrics renderGlyph(std::uint32_t* buffer, std::uint32_t surfaceW, std::uint32_t surfaceH, int x, int y,
             std::uint32_t ch, std::uint32_t color) const
     {
-        FT_Int32 loadFlags = FT_LOAD_RENDER | FT_LOAD_FORCE_AUTOHINT;
-        if (monochrome_)
-            loadFlags |= FT_LOAD_MONOCHROME;
-
+        const auto loadFlags = getLoadFlags();
         const auto error = FT_Load_Char(face, ch, loadFlags);
         if (error)
             throw std::runtime_error("Load glyph error");
@@ -177,7 +174,7 @@ public:
 
     int isGlyphProvided(FT_ULong ch) const
     {
-        return FT_Get_Char_Index(face, ch);
+        return FT_Get_Char_Index(face, ch) && !FT_Load_Char(face, ch, getLoadFlags());
     }
 
     int getKerning(const std::uint32_t left, const std::uint32_t right) const
@@ -299,6 +296,15 @@ public:
     /* Extra width in glyph bounds for text styles */
     int glyph_overhang;
     float glyph_italics;
+
+private:
+    FT_Int32 getLoadFlags() const
+    {
+        FT_Int32 loadFlags = FT_LOAD_RENDER | FT_LOAD_FORCE_AUTOHINT;
+        if (monochrome_)
+            loadFlags |= FT_LOAD_MONOCHROME;
+        return loadFlags;
+    }
 };
 
 }
