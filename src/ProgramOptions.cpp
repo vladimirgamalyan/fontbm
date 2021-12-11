@@ -50,6 +50,7 @@ Config ProgramOptions::parseCommandLine(int argc, char* argv[])
             (textureSizeListOptionName, "list of texture sizes (will be tried from left to right to fit glyphs)", cxxopts::value<std::string>(textureSizeList))
             ("texture-crop-width", "crop unused parts of output textures (width)", cxxopts::value<bool>(config.cropTexturesWidth))
             ("texture-crop-height", "crop unused parts of output textures (height)", cxxopts::value<bool>(config.cropTexturesHeight))
+            ("verbose", "verbose output", cxxopts::value<bool>(config.verbose))
             ("max-texture-count", "maximum generated textures", cxxopts::value<std::uint32_t>(config.maxTextureCount))
             ("texture-name-suffix", R"(texture name suffix: "index_aligned", "index", "none", default: "index_aligned")", cxxopts::value<std::string>(textureNameSuffix)->default_value("index_aligned"))
             ;

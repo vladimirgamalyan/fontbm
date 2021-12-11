@@ -326,6 +326,9 @@ void App::execute(const int argc, char* argv[])
     const auto config = ProgramOptions::parseCommandLine(argc, argv);
 
     ft::Library library;
+    if (config.verbose)
+        std::cout << "freetype " << library.getVersionString() << "\n";
+
     ft::Font font(library, config.fontFile, config.fontSize, 0, config.monochrome);
 
     auto glyphs = collectGlyphInfo(font, config.chars);

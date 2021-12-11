@@ -1,5 +1,6 @@
 #include "FtLibrary.h"
 #include "FtException.h"
+#include "../utils/StringMaker.h"
 
 namespace ft {
 
@@ -27,6 +28,18 @@ Library::~Library()
             library = nullptr;
         }
     }
+}
+
+std::string Library::getVersionString() const
+{
+    if (!library)
+        return "";
+
+    FT_Int major;
+    FT_Int minor;
+    FT_Int patch;
+    FT_Library_Version(library, &major, &minor, &patch);
+    return StringMaker() << major << "." << minor << "." << patch;
 }
 
 }

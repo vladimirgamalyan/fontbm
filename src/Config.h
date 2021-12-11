@@ -78,5 +78,6 @@ struct Config
     bool extraInfo = false;
     bool cropTexturesWidth = false;
     bool cropTexturesHeight = false;
+    bool verbose = false;
     TextureNameSuffix textureNameSuffix = TextureNameSuffix::IndexAligned;
 };

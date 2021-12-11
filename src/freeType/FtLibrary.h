@@ -1,5 +1,6 @@
 #pragma once
 #include "FtInclude.h"
+#include <string>
 
 namespace ft {
 
@@ -15,6 +16,8 @@ public:
     Library(Library&&) = delete;
     Library& operator = (const Library&) = delete;
     Library& operator=(Library&&) = delete;
+
+    std::string getVersionString() const;
 
 private:
     static int initialized;
