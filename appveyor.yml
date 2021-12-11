@@ -12,7 +12,7 @@ platform:
   - Win32
   
 install:
-  - vcpkg install freetype:x64-windows-2019-142
+  - vcpkg install freetype
   
 before_build:
   - cmake -G "Visual Studio 16 2019" -DCMAKE_TOOLCHAIN_FILE=c:/tools/vcpkg/scripts/buildsystems/vcpkg.cmake
