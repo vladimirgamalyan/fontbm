@@ -1,5 +1,9 @@
 os:
   - Visual Studio 2019
+  
+environment:
+  VCPKG_VISUAL_STUDIO_PATH: "C:\\Program Files (x86)\\Microsoft Visual Studio\\2019\\Community"
+  VCPKG_PLATFORM_TOOLSET: v142
 
 configuration:
   - Release
@@ -8,7 +12,7 @@ platform:
   - Win32
   
 install:
-  - vcpkg install freetype
+  - vcpkg install freetype:x64-windows-2019-142
   
 before_build:
   - cmake -G "Visual Studio 16 2019" -DCMAKE_TOOLCHAIN_FILE=c:/tools/vcpkg/scripts/buildsystems/vcpkg.cmake
