@@ -1,5 +1,5 @@
 os:
-  - Visual Studio 2017
+  - Visual Studio 2019
 
 configuration:
   - Release
@@ -11,7 +11,7 @@ install:
   - vcpkg install freetype
   
 before_build:
-  - cmake -G "Visual Studio 15 2017" -DCMAKE_TOOLCHAIN_FILE=c:/tools/vcpkg/scripts/buildsystems/vcpkg.cmake
+  - cmake -G "Visual Studio 16 2019" -DCMAKE_TOOLCHAIN_FILE=c:/tools/vcpkg/scripts/buildsystems/vcpkg.cmake
 
 build:
   project: fontbm.sln
