@@ -24,6 +24,7 @@ set(SOURCES
         src/utils/extractFileName.h
         src/utils/splitStrByDelim.h
         src/utils/splitStrByDelim.cpp
+        src/utils/StringMaker.h
         src/utils/getNumberLen.h
         src/freeType/FtLibrary.h
         src/freeType/FtFont.h
@@ -56,6 +57,7 @@ add_executable(unit_tests
         src/utils/getNumberLenTest.cpp
         src/utils/splitStrByDelimTest.cpp
         src/utils/extractFileNameTest.cpp
+        src/utils/StringMaker.h
         src/ProgramOptionsTest.cpp
         )
 target_link_libraries(unit_tests ${COMMON_LIBRARIES})

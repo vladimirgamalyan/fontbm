@@ -3,6 +3,7 @@
 #include <cmath>
 #include "FtInclude.h"
 #include "FtException.h"
+#include "../utils/StringMaker.h"
 
 /* Handy routines for converting from fixed point */
 #define FT_FLOOR(X) (((X) & -64) / 64)
@@ -129,9 +130,10 @@ public:
         if (monochrome_)
             loadFlags |= FT_LOAD_MONOCHROME;
 
-        const auto error = FT_Load_Char(face, ch, loadFlags);
+        const int error = FT_Load_Char(face, ch, loadFlags);
         if (error)
-            throw std::runtime_error("Load glyph error");
+            throw std::runtime_error(StringMaker() << "Error Load glyph " << ch << " " << error);
+
 
         auto slot = face->glyph;
         const auto metrics = &slot->metrics;
@@ -144,6 +146,7 @@ public:
         glyphMetrics.horiAdvance = FT_CEIL(metrics->horiAdvance);
         glyphMetrics.lsbDelta = slot->lsb_delta;
         glyphMetrics.rsbDelta = slot->rsb_delta;
+
 
         if (buffer)
         {
