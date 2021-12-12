@@ -8,6 +8,15 @@ jobs:
     runs-on: ubuntu-latest
     
     steps:
+    - name: freetype install
+      run: |
+        wget https://download.savannah.gnu.org/releases/freetype/freetype-2.11.1.tar.gz
+        tar xvfz freetype-2.11.1.tar.gz
+        cd freetype-2.11.1
+        ./configure --prefix=/usr/local --enable-freetype-config
+        make
+        sudo make install
+
     - uses: actions/checkout@v2
 
     - name: cmake
