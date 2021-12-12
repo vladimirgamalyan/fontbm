@@ -15,7 +15,8 @@ install:
   - vcpkg install freetype
   - cd c:/tools/vcpkg
   - vcpkg integrate install
-  
+  - cd %APPVEYOR_BUILD_FOLDER%  
+
 before_build:
   - cmake -G "Visual Studio 16 2019" -DCMAKE_TOOLCHAIN_FILE=c:/tools/vcpkg/scripts/buildsystems/vcpkg.cmake
 
