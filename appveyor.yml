@@ -1,9 +1,5 @@
 os:
-  - Visual Studio 2019
-  
-environment:
-  VCPKG_VISUAL_STUDIO_PATH: "C:\\Program Files (x86)\\Microsoft Visual Studio\\2019\\Community"
-  VCPKG_PLATFORM_TOOLSET: v142
+  - Visual Studio 2017
 
 configuration:
   - Release
@@ -15,10 +11,12 @@ install:
   - vcpkg install freetype
   - cd c:/tools/vcpkg
   - vcpkg integrate install
-  - cd %APPVEYOR_BUILD_FOLDER%  
+  - cd %APPVEYOR_BUILD_FOLDER%
+
+cache: c:\tools\vcpkg\installed\
 
 before_build:
-  - cmake -G "Visual Studio 16 2019" -DCMAKE_TOOLCHAIN_FILE=c:/tools/vcpkg/scripts/buildsystems/vcpkg.cmake
+  - cmake -G "Visual Studio 15 2017" -DCMAKE_TOOLCHAIN_FILE=c:/tools/vcpkg/scripts/buildsystems/vcpkg.cmake
 
 build:
   project: fontbm.sln
