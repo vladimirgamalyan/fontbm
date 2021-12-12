@@ -209,10 +209,11 @@ std::vector<std::string> App::renderTextures(const Glyphs& glyphs, const Config&
 void App::writeFontInfoFile(const Glyphs& glyphs, const Config& config, const ft::Font& font,
         const std::vector<std::string>& fileNames, const std::vector<Config::Size>& pages)
 {
-    for (size_t i = 0; i < fileNames.size() - 1; ++i)
-        for (size_t k = i + 1; k < fileNames.size(); ++k)
-            if (fileNames[i] == fileNames[k])
-                throw std::runtime_error("textures have the same names");
+    if (!fileNames.empty())
+        for (size_t i = 0; i < fileNames.size() - 1; ++i)
+            for (size_t k = i + 1; k < fileNames.size(); ++k)
+                if (fileNames[i] == fileNames[k])
+                    throw std::runtime_error("textures have the same names");
 
     bool pagesHaveDifferentSize = false;
     if (pages.size() > 1)
@@ -246,7 +247,7 @@ void App::writeFontInfoFile(const Glyphs& glyphs, const Config& config, const ft
 
     f.common.lineHeight = static_cast<std::uint16_t>(font.height);
     f.common.base = static_cast<std::uint16_t>(font.yMax);
-    if (!pagesHaveDifferentSize)
+    if (!pagesHaveDifferentSize && !pages.empty())
     {
         f.common.scaleW = static_cast<std::uint16_t>(pages.front().w);
         f.common.scaleH = static_cast<std::uint16_t>(pages.front().h);
