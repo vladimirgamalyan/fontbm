@@ -12,7 +12,7 @@ platform:
   - Win32
   
 install:
-  - cmd: rmdir /s C:\MinGW
+  - cmd: rmdir /Q /S C:\MinGW
   - vcpkg install freetype
   
 before_build:
