@@ -8,15 +8,15 @@ platform:
   - Win32
   
 install:
+  - cd C:\Tools\vcpkg
+  - git pull
   - vcpkg install freetype
-  - cd c:/tools/vcpkg
+  - .\bootstrap-vcpkg.bat  
   - vcpkg integrate install
   - cd %APPVEYOR_BUILD_FOLDER%
 
-cache: c:\tools\vcpkg\installed\
-
 before_build:
-  - cmake -G "Visual Studio 15 2017" -DCMAKE_TOOLCHAIN_FILE=c:/tools/vcpkg/scripts/buildsystems/vcpkg.cmake
+  - cmake -G "Visual Studio 15 2017" -DCMAKE_TOOLCHAIN_FILE=C:/Tools/vcpkg/scripts/buildsystems/vcpkg.cmake
 
 build:
   project: fontbm.sln
