@@ -16,7 +16,7 @@ Config ProgramOptions::parseCommandLine(int argc, char* argv[])
     {
         Config config;
         std::string chars;
-        std::string charsFile;
+        std::vector<std::string> charsFile;
         std::string color;
         std::string textureSizeList;
         std::string backgroundColor;
@@ -32,7 +32,7 @@ Config ProgramOptions::parseCommandLine(int argc, char* argv[])
             ("help", "produce help message")
             ("font-file", "path to ttf file, required", cxxopts::value<std::string>(config.fontFile))
             (charsOptionName, "required characters, for example: 32-64,92,120-126\ndefault value is 32-126 if 'chars-file' option is not defined", cxxopts::value<std::string>(chars))
-            (charsFileOptionName, "optional path to UTF-8 text file with required characters (will be combined with 'chars' option)", cxxopts::value<std::string>(charsFile))
+            (charsFileOptionName, "optional path to UTF-8 text file with required characters (will be combined with 'chars' option)", cxxopts::value<std::vector<std::string>>(charsFile))
             ("color", "foreground RGB color, for example: 32,255,255, default value is 255,255,255", cxxopts::value<std::string>(color)->default_value("255,255,255"))
             (backgroundColorOptionName, "background color RGB color, for example: 0,0,128, transparent by default", cxxopts::value<std::string>(backgroundColor))
             ("font-size", "font size, default value is 32", cxxopts::value<std::uint16_t>(config.fontSize)->default_value("32"))
@@ -74,7 +74,8 @@ Config ProgramOptions::parseCommandLine(int argc, char* argv[])
             chars = "32-126";
         config.chars = parseCharsString(chars);
         if (result.count(charsFileOptionName))
-            getCharsFromFile(charsFile, config.chars);
+            for (const auto& f : charsFile)
+                getCharsFromFile(f, config.chars);
 
         config.color = parseColor(color);
         config.backgroundTransparent = result.count(backgroundColorOptionName) == 0;
