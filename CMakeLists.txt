@@ -1,7 +1,7 @@
 cmake_minimum_required(VERSION 3.0)
 project(fontbm)
 
-find_package(Freetype REQUIRED)
+find_package(freetype REQUIRED)
 include_directories(${FREETYPE_INCLUDE_DIRS})
 
 if(NOT MSVC)
