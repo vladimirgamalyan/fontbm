@@ -12,8 +12,9 @@ platform:
   - Win32
   
 install:
-  - cmd: rmdir /Q /S C:\MinGW
   - vcpkg install freetype
+  - cd c:/tools/vcpkg
+  - vcpkg integrate install
   
 before_build:
   - cmake -G "Visual Studio 16 2019" -DCMAKE_TOOLCHAIN_FILE=c:/tools/vcpkg/scripts/buildsystems/vcpkg.cmake
