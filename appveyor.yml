@@ -10,9 +10,9 @@ platform:
 install:
   - cd C:\Tools\vcpkg
   - git pull
-  - vcpkg install freetype
-  - .\bootstrap-vcpkg.bat  
+  - .\bootstrap-vcpkg.bat
   - vcpkg integrate install
+  - vcpkg install freetype  
   - cd %APPVEYOR_BUILD_FOLDER%
 
 before_build:
