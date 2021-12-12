@@ -34,7 +34,7 @@ option  | default | comment
 --texture-crop-height | | crop unused parts of output textures (height)
 --color | 255,255,255 | foreground RGB color, for example: 32,255,255 (without spaces)
 --background-color | | background RGB color, for example: 0,0,128 (without spaces), transparent by default
---chars-file | | optional path to UTF-8 text file with additional required characters (will be combined with 'chars' option).
+--chars-file | | optional path to UTF-8 text file with additional required characters (will be combined with 'chars' option), can be set multiply times
 --data-format | txt | output data file format: txt, xml, bin, [json](https://github.com/Jam3/load-bmfont/blob/master/json-spec.md)
 --include-kerning-pairs | | include kerning pairs to output file
 --padding-up | 0 | padding up
