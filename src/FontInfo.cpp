@@ -251,6 +251,9 @@ void FontInfo::writeToTextFile(const std::string &fileName) const
 
 void FontInfo::writeToBinFile(const std::string &fileName) const
 {
+    if (extraInfo)
+        throw std::runtime_error("--extra-info flag is not compatible with binary format");
+
     for (size_t i = 1; i < pages.size(); ++i)
         if (pages[0].length() != pages[i].length())
             throw std::runtime_error("texture names have different length (incompatible with bin format)");
