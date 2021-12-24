@@ -72,7 +72,12 @@ public:
             const auto scale = face->size->metrics.y_scale;
             yMin = FT_FLOOR(FT_MulFix(face->bbox.yMin, scale));
             yMax  = FT_CEIL(FT_MulFix(face->bbox.yMax, scale));
-            height  = FT_CEIL(FT_MulFix(face->height, scale));
+            // height  = FT_CEIL(FT_MulFix(face->height, scale));
+            height =  std::lround(static_cast<float>(face->size->metrics.height) / static_cast<float>(1 << 6));
+            //height =  std::lround(FT_MulFix(face->height, scale) / static_cast<float>(1 << 6));
+            ascent = FT_CEIL(FT_MulFix(face->ascender, scale));
+            //ascent = std::lround(FT_MulFix(face->ascender, scale) / static_cast<float>(1 << 6));
+            descent = FT_FLOOR(FT_MulFix(face->descender, scale));
         }
         else
         {
@@ -96,6 +101,10 @@ public:
             yMin = 0;
             yMax = face->available_sizes[ptsize].height;
             height = face->available_sizes[ptsize].height;
+
+            //TODO: correct values
+            ascent = 0;
+            descent = 0;
         }
 
         /* Initialize the font face style */
@@ -116,6 +125,8 @@ public:
         glyph_italics *= height;
 
         totalHeight = yMax - yMin;
+
+
     }
 
     ~Font()
@@ -233,7 +244,14 @@ public:
         std::cout << "face->bbox.yMin " << FT_FLOOR(FT_MulFix(face->bbox.yMin, scale)) << "\n";
         std::cout << "face->ascender " << FT_CEIL(FT_MulFix(face->ascender, scale)) << "\n";
         std::cout << "face->descender " << FT_FLOOR(FT_MulFix(face->descender, scale)) << "\n";
-        std::cout << "face->height " << FT_CEIL(FT_MulFix(face->height, scale)) << "\n";
+        std::cout << "face->height " << FT_CEIL(FT_MulFix(face->height, scale)) << "\n";        // distance between lines
+        std::cout << "face->height f " << static_cast<float>(FT_MulFix(face->height, scale)) / static_cast<float>(1 << 6) << "\n";
+        std::cout << "face->size->metrics.height " << FT_CEIL(face->size->metrics.height) << "\n";
+
+        std::cout << "metrics.height " << static_cast<float>(face->size->metrics.height) / static_cast<float>(1 << 6) << "\n"; // as in SFML getLineSpacing
+        std::cout << "metrics.ascender " << static_cast<float>(face->size->metrics.ascender) / static_cast<float>(1 << 6) << "\n";
+        std::cout << "metrics.descender " << static_cast<float>(face->size->metrics.descender) / static_cast<float>(1 << 6) << "\n";
+        std::cout << "a " << static_cast<float>(FT_MulFix(face->ascender, scale)) / static_cast<float>(1 << 6) << "\n";
 
         FT_UInt gindex;
         FT_ULong charcode = FT_Get_First_Char(face, &gindex);
@@ -285,6 +303,8 @@ public:
     int height;
     int yMax;
     int yMin;
+    int ascent;
+    int descent;
     int totalHeight = 0;
 
     /* For non-scalable formats, we must remember which font index size */

@@ -36,7 +36,7 @@ App::Glyphs App::collectGlyphInfo(const ft::Font& font, const std::set<std::uint
             glyphInfo.height = glyphMetrics.height;
             glyphInfo.xAdvance = glyphMetrics.horiAdvance;
             glyphInfo.xOffset = glyphMetrics.horiBearingX;
-            glyphInfo.yOffset = font.yMax - glyphMetrics.horiBearingY;
+            glyphInfo.yOffset = font.ascent - glyphMetrics.horiBearingY;
             result[id] = glyphInfo;
         }
         else
@@ -246,7 +246,7 @@ void App::writeFontInfoFile(const Glyphs& glyphs, const Config& config, const ft
     f.info.spacing.vertical = static_cast<std::uint8_t>(config.spacing.ver);
 
     f.common.lineHeight = static_cast<std::uint16_t>(font.height);
-    f.common.base = static_cast<std::uint16_t>(font.yMax);
+    f.common.base = static_cast<std::uint16_t>(font.ascent);
     if (!pagesHaveDifferentSize && !pages.empty())
     {
         f.common.scaleW = static_cast<std::uint16_t>(pages.front().w);
