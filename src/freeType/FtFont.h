@@ -210,12 +210,12 @@ public:
 
         // X advance is already in pixels for bitmap fonts
         if (!FT_IS_SCALABLE(face))
-            return static_cast<float>(kerning.x);
+            return static_cast<int>(kerning.x);
 
-        float firstRsbDelta = renderGlyph(nullptr, 0, 0, 0, 0, left, 0).rsbDelta;
-        float secondLsbDelta = renderGlyph(nullptr, 0, 0, 0, 0, right, 0).lsbDelta;
+        float firstRsbDelta = static_cast<float>(renderGlyph(nullptr, 0, 0, 0, 0, left, 0).rsbDelta);
+        float secondLsbDelta = static_cast<float>(renderGlyph(nullptr, 0, 0, 0, 0, right, 0).lsbDelta);
 
-        return std::floor((secondLsbDelta - firstRsbDelta + static_cast<float>(kerning.x) + 32) / static_cast<float>(1 << 6));
+        return static_cast <int> (std::floor((secondLsbDelta - firstRsbDelta + static_cast<float>(kerning.x) + 32) / static_cast<float>(1 << 6)));
     }
 
     void debugInfo() const
