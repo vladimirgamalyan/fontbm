@@ -67,7 +67,23 @@ std::vector<Config::Size> App::arrangeGlyphs(Glyphs& glyphs, const Config& confi
         auto glyphRectanglesCopy = glyphRectangles;
         Config::Size lastSize;
 
-        for (const auto& ss: config.textureSizeList) {
+        uint64_t allGlyphSquare = 0;
+        for (const auto& i : glyphRectangles)
+            allGlyphSquare += i.width * i.height;
+        //std::cout << "allGlyphSquare: " << allGlyphSquare << "\n";
+
+        //int tryCount = 0;
+        for (size_t i = 0; i < config.textureSizeList.size(); ++i)
+        {
+            const auto& ss = config.textureSizeList[i];
+            uint64_t textureSquare = ss.w * ss.h;
+            if (textureSquare < allGlyphSquare && i + 1 < config.textureSizeList.size())
+                continue;
+
+            //std::cout << "size: " << ss.w << " " << ss.h << ", allGlyphSquare: " << textureSquare << "\n";
+
+            //++tryCount;
+
             lastSize = ss;
             glyphRectangles = glyphRectanglesCopy;
 
@@ -81,6 +97,8 @@ std::vector<Config::Size> App::arrangeGlyphs(Glyphs& glyphs, const Config& confi
             if (glyphRectangles.empty())
                 break;
         }
+
+        //std::cout << "tryCount: " << tryCount << "\n";
 
         if (arrangedRectangles.empty())
         {
