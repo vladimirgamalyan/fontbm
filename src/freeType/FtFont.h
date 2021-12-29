@@ -98,12 +98,10 @@ public:
              * non-scalable fonts must be determined differently
              * or sometimes cannot be determined.
              * */
-            yMin = 0;
-            yMax = face->available_sizes[ptsize].height;
             height = face->available_sizes[ptsize].height;
-
-            //TODO: correct values
-            ascent = 0;
+            yMax = height;
+            yMin = 0;
+            ascent = height;
             descent = 0;
         }
 

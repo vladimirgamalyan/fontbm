@@ -40,3 +40,4 @@
 /tests/tmp
 /tests/venv
 /tests/.idea
+/RelWithDebInfo
