@@ -69,14 +69,14 @@ std::vector<Config::Size> App::arrangeGlyphs(Glyphs& glyphs, const Config& confi
 
         uint64_t allGlyphSquare = 0;
         for (const auto& i : glyphRectangles)
-            allGlyphSquare += i.width * i.height;
+            allGlyphSquare += static_cast<uint64_t>(i.width) * i.height;
         //std::cout << "allGlyphSquare: " << allGlyphSquare << "\n";
 
         //int tryCount = 0;
         for (size_t i = 0; i < config.textureSizeList.size(); ++i)
         {
             const auto& ss = config.textureSizeList[i];
-            uint64_t textureSquare = ss.w * ss.h;
+            uint64_t textureSquare = static_cast<uint64_t>(ss.w) * ss.h;
             if (textureSquare < allGlyphSquare && i + 1 < config.textureSizeList.size())
                 continue;
 
