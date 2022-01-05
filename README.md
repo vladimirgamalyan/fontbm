@@ -101,6 +101,10 @@ make
 * [cherniid](https://github.com/cherniid)
 * [Radfordhound](https://github.com/Radfordhound)
 
+## Special thanks
+
+* [phoddie](https://github.com/phoddie)
+
 ## License
 
 [MIT License](http://opensource.org/licenses/MIT)
