@@ -536,7 +536,7 @@ void FontInfo::writeToCborFile(const std::string &fileName) const
         encoder.write_string(s);
 
     // characters
-    encoder.write_array(chars.size());
+    encoder.write_array(chars.size() * 10u);
     for (auto c: chars)
     {
         encoder.write_uint(c.id);
@@ -544,7 +544,6 @@ void FontInfo::writeToCborFile(const std::string &fileName) const
         encoder.write_uint(c.y);
         encoder.write_uint(c.width);
         encoder.write_uint(c.height);
-
         encoder.write_int(c.xoffset);
         encoder.write_int(c.yoffset);
         encoder.write_int(c.xadvance);
@@ -553,7 +552,7 @@ void FontInfo::writeToCborFile(const std::string &fileName) const
     }
 
     // kernings
-    encoder.write_array(kernings.size());
+    encoder.write_array(kernings.size() * 3u);
     for (auto k: kernings)
     {
         encoder.write_uint(k.first);
