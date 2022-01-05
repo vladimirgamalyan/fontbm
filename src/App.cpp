@@ -300,7 +300,7 @@ void App::writeFontInfoFile(const Glyphs& glyphs, const Config& config, const ft
         f.chars.push_back(c);
     }
 
-    if (config.includeKerningPairs)
+    if (config.kerningPairs != Config::KerningPairs::Disabled)
     {
         auto chars(config.chars);
 
@@ -308,7 +308,7 @@ void App::writeFontInfoFile(const Glyphs& glyphs, const Config& config, const ft
         {
             for (const auto& ch1 : chars)
             {
-                const auto k = static_cast<std::int16_t>(font.getKerning(ch0, ch1));
+                const auto k = static_cast<std::int16_t>(font.getKerning(ch0, ch1, config.kerningPairs == Config::KerningPairs::Extended));
                 if (k)
                 {
                     FontInfo::Kerning kerning;

@@ -15,6 +15,12 @@ struct Config
         Json
     };
 
+    enum class KerningPairs {
+        Disabled,
+        Regular,
+        Extended
+    };
+
     enum class TextureNameSuffix {
         IndexAligned,
         Index,
@@ -71,7 +77,7 @@ struct Config
     std::vector<Size> textureSizeList;
     std::string output;
     DataFormat dataFormat = DataFormat::Text;
-    bool includeKerningPairs = false;
+    KerningPairs kerningPairs = KerningPairs::Disabled;
     std::uint32_t maxTextureCount = 0;
     bool useMaxTextuerCount = false;
     bool monochrome = false;

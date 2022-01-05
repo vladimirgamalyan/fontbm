@@ -192,28 +192,29 @@ public:
         return FT_Get_Char_Index(face, ch);
     }
 
-    int getKerning(const std::uint32_t left, const std::uint32_t right) const
+    int getKerning(const std::uint32_t left, const std::uint32_t right, bool extended) const
     {
-        if (!FT_HAS_KERNING(face))
-            return 0;
-
-        FT_Vector kerning;
-
         const auto indexLeft = FT_Get_Char_Index(face, left);
         const auto indexRight = FT_Get_Char_Index(face, right);
 
-        const auto error = FT_Get_Kerning(face, indexLeft, indexRight, FT_KERNING_UNFITTED, &kerning);
-        if (error)
-            throw std::runtime_error("Couldn't find glyphs kerning");
+        FT_Vector k;
+        k.x = 0;
+        if (FT_HAS_KERNING(face))
+        {
+            const FT_UInt kernMode = extended ? FT_KERNING_UNFITTED : FT_KERNING_DEFAULT;
+            const auto error = FT_Get_Kerning(face, indexLeft, indexRight, kernMode, &k);
+            if (error)
+                throw std::runtime_error("Couldn't find glyphs kerning");
+        }
 
         // X advance is already in pixels for bitmap fonts
         if (!FT_IS_SCALABLE(face))
-            return static_cast<int>(kerning.x);
+            return static_cast<int>(k.x);
 
-        float firstRsbDelta = static_cast<float>(renderGlyph(nullptr, 0, 0, 0, 0, left, 0).rsbDelta);
-        float secondLsbDelta = static_cast<float>(renderGlyph(nullptr, 0, 0, 0, 0, right, 0).lsbDelta);
+        const std::int32_t firstRsbDelta = extended ? renderGlyph(nullptr, 0, 0, 0, 0, left, 0).rsbDelta : 0;
+        const std::int32_t secondLsbDelta = extended ? renderGlyph(nullptr, 0, 0, 0, 0, right, 0).lsbDelta : 0;
 
-        return static_cast <int> (std::floor((secondLsbDelta - firstRsbDelta + static_cast<float>(kerning.x) + 32) / static_cast<float>(1 << 6)));
+        return static_cast<int>(std::floor(static_cast<float>(secondLsbDelta - firstRsbDelta + k.x + 32) / 64.f));
     }
 
     void debugInfo() const

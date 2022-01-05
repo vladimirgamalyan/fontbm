@@ -36,7 +36,7 @@ option  | default | comment
 --background-color | | background RGB color, for example: 0,0,128 (without spaces), transparent by default
 --chars-file | | optional path to UTF-8 text file with additional required characters (will be combined with 'chars' option), can be set multiple times
 --data-format | txt | output data file format: txt, xml, bin, [json](https://github.com/Jam3/load-bmfont/blob/master/json-spec.md)
---include-kerning-pairs | | include kerning pairs to output file
+--kerning-pairs | disabled | generate kerning pairs: disabled, regular, extended (bigger output size, but more precise)
 --padding-up | 0 | padding up
 --padding-right | 0 | padding right
 --padding-down | 0 | padding down

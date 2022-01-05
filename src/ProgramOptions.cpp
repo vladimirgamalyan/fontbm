@@ -25,6 +25,7 @@ Config ProgramOptions::parseCommandLine(int argc, char* argv[])
         const std::string charsOptionName = "chars";
         const std::string textureSizeListOptionName = "texture-size";
         std::string dataFormat;
+        std::string kerningPairs;
         std::string textureNameSuffix;
 
         cxxopts::Options options("fontbm", "Command line bitmap font generator, compatible with bmfont");
@@ -44,7 +45,7 @@ Config ProgramOptions::parseCommandLine(int argc, char* argv[])
             ("spacing-horiz", "spacing horiz, default value is 0", cxxopts::value<std::uint32_t>(config.spacing.hor)->default_value("0"))
             ("output", "output files name without extension, required", cxxopts::value<std::string>(config.output))
             ("data-format", R"(output data file format: "txt", "xml", "json", "bin", default: "txt")", cxxopts::value<std::string>(dataFormat)->default_value("txt"))
-            ("include-kerning-pairs", "include kerning pairs to output file", cxxopts::value<bool>(config.includeKerningPairs))
+            ("kerning-pairs", R"("generate kerning pairs: "disabled", "regular", "extended" (bigger output size, but more precise), default: "disabled")", cxxopts::value<std::string>(kerningPairs)->default_value("disabled"))
             ("monochrome", "disable anti-aliasing", cxxopts::value<bool>(config.monochrome))
             ("extra-info", "write extra information to data file", cxxopts::value<bool>(config.extraInfo))
             (textureSizeListOptionName, "list of texture sizes (will be tried from left to right to fit glyphs)", cxxopts::value<std::string>(textureSizeList))
@@ -94,6 +95,16 @@ Config ProgramOptions::parseCommandLine(int argc, char* argv[])
             config.dataFormat = Config::DataFormat::Json;
         else
             throw std::runtime_error("unknown --data-format value");
+
+        std::transform(kerningPairs.begin(), kerningPairs.end(), kerningPairs.begin(), tolower);
+        if (kerningPairs == "disabled")
+            config.kerningPairs = Config::KerningPairs::Disabled;
+        else if (kerningPairs == "regular")
+            config.kerningPairs = Config::KerningPairs::Regular;
+        else if (kerningPairs == "extended")
+            config.kerningPairs = Config::KerningPairs::Extended;
+        else
+            throw std::runtime_error("unknown --kerning-pairs value");
 
         if (textureNameSuffix == "index_aligned")
             config.textureNameSuffix = Config::TextureNameSuffix::IndexAligned;
