@@ -492,6 +492,9 @@ void FontInfo::writeToJsonFile(const std::string &fileName) const
 
 void FontInfo::writeToCborFile(const std::string &fileName) const
 {
+    if (extraInfo)
+        throw std::runtime_error("--extra-info flag is not compatible with cbor format");
+
     std::ofstream f(fileName, std::fstream::binary);
     f.exceptions(std::fstream::failbit | std::fstream::badbit);
     cbor_encoder_ostream encoder(f);
