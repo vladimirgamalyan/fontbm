@@ -35,7 +35,7 @@ option  | default | comment
 --color | 255,255,255 | foreground RGB color, for example: 32,255,255 (without spaces)
 --background-color | | background RGB color, for example: 0,0,128 (without spaces), transparent by default
 --chars-file | | optional path to UTF-8 text file with additional required characters (will be combined with 'chars' option), can be set multiple times
---data-format | txt | output data file format: txt, xml, bin, [json](https://github.com/Jam3/load-bmfont/blob/master/json-spec.md)
+--data-format | txt | output data file format: txt, xml, bin, [json](https://github.com/Jam3/load-bmfont/blob/master/json-spec.md), [cbor](http://cbor.io/)
 --kerning-pairs | disabled | generate kerning pairs: disabled, regular, extended (bigger output size, but more precise)
 --padding-up | 0 | padding up
 --padding-right | 0 | padding right
