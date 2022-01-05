@@ -5,6 +5,7 @@
 #include "FontInfo.h"
 #include "external/tinyxml2/tinyxml2.h"
 #include "external/json.hpp"
+#include "external/cbor/cbor_encoder_ostream.h"
 
 std::string FontInfo::getCharSetName(std::uint8_t charSet)
 {
@@ -487,4 +488,78 @@ void FontInfo::writeToJsonFile(const std::string &fileName) const
 
     std::ofstream f(fileName);
     f << j.dump(4);
+}
+
+void FontInfo::writeToCborFile(const std::string &fileName) const
+{
+    std::ofstream f(fileName, std::fstream::binary);
+    f.exceptions(std::fstream::failbit | std::fstream::badbit);
+    cbor_encoder_ostream encoder(f);
+
+    encoder.write_indefinite_array();
+    encoder.write_string("BMF");
+    encoder.write_uint(3);
+    encoder.write_uint(1);
+
+    // info
+    encoder.write_int(info.size);
+    encoder.write_bool(info.smooth);
+    encoder.write_bool(info.unicode);
+    encoder.write_bool(info.italic);
+    encoder.write_bool(info.bold);
+    encoder.write_uint(info.unicode ? 0 : info.charset);
+    encoder.write_uint(info.stretchH);
+    encoder.write_int(info.aa);
+    encoder.write_uint(info.padding.up);
+    encoder.write_uint(info.padding.right);
+    encoder.write_uint(info.padding.down);
+    encoder.write_uint(info.padding.left);
+    encoder.write_uint(info.spacing.horizontal);
+    encoder.write_uint(info.spacing.vertical);
+    encoder.write_uint(info.outline);
+
+    // common
+    encoder.write_uint(common.lineHeight);
+    encoder.write_uint(common.base);
+    encoder.write_uint(common.scaleW);
+    encoder.write_uint(common.scaleH);
+    encoder.write_uint(static_cast<std::uint16_t>(pages.size()));
+    encoder.write_bool(common.packed);
+    encoder.write_uint(common.alphaChnl);
+    encoder.write_uint(common.redChnl);
+    encoder.write_uint(common.greenChnl);
+    encoder.write_uint(common.blueChnl);
+
+    // pages
+    encoder.write_array(pages.size());
+    for (const auto& s: pages)
+        encoder.write_string(s);
+
+    // characters
+    encoder.write_array(chars.size());
+    for (auto c: chars)
+    {
+        encoder.write_uint(c.id);
+        encoder.write_uint(c.x);
+        encoder.write_uint(c.y);
+        encoder.write_uint(c.width);
+        encoder.write_uint(c.height);
+
+        encoder.write_int(c.xoffset);
+        encoder.write_int(c.yoffset);
+        encoder.write_int(c.xadvance);
+        encoder.write_int(c.page);
+        encoder.write_int(c.chnl);
+    }
+
+    // kernings
+    encoder.write_array(kernings.size());
+    for (auto k: kernings)
+    {
+        encoder.write_uint(k.first);
+        encoder.write_uint(k.second);
+        encoder.write_int(k.amount);
+    }
+
+    encoder.write_break();
 }

@@ -12,7 +12,8 @@ struct Config
         Xml,
         Text,
         Bin,
-        Json
+        Json,
+        Cbor
     };
 
     enum class KerningPairs {

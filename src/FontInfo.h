@@ -84,6 +84,7 @@ struct FontInfo
     void writeToTextFile(const std::string &fileName) const;
     void writeToBinFile(const std::string &fileName) const;
     void writeToJsonFile(const std::string &fileName) const;
+    void writeToCborFile(const std::string &fileName) const;
 
 private:
     static std::string getCharSetName(std::uint8_t charSet);
