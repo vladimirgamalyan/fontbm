@@ -192,7 +192,14 @@ public:
         return FT_Get_Char_Index(face, ch);
     }
 
-    int getKerning(const std::uint32_t left, const std::uint32_t right, bool extended) const
+    enum class KerningMode
+    {
+        Basic,
+        Regular,
+        Extended
+    };
+
+    int getKerning(const std::uint32_t left, const std::uint32_t right, KerningMode kerningMode) const
     {
         const auto indexLeft = FT_Get_Char_Index(face, left);
         const auto indexRight = FT_Get_Char_Index(face, right);
@@ -201,7 +208,7 @@ public:
         k.x = 0;
         if (FT_HAS_KERNING(face))
         {
-            const FT_UInt kernMode = extended ? FT_KERNING_UNFITTED : FT_KERNING_DEFAULT;
+            const FT_UInt kernMode = kerningMode == KerningMode::Basic ? FT_KERNING_DEFAULT : FT_KERNING_UNFITTED;
             const auto error = FT_Get_Kerning(face, indexLeft, indexRight, kernMode, &k);
             if (error)
                 throw std::runtime_error("Couldn't find glyphs kerning");
@@ -211,8 +218,10 @@ public:
         if (!FT_IS_SCALABLE(face))
             return static_cast<int>(k.x);
 
-        const std::int32_t firstRsbDelta = extended ? renderGlyph(nullptr, 0, 0, 0, 0, left, 0).rsbDelta : 0;
-        const std::int32_t secondLsbDelta = extended ? renderGlyph(nullptr, 0, 0, 0, 0, right, 0).lsbDelta : 0;
+        const bool useRsbLsb = (kerningMode == KerningMode::Regular && k.x) || (kerningMode == KerningMode::Extended);
+
+        const std::int32_t firstRsbDelta = useRsbLsb ? renderGlyph(nullptr, 0, 0, 0, 0, left, 0).rsbDelta : 0;
+        const std::int32_t secondLsbDelta = useRsbLsb ? renderGlyph(nullptr, 0, 0, 0, 0, right, 0).lsbDelta : 0;
 
         return static_cast<int>(std::floor(static_cast<float>(secondLsbDelta - firstRsbDelta + k.x + 32) / 64.f));
     }

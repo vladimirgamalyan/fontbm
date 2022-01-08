@@ -18,6 +18,7 @@ struct Config
 
     enum class KerningPairs {
         Disabled,
+        Basic,
         Regular,
         Extended
     };

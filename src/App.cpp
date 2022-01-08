@@ -304,11 +304,17 @@ void App::writeFontInfoFile(const Glyphs& glyphs, const Config& config, const ft
     {
         auto chars(config.chars);
 
+        ft::Font::KerningMode kerningMode = ft::Font::KerningMode::Basic;
+        if (config.kerningPairs == Config::KerningPairs::Regular)
+            kerningMode = ft::Font::KerningMode::Regular;
+        if (config.kerningPairs == Config::KerningPairs::Extended)
+            kerningMode = ft::Font::KerningMode::Extended;
+
         for (const auto& ch0 : config.chars)
         {
             for (const auto& ch1 : chars)
             {
-                const auto k = static_cast<std::int16_t>(font.getKerning(ch0, ch1, config.kerningPairs == Config::KerningPairs::Extended));
+                const auto k = static_cast<std::int16_t>(font.getKerning(ch0, ch1, kerningMode));
                 if (k)
                 {
                     FontInfo::Kerning kerning;
