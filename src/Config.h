@@ -68,6 +68,12 @@ struct Config
         std::uint32_t hor = 0;
     };
 
+    struct Alignment
+    {
+        std::uint32_t ver = 1;
+        std::uint32_t hor = 1;
+    };
+
     std::string fontFile;
     std::set<std::uint32_t> chars;
     Color color;
@@ -76,6 +82,7 @@ struct Config
     std::uint16_t fontSize = 16;
     Padding padding;
     Spacing spacing;
+    Alignment alignment;
     std::vector<Size> textureSizeList;
     std::string output;
     DataFormat dataFormat = DataFormat::Text;
