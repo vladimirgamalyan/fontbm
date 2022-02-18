@@ -100,6 +100,7 @@ make
 * [AMDmi3](https://github.com/AMDmi3)
 * [cherniid](https://github.com/cherniid)
 * [Radfordhound](https://github.com/Radfordhound)
+* [phoddie](https://github.com/phoddie)
 
 ## Special thanks
 
