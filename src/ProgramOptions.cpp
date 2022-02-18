@@ -51,6 +51,8 @@ Config ProgramOptions::parseCommandLine(int argc, char* argv[])
             (textureSizeListOptionName, "list of texture sizes (will be tried from left to right to fit glyphs)", cxxopts::value<std::string>(textureSizeList))
             ("texture-crop-width", "crop unused parts of output textures (width)", cxxopts::value<bool>(config.cropTexturesWidth))
             ("texture-crop-height", "crop unused parts of output textures (height)", cxxopts::value<bool>(config.cropTexturesHeight))
+            ("align-horiz", "align glyph horizontal position", cxxopts::value<std::uint32_t>(config.alignment.hor))
+            ("align-vert", "align glyph vertical position", cxxopts::value<std::uint32_t>(config.alignment.ver))
             ("verbose", "verbose output", cxxopts::value<bool>(config.verbose))
             ("max-texture-count", "maximum generated textures", cxxopts::value<std::uint32_t>(config.maxTextureCount))
             ("texture-name-suffix", R"(texture name suffix: "index_aligned", "index", "none", default: "index_aligned")", cxxopts::value<std::string>(textureNameSuffix)->default_value("index_aligned"))
@@ -135,6 +137,11 @@ Config ProgramOptions::parseCommandLine(int argc, char* argv[])
                 {2048, 1024},
                 {2048, 2048}
         };
+
+        if (!config.alignment.hor)
+            throw std::runtime_error("invalid --align-horiz");
+        if (!config.alignment.ver)
+            throw std::runtime_error("invalid --align-vert");
 
         return config;
     }

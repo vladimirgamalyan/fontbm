@@ -9,14 +9,19 @@
 
 //TODO: read .bmfc files (BMFont configuration file)
 
-std::vector<rbp::RectSize> App::getGlyphRectangles(const Glyphs &glyphs, const std::uint32_t additionalWidth, const std::uint32_t additionalHeight)
+std::vector<rbp::RectSize> App::getGlyphRectangles(const Glyphs &glyphs, const std::uint32_t additionalWidth, const std::uint32_t additionalHeight, const Config& config)
 {
     std::vector<rbp::RectSize> result;
     for (const auto& kv : glyphs)
     {
         const auto& glyphInfo = kv.second;
-        if (!glyphInfo.isEmpty())
-            result.emplace_back(glyphInfo.width + additionalWidth, glyphInfo.height + additionalHeight, kv.first);
+        if (!glyphInfo.isEmpty()) {
+            auto width = glyphInfo.width + additionalWidth;
+            auto height = glyphInfo.height + additionalHeight;
+            width = ((width + config.alignment.hor - 1) / config.alignment.hor) * config.alignment.hor;
+            height = ((height + config.alignment.ver - 1) / config.alignment.ver) * config.alignment.ver;
+            result.emplace_back(width, height, kv.first);
+        }
     }
     return result;
 }
@@ -57,7 +62,7 @@ std::vector<Config::Size> App::arrangeGlyphs(Glyphs& glyphs, const Config& confi
     const auto additionalHeight = config.spacing.ver + config.padding.up + config.padding.down;
     std::vector<Config::Size> result;
 
-    auto glyphRectangles = getGlyphRectangles(glyphs, additionalWidth, additionalHeight);
+    auto glyphRectangles = getGlyphRectangles(glyphs, additionalWidth, additionalHeight, config);
 
     rbp::MaxRectsBinPack mrbp;
 
