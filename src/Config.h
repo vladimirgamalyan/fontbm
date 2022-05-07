@@ -88,7 +88,7 @@ struct Config
     DataFormat dataFormat = DataFormat::Text;
     KerningPairs kerningPairs = KerningPairs::Disabled;
     std::uint32_t maxTextureCount = 0;
-    bool useMaxTextuerCount = false;
+    bool useMaxTextureCount = false;
     bool monochrome = false;
     bool extraInfo = false;
     bool cropTexturesWidth = false;

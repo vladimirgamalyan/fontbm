@@ -366,7 +366,7 @@ void App::execute(const int argc, char* argv[])
 
     auto glyphs = collectGlyphInfo(font, config.chars);
     const auto pages = arrangeGlyphs(glyphs, config);
-    if (config.useMaxTextuerCount && pages.size() > config.maxTextureCount)
+    if (config.useMaxTextureCount && pages.size() > config.maxTextureCount)
         throw std::runtime_error("too many generated textures (more than --max-texture-count)");
 
     const auto fileNames = renderTextures(glyphs, config, font, pages);
