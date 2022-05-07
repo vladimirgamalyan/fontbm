@@ -81,20 +81,17 @@ std::vector<Config::Size> App::arrangeGlyphs(Glyphs& glyphs, const Config& confi
         for (size_t i = 0; i < config.textureSizeList.size(); ++i)
         {
             const auto& ss = config.textureSizeList[i];
-            uint64_t textureSquare = static_cast<uint64_t>(ss.w) * ss.h;
-            if (textureSquare < allGlyphSquare && i + 1 < config.textureSizeList.size())
-                continue;
-
-            //std::cout << "size: " << ss.w << " " << ss.h << ", allGlyphSquare: " << textureSquare << "\n";
-
-            //++tryCount;
-
-            lastSize = ss;
-            glyphRectangles = glyphRectanglesCopy;
 
             //TODO: check workAreaW,H
             const auto workAreaW = ss.w - config.spacing.hor;
             const auto workAreaH = ss.h - config.spacing.ver;
+
+            uint64_t textureSquare = static_cast<uint64_t>(workAreaW) * workAreaH;
+            if (textureSquare < allGlyphSquare && i + 1 < config.textureSizeList.size())
+                continue;
+
+            lastSize = ss;
+            glyphRectangles = glyphRectanglesCopy;
 
             mrbp.Init(workAreaW, workAreaH);
             mrbp.Insert(glyphRectangles, arrangedRectangles, rbp::MaxRectsBinPack::RectBestAreaFit);
