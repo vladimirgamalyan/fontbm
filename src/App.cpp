@@ -75,9 +75,7 @@ std::vector<Config::Size> App::arrangeGlyphs(Glyphs& glyphs, const Config& confi
         uint64_t allGlyphSquare = 0;
         for (const auto& i : glyphRectangles)
             allGlyphSquare += static_cast<uint64_t>(i.width) * i.height;
-        //std::cout << "allGlyphSquare: " << allGlyphSquare << "\n";
 
-        //int tryCount = 0;
         for (size_t i = 0; i < config.textureSizeList.size(); ++i)
         {
             const auto& ss = config.textureSizeList[i];
@@ -99,8 +97,6 @@ std::vector<Config::Size> App::arrangeGlyphs(Glyphs& glyphs, const Config& confi
             if (glyphRectangles.empty())
                 break;
         }
-
-        //std::cout << "tryCount: " << tryCount << "\n";
 
         if (arrangedRectangles.empty())
         {
