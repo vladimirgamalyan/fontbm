@@ -32,7 +32,7 @@ deploy:
   provider: GitHub
   description: 'fontbm windows binaries'
   auth_token:
-    secure: IuMkEFtoGHDsFlHDQDv7oPJDC+THkDbyV4QFXxRPqeKpfH+UbZ8pJN4zN9Txx/kC
+    secure: nXiCCnu0iLt3SzV9/DYgOnI5UHWDogpqrUNJq7OsbLkSVGKyEO2b3XrbAFjn2LER
   artifact: fontbm
   on:
     appveyor_repo_tag: true
