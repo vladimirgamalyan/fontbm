@@ -254,7 +254,7 @@ void App::writeFontInfoFile(const Glyphs& glyphs, const Config& config, const ft
     FontInfo f;
 
     f.info.face = font.getFamilyNameOr("unknown");
-    f.info.size = -static_cast<std::int16_t>(config.fontSize);
+    f.info.size = static_cast<std::int16_t>(config.fontSize);
     f.info.smooth = config.monochrome;
     f.info.unicode = true;
     f.info.bold = font.isBold();
