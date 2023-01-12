@@ -75,26 +75,21 @@ std::vector<Config::Size> App::arrangeGlyphs(Glyphs& glyphs, const Config& confi
         uint64_t allGlyphSquare = 0;
         for (const auto& i : glyphRectangles)
             allGlyphSquare += static_cast<uint64_t>(i.width) * i.height;
-        //std::cout << "allGlyphSquare: " << allGlyphSquare << "\n";
 
-        //int tryCount = 0;
         for (size_t i = 0; i < config.textureSizeList.size(); ++i)
         {
             const auto& ss = config.textureSizeList[i];
-            uint64_t textureSquare = static_cast<uint64_t>(ss.w) * ss.h;
-            if (textureSquare < allGlyphSquare && i + 1 < config.textureSizeList.size())
-                continue;
-
-            //std::cout << "size: " << ss.w << " " << ss.h << ", allGlyphSquare: " << textureSquare << "\n";
-
-            //++tryCount;
-
-            lastSize = ss;
-            glyphRectangles = glyphRectanglesCopy;
 
             //TODO: check workAreaW,H
             const auto workAreaW = ss.w - config.spacing.hor;
             const auto workAreaH = ss.h - config.spacing.ver;
+
+            uint64_t textureSquare = static_cast<uint64_t>(workAreaW) * workAreaH;
+            if (textureSquare < allGlyphSquare && i + 1 < config.textureSizeList.size())
+                continue;
+
+            lastSize = ss;
+            glyphRectangles = glyphRectanglesCopy;
 
             mrbp.Init(workAreaW, workAreaH);
             mrbp.Insert(glyphRectangles, arrangedRectangles, rbp::MaxRectsBinPack::RectBestAreaFit);
@@ -102,8 +97,6 @@ std::vector<Config::Size> App::arrangeGlyphs(Glyphs& glyphs, const Config& confi
             if (glyphRectangles.empty())
                 break;
         }
-
-        //std::cout << "tryCount: " << tryCount << "\n";
 
         if (arrangedRectangles.empty())
         {
@@ -366,7 +359,7 @@ void App::execute(const int argc, char* argv[])
 
     auto glyphs = collectGlyphInfo(font, config.chars);
     const auto pages = arrangeGlyphs(glyphs, config);
-    if (config.useMaxTextuerCount && pages.size() > config.maxTextureCount)
+    if (config.useMaxTextureCount && pages.size() > config.maxTextureCount)
         throw std::runtime_error("too many generated textures (more than --max-texture-count)");
 
     const auto fileNames = renderTextures(glyphs, config, font, pages);

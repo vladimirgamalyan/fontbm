@@ -71,7 +71,7 @@ Config ProgramOptions::parseCommandLine(int argc, char* argv[])
         if (!result.count("output"))
             throw std::runtime_error("--output required");
 
-        config.useMaxTextuerCount = result.count("max-texture-count");
+        config.useMaxTextureCount = result.count("max-texture-count");
 
         if (!result.count(charsOptionName) && !result.count(charsFileOptionName))
             chars = "32-126";
