@@ -103,6 +103,8 @@ Config ProgramOptions::parseCommandLine(int argc, char* argv[])
         std::transform(kerningPairs.begin(), kerningPairs.end(), kerningPairs.begin(), tolower);
         if (kerningPairs == "disabled")
             config.kerningPairs = Config::KerningPairs::Disabled;
+        else if (kerningPairs == "basic")
+            config.kerningPairs = Config::KerningPairs::Basic;
         else if (kerningPairs == "regular")
             config.kerningPairs = Config::KerningPairs::Regular;
         else if (kerningPairs == "extended")
