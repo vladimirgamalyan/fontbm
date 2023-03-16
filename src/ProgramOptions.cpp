@@ -44,7 +44,7 @@ Config ProgramOptions::parseCommandLine(int argc, char* argv[])
             ("spacing-vert", "spacing vert, default value is 0", cxxopts::value<std::uint32_t>(config.spacing.ver)->default_value("0"))
             ("spacing-horiz", "spacing horiz, default value is 0", cxxopts::value<std::uint32_t>(config.spacing.hor)->default_value("0"))
             ("output", "output files name without extension, required", cxxopts::value<std::string>(config.output))
-            ("data-format", R"(output data file format: "txt", "xml", "json", "bin", "cbor", default: "txt")", cxxopts::value<std::string>(dataFormat)->default_value("txt"))
+            ("data-format", R"(output data file format: "txt", "xml", "json", "bin", default: "txt")", cxxopts::value<std::string>(dataFormat)->default_value("txt"))
             ("kerning-pairs", R"("generate kerning pairs: "disabled", "basic", "regular" (tuned by hinter), "extended" (bigger output size, but more precise), default: "disabled")", cxxopts::value<std::string>(kerningPairs)->default_value("disabled"))
             ("monochrome", "disable anti-aliasing", cxxopts::value<bool>(config.monochrome))
             (textureSizeListOptionName, "list of texture sizes (will be tried from left to right to fit glyphs)", cxxopts::value<std::string>(textureSizeList))
@@ -94,8 +94,6 @@ Config ProgramOptions::parseCommandLine(int argc, char* argv[])
             config.dataFormat = Config::DataFormat::Bin;
         else if (dataFormat == "json")
             config.dataFormat = Config::DataFormat::Json;
-        else if (dataFormat == "cbor")
-            config.dataFormat = Config::DataFormat::Cbor;
         else
             throw std::runtime_error("unknown --data-format value");
 

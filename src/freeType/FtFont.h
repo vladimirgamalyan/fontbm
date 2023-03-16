@@ -121,10 +121,6 @@ public:
         /* x offset = cos(((90.0-12)/360)*2*M_PI), or 12 degree angle */
         glyph_italics = 0.207f;
         glyph_italics *= height;
-
-        //totalHeight = yMax - yMin;
-
-
     }
 
     ~Font()

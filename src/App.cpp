@@ -338,9 +338,6 @@ void App::writeFontInfoFile(const Glyphs& glyphs, const Config& config, const ft
         case Config::DataFormat::Json:
             f.writeToJsonFile(dataFileName);
             break;
-        case Config::DataFormat::Cbor:
-            f.writeToCborFile(dataFileName);
-            break;
     }
 }
 
