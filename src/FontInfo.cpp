@@ -122,8 +122,6 @@ void FontInfo::writeToXmlFile(const std::string &fileName) const
     commonElement->SetAttribute("redChnl", common.redChnl);
     commonElement->SetAttribute("greenChnl", common.greenChnl);
     commonElement->SetAttribute("blueChnl", common.blueChnl);
-    if (extraInfo)
-        commonElement->SetAttribute("totalHeight", common.totalHeight);
     root->InsertEndChild(commonElement);
 
     tinyxml2::XMLElement* pagesElement = doc.NewElement("pages");
@@ -211,8 +209,6 @@ void FontInfo::writeToTextFile(const std::string &fileName) const
         << " redChnl=" << static_cast<int>(common.redChnl)
         << " greenChnl=" << static_cast<int>(common.greenChnl)
         << " blueChnl=" << static_cast<int>(common.blueChnl);
-    if (extraInfo)
-        f << " totalHeight=" << common.totalHeight;
     f << std::endl;
 
     for (size_t i = 0; i < pages.size(); ++i)
@@ -252,9 +248,6 @@ void FontInfo::writeToTextFile(const std::string &fileName) const
 
 void FontInfo::writeToBinFile(const std::string &fileName) const
 {
-    if (extraInfo)
-        throw std::runtime_error("--extra-info flag is not compatible with binary format");
-
     for (size_t i = 1; i < pages.size(); ++i)
         if (pages[0].length() != pages[i].length())
             throw std::runtime_error("texture names have different length (incompatible with bin format)");
@@ -450,8 +443,6 @@ void FontInfo::writeToJsonFile(const std::string &fileName) const
     commonNode["redChnl"] = common.redChnl;
     commonNode["greenChnl"] = common.greenChnl;
     commonNode["blueChnl"] = common.blueChnl;
-    if (extraInfo)
-        commonNode["totalHeight"] = common.totalHeight;
 
     nlohmann::json charsNode = nlohmann::json::array();
     for(auto c: chars)
@@ -492,9 +483,6 @@ void FontInfo::writeToJsonFile(const std::string &fileName) const
 
 void FontInfo::writeToCborFile(const std::string &fileName) const
 {
-    if (extraInfo)
-        throw std::runtime_error("--extra-info flag is not compatible with cbor format");
-
     std::ofstream f(fileName, std::fstream::binary);
     f.exceptions(std::fstream::failbit | std::fstream::badbit);
     cbor_encoder_ostream encoder(f);
