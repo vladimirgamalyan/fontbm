@@ -41,3 +41,4 @@
 /tests/venv
 /tests/.idea
 /RelWithDebInfo
+/out
