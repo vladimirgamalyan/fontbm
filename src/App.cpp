@@ -276,6 +276,19 @@ void App::writeFontInfoFile(const Glyphs& glyphs, const Config& config, const ft
 
     f.pages = fileNames;
 
+    std::int32_t maxXAdvance = 0;
+    for (const auto& kv: glyphs)
+    {
+        const auto &glyph = kv.second;
+        if (!glyph.isEmpty())
+        {
+            if (glyph.xAdvance > maxXAdvance) {
+              maxXAdvance = glyph.xAdvance;
+            }
+        }
+    }
+
+
     for (const auto& kv: glyphs)
     {
         //TODO: page = 0 for empty glyphs.
@@ -289,10 +302,12 @@ void App::writeFontInfoFile(const Glyphs& glyphs, const Config& config, const ft
             c.width = static_cast<std::uint16_t>(glyph.width + config.padding.left + config.padding.right);
             c.height = static_cast<std::uint16_t>(glyph.height + config.padding.up + config.padding.down);
             c.page = static_cast<std::uint8_t>(glyph.page);
-            c.xoffset = static_cast<std::int16_t>(glyph.xOffset - config.padding.left);
+            //c.xoffset = static_cast<std::int16_t>(glyph.xOffset - config.padding.left);
+            c.xoffset = static_cast<std::int16_t>(glyph.xOffset - config.padding.left + (maxXAdvance - glyph.xAdvance) / 2);
             c.yoffset = static_cast<std::int16_t>(glyph.yOffset - config.padding.up);
         }
-        c.xadvance = static_cast<std::int16_t>(glyph.xAdvance);
+        //c.xadvance = static_cast<std::int16_t>(glyph.xAdvance);
+        c.xadvance = static_cast<std::int16_t>(maxXAdvance);
         c.chnl = 15;
 
         f.chars.push_back(c);
