@@ -42,6 +42,62 @@ set(SOURCES
         src/external/maxRectsBinPack/Rect.h
         src/external/lodepng/lodepng.h
         src/external/lodepng/lodepng.cpp
+        src/external/lunasvg/include/lunasvg.h
+        src/external/lunasvg/source/canvas.cpp
+        src/external/lunasvg/source/canvas.h
+        src/external/lunasvg/source/clippathelement.cpp
+        src/external/lunasvg/source/clippathelement.h
+        src/external/lunasvg/source/defselement.cpp
+        src/external/lunasvg/source/defselement.h
+        src/external/lunasvg/source/element.cpp
+        src/external/lunasvg/source/element.h
+        src/external/lunasvg/source/gelement.cpp
+        src/external/lunasvg/source/gelement.h
+        src/external/lunasvg/source/geometryelement.cpp
+        src/external/lunasvg/source/geometryelement.h
+        src/external/lunasvg/source/graphicselement.cpp
+        src/external/lunasvg/source/graphicselement.h
+        src/external/lunasvg/source/layoutcontext.cpp
+        src/external/lunasvg/source/layoutcontext.h
+        src/external/lunasvg/source/lunasvg.cpp
+        src/external/lunasvg/source/markerelement.cpp
+        src/external/lunasvg/source/markerelement.h
+        src/external/lunasvg/source/maskelement.cpp
+        src/external/lunasvg/source/maskelement.h
+        src/external/lunasvg/source/paintelement.cpp
+        src/external/lunasvg/source/paintelement.h
+        src/external/lunasvg/source/parser.cpp
+        src/external/lunasvg/source/parser.h
+        src/external/lunasvg/source/parserutils.h
+        src/external/lunasvg/source/property.cpp
+        src/external/lunasvg/source/property.h
+        src/external/lunasvg/source/stopelement.cpp
+        src/external/lunasvg/source/stopelement.h
+        src/external/lunasvg/source/styledelement.cpp
+        src/external/lunasvg/source/styledelement.h
+        src/external/lunasvg/source/styleelement.cpp
+        src/external/lunasvg/source/styleelement.h
+        src/external/lunasvg/source/svgelement.cpp
+        src/external/lunasvg/source/svgelement.h
+        src/external/lunasvg/source/symbolelement.cpp
+        src/external/lunasvg/source/symbolelement.h
+        src/external/lunasvg/source/useelement.cpp
+        src/external/lunasvg/source/useelement.h 
+        src/external/lunasvg/3rdparty/plutovg/plutovg-blend.c
+        src/external/lunasvg/3rdparty/plutovg/plutovg.c
+        src/external/lunasvg/3rdparty/plutovg/plutovg-dash.c
+        src/external/lunasvg/3rdparty/plutovg/plutovg-ft-math.c
+        src/external/lunasvg/3rdparty/plutovg/plutovg-ft-math.h
+        src/external/lunasvg/3rdparty/plutovg/plutovg-ft-raster.c
+        src/external/lunasvg/3rdparty/plutovg/plutovg-ft-raster.h
+        src/external/lunasvg/3rdparty/plutovg/plutovg-ft-stroker.c
+        src/external/lunasvg/3rdparty/plutovg/plutovg-ft-stroker.h
+        src/external/lunasvg/3rdparty/plutovg/plutovg-ft-types.h
+        src/external/lunasvg/3rdparty/plutovg/plutovg-geometry.c
+        src/external/lunasvg/3rdparty/plutovg/plutovg.h
+        src/external/lunasvg/3rdparty/plutovg/plutovg-paint.c
+        src/external/lunasvg/3rdparty/plutovg/plutovg-private.h
+        src/external/lunasvg/3rdparty/plutovg/plutovg-rle.c
         )
 
 add_definitions(-DLODEPNG_NO_COMPILE_DECODER)

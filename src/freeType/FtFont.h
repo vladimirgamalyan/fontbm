@@ -5,9 +5,18 @@
 #include "FtException.h"
 #include "../utils/StringMaker.h"
 
+#include "../external/lunasvg/include/lunasvg.h"
+#include <freetype/otsvg.h>
+#include <freetype/ftbbox.h>
+#include <freetype/ftmodapi.h>
+
 /* Handy routines for converting from fixed point */
-#define FT_FLOOR(X) (((X) & -64) / 64)
-#define FT_CEIL(X)  ((((X) + 63) & -64) / 64)
+#define FT_FLOOR(X)                 (((X) & -64) / 64)
+#define FT_CEIL(X)                  ((((X) + 63) & -64) / 64)
+#define FT_ROUND(_VAL)              ((float)(int)((_VAL) + 0.5f))
+#define FT_COL32(R,G,B,A)           (((uint32_t)(A)<<24) | ((uint32_t)(B)<<16) | ((uint32_t)(G)<<8) | ((uint32_t)(R)<<0))
+#define DE_MULTIPLY(color, alpha)   (uint32_t)(255.0f * (float)color / (float)alpha + 0.5f)
+#define UNUSED(x)                   (void)(x)
 
 /* Set and retrieve the font style */
 #define TTF_STYLE_NORMAL        0x00
@@ -124,7 +133,10 @@ public:
 
         totalHeight = yMax - yMin;
 
-
+        SVG_RendererHooks hooks = { lunasvgPortInit, lunasvgPortFree, lunasvgPortRender, lunasvgPortPresetSlot };
+        error = FT_Property_Set(library.library, "ot-svg", "svg-hooks", &hooks);
+        if (error)
+            throw Exception("Couldn't set svg hooks", error);
     }
 
     ~Font()
@@ -135,14 +147,14 @@ public:
     GlyphMetrics renderGlyph(std::uint32_t* buffer, std::uint32_t surfaceW, std::uint32_t surfaceH, int x, int y,
             std::uint32_t ch, std::uint32_t color) const
     {
-        FT_Int32 loadFlags = FT_LOAD_RENDER | FT_LOAD_FORCE_AUTOHINT;
+        FT_Int32 loadFlags = FT_LOAD_RENDER | FT_LOAD_FORCE_AUTOHINT | FT_LOAD_COLOR;
         if (monochrome_)
             loadFlags |= FT_LOAD_MONOCHROME;
 
         const int error = FT_Load_Char(face, ch, loadFlags);
-        if (error)
-            throw std::runtime_error(StringMaker() << "Error Load glyph " << ch << " " << error);
 
+       if (error)
+            throw std::runtime_error(StringMaker() << "Error Load glyph " << ch << " " << error);
 
         auto slot = face->glyph;
         const auto metrics = &slot->metrics;
@@ -156,7 +168,6 @@ public:
         glyphMetrics.lsbDelta = slot->lsb_delta;
         glyphMetrics.rsbDelta = slot->rsb_delta;
 
-
         if (buffer)
         {
             const auto dst_check = buffer + surfaceW * surfaceH;
@@ -168,7 +179,8 @@ public:
                 const std::uint8_t *src = slot->bitmap.buffer + slot->bitmap.pitch * row;
 
                 std::vector<std::uint8_t> unpacked;
-                if (slot->bitmap.pixel_mode == FT_PIXEL_MODE_MONO) {
+                if (slot->bitmap.pixel_mode == FT_PIXEL_MODE_MONO)
+                {
                     unpacked.reserve(slot->bitmap.width);
                     for (int byte = 0; byte < slot->bitmap.pitch; ++byte)
                         for (std::uint8_t mask = 0x80; mask; mask = mask >> 1u)
@@ -176,10 +188,29 @@ public:
                     src = unpacked.data();
                 }
 
-                for (auto col = glyphMetrics.width; col > 0 && dst < dst_check; --col)
+                switch (slot->bitmap.pixel_mode)
                 {
-                    const std::uint32_t alpha = *src++;
-                    *dst++ = color | (alpha << 24u);
+                    case FT_PIXEL_MODE_GRAY:
+                    case FT_PIXEL_MODE_MONO:
+                        for (auto col = glyphMetrics.width; col > 0 && dst < dst_check; --col)
+                        {
+                            const std::uint32_t a = *src++;
+                            *dst++ =  color | (a << 24u);
+                        }
+                        break;
+                    case FT_PIXEL_MODE_BGRA:
+                        for (auto col = glyphMetrics.width; col > 0 && dst < dst_check; --col)
+                        {
+                            const std::uint32_t b = *src++;
+                            const std::uint32_t g = *src++;
+                            const std::uint32_t r = *src++;
+                            const std::uint32_t a = *src++;
+                            *dst++ = FT_COL32(DE_MULTIPLY(r, a), DE_MULTIPLY(g, a), DE_MULTIPLY(b, a), a);
+                        }
+                        break;
+                    default:
+                        throw std::runtime_error("Unknown color mode!");
+                        break;
                 }
             }
         }
@@ -190,6 +221,94 @@ public:
     int isGlyphProvided(FT_ULong ch) const
     {
         return FT_Get_Char_Index(face, ch);
+    }
+
+    struct LunasvgPortState
+    {
+        FT_Error            err = FT_Err_Ok;
+        lunasvg::Matrix     matrix;
+        std::unique_ptr<lunasvg::Document> svg = nullptr;
+    };
+
+    static FT_Error lunasvgPortInit(FT_Pointer* _state)
+    {
+        *_state = new LunasvgPortState();
+        return FT_Err_Ok;
+    }
+
+    static void lunasvgPortFree(FT_Pointer* _state)
+    {
+        delete(*(LunasvgPortState**)_state);
+    }
+
+    static FT_Error lunasvgPortRender(FT_GlyphSlot slot, FT_Pointer* _state)
+    {
+        LunasvgPortState* state = *(LunasvgPortState**)_state;
+        // If there was an error while loading the svg in lunasvgPortPresetSlot(), the renderer hook still get called, so just returns the error.
+        if (state->err != FT_Err_Ok)
+            return state->err;
+        // rows is height, pitch (or stride) equals to width * sizeof(int32)
+        lunasvg::Bitmap bitmap((uint8_t*)slot->bitmap.buffer, slot->bitmap.width, slot->bitmap.rows, slot->bitmap.pitch);
+        state->svg->setMatrix(state->svg->matrix().identity()); // Reset the svg matrix to the default value
+        state->svg->render(bitmap, state->matrix);              // state->matrix is already scaled and translated
+        state->err = FT_Err_Ok;
+        return state->err;
+    }
+
+    static FT_Error lunasvgPortPresetSlot(FT_GlyphSlot slot, FT_Bool cache, FT_Pointer* _state)
+    {
+        UNUSED(cache);
+
+        FT_SVG_Document   document = (FT_SVG_Document)slot->other;
+        LunasvgPortState* state = *(LunasvgPortState**)_state;
+        FT_Size_Metrics&  metrics = document->metrics;
+        state->svg = lunasvg::Document::loadFromData((const char*)document->svg_document, document->svg_document_length);
+        if (state->svg == nullptr)
+        {
+            state->err = FT_Err_Invalid_SVG_Document;
+            return state->err;
+        }
+        lunasvg::Box box = state->svg->box();
+        double scale = std::min(metrics.x_ppem / box.w, metrics.y_ppem / box.h);
+        double xx = (double)document->transform.xx / (1 << 16);
+        double xy = -(double)document->transform.xy / (1 << 16);
+        double yx = -(double)document->transform.yx / (1 << 16);
+        double yy = (double)document->transform.yy / (1 << 16);
+        double x0 = (double)document->delta.x / 64 * box.w / metrics.x_ppem;
+        double y0 = -(double)document->delta.y / 64 * box.h / metrics.y_ppem;
+        // Scale and transform, we don't translate the svg yet
+        state->matrix.identity();
+        state->matrix.scale(scale, scale);
+        state->matrix.transform(xx, xy, yx, yy, x0, y0);
+        state->svg->setMatrix(state->matrix);
+        // Pre-translate the matrix for the rendering step
+        state->matrix.translate(-box.x, -box.y);
+        // Get the box again after the transformation
+        box = state->svg->box();
+        // Calculate the bitmap size
+        slot->bitmap_left = FT_Int(box.x);
+        slot->bitmap_top = FT_Int(-box.y);
+        slot->bitmap.rows = (unsigned int)(ceilf((float)box.h));
+        slot->bitmap.width = (unsigned int)(ceilf((float)box.w));
+        slot->bitmap.pitch = slot->bitmap.width * 4;
+        slot->bitmap.pixel_mode = FT_PIXEL_MODE_BGRA;
+        // Compute all the bearings and set them correctly. The outline is scaled already, we just need to use the bounding box.
+        double metrics_width = box.w;
+        double metrics_height = box.h;
+        double horiBearingX = box.x;
+        double horiBearingY = -box.y;
+        double vertBearingX = slot->metrics.horiBearingX / 64.0 - slot->metrics.horiAdvance / 64.0 / 2.0;
+        double vertBearingY = (slot->metrics.vertAdvance / 64.0 - slot->metrics.height / 64.0) / 2.0;
+        slot->metrics.width = FT_Pos(FT_ROUND(metrics_width * 64.0));   // Using FT_ROUND() assume width and height are positive
+        slot->metrics.height = FT_Pos(FT_ROUND(metrics_height * 64.0));
+        slot->metrics.horiBearingX = FT_Pos(horiBearingX * 64);
+        slot->metrics.horiBearingY = FT_Pos(horiBearingY * 64);
+        slot->metrics.vertBearingX = FT_Pos(vertBearingX * 64);
+        slot->metrics.vertBearingY = FT_Pos(vertBearingY * 64);
+        if (slot->metrics.vertAdvance == 0)
+            slot->metrics.vertAdvance = FT_Pos(metrics_height * 1.2 * 64.0);
+        state->err = FT_Err_Ok;
+        return state->err;
     }
 
     enum class KerningMode
