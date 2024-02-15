@@ -158,6 +158,7 @@ std::vector<std::string> App::renderTextures(const Glyphs& glyphs, const Config&
         return {};
 
     const auto pageNameDigits = getNumberLen(pages.size() - 1);
+    auto slot = font.face->glyph;
 
     for (std::uint32_t page = 0; page < pages.size(); ++page)
     {
@@ -178,7 +179,7 @@ std::vector<std::string> App::renderTextures(const Glyphs& glyphs, const Config&
                 const auto y = glyph.y + config.padding.up;
 
                 font.renderGlyph(&surface[0], s.w, s.h, x, y,
-                        kv.first, config.color.getBGR());
+                        kv.first, slot->format == FT_GLYPH_FORMAT_SVG ? config.backgroundColor.getBGR() : config.color.getBGR());
             }
         }
 
@@ -187,18 +188,28 @@ std::vector<std::string> App::renderTextures(const Glyphs& glyphs, const Config&
             auto cur = surface.data();
             const auto end = &surface.back();
 
-            const auto fgColor = config.color.getBGR();
             const auto bgColor = config.backgroundColor.getBGR();
 
             while (cur <= end)
             {
-                const std::uint32_t a0 = (*cur) >> 24u;
+                const auto fgColor = (*cur);
+                const std::uint32_t a0 = fgColor >> 24u;
                 const std::uint32_t a1 = 256 - a0;
-                const std::uint32_t rb1 = (a1 * (bgColor & 0xFF00FFu)) >> 8u;
-                const std::uint32_t rb2 = (a0 * (fgColor & 0xFF00FFu)) >> 8u;
-                const std::uint32_t g1  = (a1 * (bgColor & 0x00FF00u)) >> 8u;
-                const std::uint32_t g2  = (a0 * (fgColor & 0x00FF00u)) >> 8u;
-                *cur =  ((rb1 | rb2) & 0xFF00FFu) + ((g1 | g2) & 0x00FF00u);
+
+                const std::uint32_t fgB = (fgColor & 0xFF0000u) >> 16u;
+                const std::uint32_t fgG = (fgColor & 0x00FF00u) >> 8u;
+                const std::uint32_t fgR = fgColor & 0x0000FFu;
+
+                const std::uint32_t bgB = (bgColor & 0xFF0000u) >> 16u;
+                const std::uint32_t bgG = (bgColor & 0x00FF00u) >> 8u;
+                const std::uint32_t bgR = bgColor & 0x0000FFu;
+
+                const std::uint32_t blB = (a1 * bgB + a0 * fgB) >> 8u;
+                const std::uint32_t blG = (a1 * bgG + a0 * fgG) >> 8u;
+                const std::uint32_t blR = (a1 * bgR + a0 * fgR) >> 8u;
+
+                *cur = (a0 << 24u) | (blB << 16u) | (blG << 8u) | blR;
+
                 ++cur;
             }
         }
