@@ -1,9 +1,10 @@
 # fontbm
 
-[BMFont](http://www.angelcode.com/products/bmfont/) compatible, cross-platform (Linux/macOS/Windows) command line bitmap font generator (FreeType2 based render).
+[BMFont](http://www.angelcode.com/products/bmfont/) compatible, cross-platform (Linux/macOS/Windows) command line bitmap font generator (FreeType2 based renderer) including the Adobe OpenType-SVG format.
 
 ![sample](/.github/img/sample0.png?raw=true)
 ![sample](/.github/img/sample1.png?raw=true)
+![sample](/.github/img/sample2.png?raw=true)
 
 ## Status
 
@@ -55,6 +56,7 @@ Dependencies:
 * GCC-4.9
 * CMake 3.0
 * [FreeType](https://www.freetype.org/)
+* [LunaSVG](https://github.com/sammycage/lunasvg)
 
 Build:
 
@@ -102,6 +104,7 @@ make
 * [cherniid](https://github.com/cherniid)
 * [Radfordhound](https://github.com/Radfordhound)
 * [phoddie](https://github.com/phoddie)
+* [benbaker76](https://github.com/benbaker76)
 
 ## Special thanks
 
@@ -119,3 +122,4 @@ The project also bundles third party software under its own licenses:
 * [catchorg/Catch2](https://github.com/catchorg/Catch2) - A modern, C++-native, header-only, test framework for unit-tests - [BSL-1.0](https://github.com/catchorg/Catch2/blob/master/LICENSE.txt)
 * [jarro2783/cxxopts](https://github.com/jarro2783/cxxopts) - Lightweight C++ command line option parser - [MIT](https://github.com/jarro2783/cxxopts/blob/master/LICENSE)
 * [nlohmann/json](https://github.com/nlohmann/json) - JSON for Modern C++ - [MIT](https://github.com/nlohmann/json/blob/develop/LICENSE.MIT)
+* [sammycage/lunasvg](https://github.com/sammycage/lunasvg) - SVG rendering library in C++ - [MIT](https://github.com/sammycage/lunasvg/blob/master/LICENSE)
