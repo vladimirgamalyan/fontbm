@@ -89,6 +89,7 @@ Open .sln file in Visual Studio 2015, configure paths to FreeType and rebuild al
 
 ```
 brew install freetype
+brew install cmake
 git clone https://github.com/vladimirgamalyan/fontbm.git
 cd fontbm
 cmake .
