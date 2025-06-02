@@ -47,17 +47,17 @@ def test_expected(font_exe, env):
     clear_work_dir()
     subprocess.run([font_exe, '--font-file', 'fonts/FreeSans.ttf', '--chars', '32-126',
         '--padding-up', '8', '--padding-right', '7', '--padding-down', '6', '--padding-left', '5',
-        '--output', 'generated/test0', '--include-kerning-pairs'], check=True, env=env)
+        '--output', 'generated/test0', '--kerning-pairs', 'regular'], check=True, env=env)
     check_diff('expected/test0.fnt', 'generated/test0.fnt')
 
     subprocess.run([font_exe, '--font-file', 'fonts/FreeSans.ttf', '--chars', '32-126',
-        '--output', 'generated/test1', '--include-kerning-pairs',
+        '--output', 'generated/test1', '--kerning-pairs', 'regular',
         '--padding-up', '8', '--padding-right', '7',
         '--data-format', 'xml'], check=True, env=env)
     check_diff('expected/test1.fnt', 'generated/test1.fnt')
 
     subprocess.run([font_exe, '--font-file', 'fonts/FreeSans.ttf', '--chars', '32-126',
-        '--output', 'generated/test2', '--include-kerning-pairs',
+        '--output', 'generated/test2', '--kerning-pairs', 'regular',
         '--spacing-vert', '4', '--spacing-horiz', '5',
         '--data-format', 'bin'], check=True, env=env)
     check_diff('expected/test2.fnt', 'generated/test2.fnt', True)
@@ -65,7 +65,7 @@ def test_expected(font_exe, env):
 
 def test_too_many_textures(font_exe, env):
     process = subprocess.Popen([font_exe, '--font-file', 'fonts/FreeSans.ttf', '--chars', '32-126',
-                                '--output', 'generated/test3', '--include-kerning-pairs',
+                                '--output', 'generated/test3', '--kerning-pairs', 'regular',
                                 '--texture-width', '128', '--texture-height', '128',
                                 '--max-texture-count', '1'],
                                stdout=subprocess.PIPE, stderr=subprocess.PIPE,
@@ -302,7 +302,7 @@ def test_fnt_formats(font_exe, env):
     clear_work_dir()
     args = [font_exe, '--font-file', 'fonts/FreeSans.ttf', '--output', 'generated/format_test',
             '--chars', '32-126', '--font-size', '16',
-            '--include-kerning-pairs',
+            '--kerning-pairs', 'regular',
             '--padding-up', '1', '--padding-right', '2', '--padding-down', '3', '--padding-left', '4',
             '--spacing-horiz', '5', '--spacing-vert', '6',
             '--texture-width', '128', '--texture-height', '128']
