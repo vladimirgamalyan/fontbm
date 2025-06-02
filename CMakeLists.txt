@@ -1,8 +1,14 @@
-cmake_minimum_required(VERSION 3.0)
+cmake_minimum_required(VERSION 3.11)
 project(fontbm)
+
+set(CMAKE_CXX_STANDARD 20)
+set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
 find_package(Freetype REQUIRED)
 include_directories(${FREETYPE_INCLUDE_DIRS})
+
+find_package(HarfBuzz REQUIRED)
+include_directories(${HARFBUZZ_INCLUDE_DIR})
 
 if(NOT MSVC)
     set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++11 -Wall -Wextra -pedantic")
@@ -47,7 +53,7 @@ set(SOURCES
 add_definitions(-DLODEPNG_NO_COMPILE_DECODER)
 
 add_executable(fontbm ${SOURCES})
-target_link_libraries(fontbm ${COMMON_LIBRARIES} ${FREETYPE_LIBRARIES})
+target_link_libraries(fontbm ${COMMON_LIBRARIES} ${FREETYPE_LIBRARIES} harfbuzz::harfbuzz)
 
 add_executable(unit_tests
         src/external/catch.hpp

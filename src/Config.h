@@ -75,7 +75,8 @@ struct Config
     };
 
     std::string fontFile;
-    std::set<std::uint32_t> chars;
+    std::string secondaryFontFile;
+    std::set<std::uint32_t> chars; // utf32
     Color color;
     Color backgroundColor;
     bool backgroundTransparent = true;
@@ -90,9 +91,14 @@ struct Config
     std::uint32_t maxTextureCount = 0;
     bool useMaxTextureCount = false;
     bool monochrome = false;
+    bool lightHinting = false;
+    bool noHinting = false;
+    bool allChars = false;
     bool extraInfo = false;
     bool cropTexturesWidth = false;
     bool cropTexturesHeight = false;
     bool verbose = false;
+    bool slashedZero = false;
+    bool tabularNumbers = false;
     TextureNameSuffix textureNameSuffix = TextureNameSuffix::IndexAligned;
 };

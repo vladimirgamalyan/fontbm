@@ -3,6 +3,10 @@
 #include <fstream>
 #include <functional>
 #include <regex>
+#include <sstream>
+#include <string>
+#include <charconv>
+#include <iostream>
 #include "HelpException.h"
 #include "external/cxxopts.hpp"
 #include "external/utf8cpp/utf8.h"
@@ -32,6 +36,7 @@ Config ProgramOptions::parseCommandLine(int argc, char* argv[])
         options.add_options()
             ("help", "produce help message")
             ("font-file", "path to ttf file, required", cxxopts::value<std::string>(config.fontFile))
+            ("secondary-font-file", "path to ttf file, optional", cxxopts::value<std::string>(config.secondaryFontFile))
             (charsOptionName, "required characters, for example: 32-64,92,120-126\ndefault value is 32-126 if 'chars-file' option is not defined", cxxopts::value<std::string>(chars))
             (charsFileOptionName, "optional path to UTF-8 text file with required characters (will be combined with 'chars' option)", cxxopts::value<std::vector<std::string>>(charsFile))
             ("color", "foreground RGB color, for example: 32,255,255, default value is 255,255,255", cxxopts::value<std::string>(color)->default_value("255,255,255"))
@@ -46,7 +51,12 @@ Config ProgramOptions::parseCommandLine(int argc, char* argv[])
             ("output", "output files name without extension, required", cxxopts::value<std::string>(config.output))
             ("data-format", R"(output data file format: "txt", "xml", "json", "bin", "cbor", default: "txt")", cxxopts::value<std::string>(dataFormat)->default_value("txt"))
             ("kerning-pairs", R"("generate kerning pairs: "disabled", "basic", "regular" (tuned by hinter), "extended" (bigger output size, but more precise), default: "disabled")", cxxopts::value<std::string>(kerningPairs)->default_value("disabled"))
+            ("all-chars", "retrieve all characters from font", cxxopts::value<bool>(config.allChars))
             ("monochrome", "disable anti-aliasing", cxxopts::value<bool>(config.monochrome))
+            ("light-hinting", "use a lighter hinting algorithm", cxxopts::value<bool>(config.lightHinting))
+            ("no-hinting", "disable hinting completely", cxxopts::value<bool>(config.noHinting))
+            ("tabular-numbers", "enables non-proportional numbers", cxxopts::value<bool>(config.tabularNumbers))
+            ("slashed-zero", "enables slashed zero", cxxopts::value<bool>(config.slashedZero))
             ("extra-info", "write extra information to data file", cxxopts::value<bool>(config.extraInfo))
             (textureSizeListOptionName, "list of texture sizes (will be tried from left to right to fit glyphs)", cxxopts::value<std::string>(textureSizeList))
             ("texture-crop-width", "crop unused parts of output textures (width)", cxxopts::value<bool>(config.cropTexturesWidth))
@@ -137,7 +147,11 @@ Config ProgramOptions::parseCommandLine(int argc, char* argv[])
                 {1024, 512},
                 {1024, 1024},
                 {2048, 1024},
-                {2048, 2048}
+                {2048, 2048},
+                {4096, 2048},
+                {4096, 4096},
+                {8192, 4096},
+                {8192, 8192},
         };
 
         if (!config.alignment.hor)
@@ -161,37 +175,39 @@ std::set<std::uint32_t> ProgramOptions::parseCharsString(std::string str)
     if (str.empty())
         return std::set<std::uint32_t>();
 
-    const std::regex re(R"(^\d{1,7}(-\d{1,7})?(,\d{1,7}(-\d{1,7})?)*$)");
-    if (!std::regex_match(str, re))
-        throw std::logic_error("invalid chars value");
+    std::set<uint32_t> result;
 
-    const auto ranges = splitStrByDelim(str, ',');
-
-    std::vector<std::pair<std::uint32_t, std::uint32_t>> charList;
-    for (const auto& range : ranges)
-    {
-        auto minMaxStr = splitStrByDelim(range, '-');
-        if (minMaxStr.size() == 1)
-            minMaxStr.push_back(minMaxStr[0]);
-
-        const auto v0 = std::stoul(minMaxStr[0]);
-        const auto v1 = std::stoul(minMaxStr[1]);
+    std::istringstream ss(str);
+    std::string segment;
+    while (std::getline(ss, segment, ',')) {
+        size_t dash_pos = segment.find('-');
+        
+        auto parse_value = [](const std::string& s) {
+            uint32_t val = 0;
+            std::from_chars_result res;
+            if (s.starts_with("0x") || s.starts_with("0X"))
+                res = std::from_chars(s.data() + 2, s.data() + s.size(), val, 16);
+            else
+                res = std::from_chars(s.data(), s.data() + s.size(), val, 10);
+            return val;
+        };
 
         const auto maxUtf32 = 0x10FFFFul;
-        if (v0 > maxUtf32 || v1 > maxUtf32)
-            throw std::out_of_range("invalid utf-32 value (out of range 0x000000..0x10ffff)");
-
-        charList.emplace_back(static_cast<std::uint32_t>(v0), static_cast<std::uint32_t>(v1));
-    }
-
-    std::set<std::uint32_t> result;
-    for (const auto& range : charList)
-    {
-        for (auto v = range.first; v < range.second; ++v)
+        if (dash_pos != std::string::npos) {
+            uint32_t start = parse_value(segment.substr(0, dash_pos));
+            uint32_t end = parse_value(segment.substr(dash_pos + 1));
+            if (start > maxUtf32 || end > maxUtf32)
+                throw std::out_of_range("invalid utf-32 value (out of range 0x000000..0x10ffff)");
+            for (uint32_t i = start; i <= end; ++i) {
+                result.insert(i);
+            }
+        } else {
+            uint32_t v = parse_value(segment);
+            if (v > maxUtf32)
+                throw std::out_of_range("invalid utf-32 value (out of range 0x000000..0x10ffff)");
             result.insert(v);
-        result.insert(range.second);
+        }
     }
-
     return result;
 }
 

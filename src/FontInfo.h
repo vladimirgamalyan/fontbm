@@ -36,12 +36,14 @@ struct FontInfo
         Spacing spacing;
         std::uint8_t outline = 0;
         std::string face;
+        std::string style;
     };
 
     struct Common
     {
         std::uint16_t lineHeight = 0;
         std::uint16_t base = 0;
+        std::int16_t descent = 0;
         std::uint16_t scaleW = 0;
         std::uint16_t scaleH = 0;
         bool packed = false;

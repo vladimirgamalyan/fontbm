@@ -13,11 +13,15 @@ struct GlyphInfo
     std::uint32_t width = 0;
     std::uint32_t height = 0;
 
+    std::uint32_t utf32 = 0;
+
     // shift before render
     int xOffset = 0;
     int yOffset = 0;
 
     int xAdvance = 0;
+
+    bool secondaryFont = false;
 
     bool isEmpty() const
     {

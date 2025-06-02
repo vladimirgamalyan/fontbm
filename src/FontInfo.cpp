@@ -109,6 +109,9 @@ void FontInfo::writeToXmlFile(const std::string &fileName) const
     infoElement->SetAttribute("padding", padding.str().c_str());
     infoElement->SetAttribute("spacing", spacing.str().c_str());
     infoElement->SetAttribute("outline", info.outline);
+    if (extraInfo) {
+        infoElement->SetAttribute("style", info.style.c_str());
+    }
     root->InsertEndChild(infoElement);
 
     tinyxml2::XMLElement* commonElement = doc.NewElement("common");
@@ -122,8 +125,11 @@ void FontInfo::writeToXmlFile(const std::string &fileName) const
     commonElement->SetAttribute("redChnl", common.redChnl);
     commonElement->SetAttribute("greenChnl", common.greenChnl);
     commonElement->SetAttribute("blueChnl", common.blueChnl);
-    if (extraInfo)
+    if (extraInfo) 
+    {
+        commonElement->SetAttribute("base", common.descent);
         commonElement->SetAttribute("totalHeight", common.totalHeight);
+    }
     root->InsertEndChild(commonElement);
 
     tinyxml2::XMLElement* pagesElement = doc.NewElement("pages");
@@ -197,8 +203,11 @@ void FontInfo::writeToTextFile(const std::string &fileName) const
         << " spacing="
             << static_cast<int>(info.spacing.horizontal)
             << "," << static_cast<int>(info.spacing.vertical)
-        << " outline=" << static_cast<int>(info.outline)
-        << std::endl;
+        << " outline=" << static_cast<int>(info.outline);
+    if (extraInfo) {
+        f << " style=\"" << info.style << "\"";
+    }
+    f << std::endl;
 
     f << "common"
         << " lineHeight=" << common.lineHeight
@@ -211,8 +220,11 @@ void FontInfo::writeToTextFile(const std::string &fileName) const
         << " redChnl=" << static_cast<int>(common.redChnl)
         << " greenChnl=" << static_cast<int>(common.greenChnl)
         << " blueChnl=" << static_cast<int>(common.blueChnl);
-    if (extraInfo)
+    if (extraInfo) 
+    {
         f << " totalHeight=" << common.totalHeight;
+        f << " descent=" << common.descent;
+    }
     f << std::endl;
 
     for (size_t i = 0; i < pages.size(); ++i)
@@ -438,6 +450,9 @@ void FontInfo::writeToJsonFile(const std::string &fileName) const
     infoNode["spacing"] = {info.spacing.horizontal, info.spacing.vertical};
     infoNode["outline"] = info.outline;
     infoNode["face"] = info.face;
+    if (extraInfo) {
+        infoNode["style"] = info.style;
+    }
 
     nlohmann::json commonNode;
     commonNode["lineHeight"] = common.lineHeight;
@@ -451,7 +466,10 @@ void FontInfo::writeToJsonFile(const std::string &fileName) const
     commonNode["greenChnl"] = common.greenChnl;
     commonNode["blueChnl"] = common.blueChnl;
     if (extraInfo)
+    {
         commonNode["totalHeight"] = common.totalHeight;
+        commonNode["descent"] = common.descent;
+    }
 
     nlohmann::json charsNode = nlohmann::json::array();
     for(auto c: chars)
