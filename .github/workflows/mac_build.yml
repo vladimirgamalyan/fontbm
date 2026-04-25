@@ -5,10 +5,15 @@ on: [push]
 jobs:
   build:
 
-    runs-on: macos-10.15
+    runs-on: macos-15-intel
+    permissions:
+      contents: read
     
     steps:
     - uses: actions/checkout@v2
+
+    - name: install dependencies
+      run: HOMEBREW_NO_AUTO_UPDATE=1 brew install freetype
 
     - name: cmake
       run: cmake -DCMAKE_CXX_FLAGS=-Werror .

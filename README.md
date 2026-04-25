@@ -9,7 +9,7 @@
 
 Linux | macOS | Windows
 ------|-------|--------
-[![Actions Status](https://github.com/vladimirgamalyan/fontbm/actions/workflows/linux_build.yml/badge.svg)](https://github.com/vladimirgamalyan/fontbm/actions/workflows/linux_build.yml) | [![Actions Status](https://github.com/vladimirgamalyan/fontbm/actions/workflows/mac_build.yml/badge.svg)](https://github.com/vladimirgamalyan/fontbm/actions/workflows/mac_build.yml) | [![Build status](https://ci.appveyor.com/api/projects/status/boq0olngopfabaac?svg=true)](https://ci.appveyor.com/project/vladimirgamalyan/fontbm)
+[![Actions Status](https://github.com/vladimirgamalyan/fontbm/actions/workflows/linux_build.yml/badge.svg)](https://github.com/vladimirgamalyan/fontbm/actions/workflows/linux_build.yml) | [![Actions Status](https://github.com/vladimirgamalyan/fontbm/actions/workflows/mac_build.yml/badge.svg)](https://github.com/vladimirgamalyan/fontbm/actions/workflows/mac_build.yml) | [![Actions Status](https://github.com/vladimirgamalyan/fontbm/actions/workflows/windows_build.yml/badge.svg)](https://github.com/vladimirgamalyan/fontbm/actions/workflows/windows_build.yml)
 
 ## Usage
 
@@ -53,7 +53,7 @@ option  | default | comment
 Dependencies:
 
 * GCC-4.9
-* CMake 3.0
+* CMake 3.5
 * [FreeType](https://www.freetype.org/)
 
 Build:
@@ -75,7 +75,7 @@ Open .sln in Visual Studio 2015 and rebuild all.
 
 ## Building Windows
 
-Download and install [CMake 3.0](https://cmake.org/) (or above) and [FreeType](https://www.freetype.org/). Run: 
+Download and install [CMake 3.5](https://cmake.org/) (or above) and [FreeType](https://www.freetype.org/). Run: 
 
 ```
 cmake -G "Visual Studio 14 2015"
@@ -89,6 +89,7 @@ Open .sln file in Visual Studio 2015, configure paths to FreeType and rebuild al
 
 ```
 brew install freetype
+brew install cmake
 git clone https://github.com/vladimirgamalyan/fontbm.git
 cd fontbm
 cmake .
