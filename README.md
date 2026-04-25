@@ -53,7 +53,7 @@ option  | default | comment
 Dependencies:
 
 * GCC-4.9
-* CMake 3.0
+* CMake 3.5
 * [FreeType](https://www.freetype.org/)
 
 Build:
@@ -75,7 +75,7 @@ Open .sln in Visual Studio 2015 and rebuild all.
 
 ## Building Windows
 
-Download and install [CMake 3.0](https://cmake.org/) (or above) and [FreeType](https://www.freetype.org/). Run: 
+Download and install [CMake 3.5](https://cmake.org/) (or above) and [FreeType](https://www.freetype.org/). Run: 
 
 ```
 cmake -G "Visual Studio 14 2015"
