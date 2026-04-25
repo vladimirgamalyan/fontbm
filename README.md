@@ -95,6 +95,9 @@ cmake .
 make
 ```
 
+## Using AI agents
+Copy skills/fontbm directory to your agent's skill directory. Ask AI something like `make bitmap font, 24pt, Arial`.
+
 ## Contributors
 
 * [AMDmi3](https://github.com/AMDmi3)
