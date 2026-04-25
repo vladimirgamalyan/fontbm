@@ -11,22 +11,15 @@ jobs:
     steps:
     - uses: actions/checkout@v4
 
-    - name: setup vcpkg
-      uses: lukka/get-vcpkg@v11
-
-    - name: cache vcpkg
-      uses: actions/cache@v4
-      with:
-        path: C:\Users\runneradmin\AppData\Local\vcpkg\archives
-        key: windows-x86-vcpkg-freetype
-        restore-keys: |
-          windows-x86-vcpkg-freetype
-
     - name: install dependencies
-      run: vcpkg install freetype --triplet x86-windows
+      shell: pwsh
+      run: |
+        & "$env:VCPKG_INSTALLATION_ROOT\vcpkg.exe" install freetype --triplet x86-windows
 
     - name: cmake
-      run: cmake -S . -B build -A Win32 -DCMAKE_TOOLCHAIN_FILE=$env:VCPKG_ROOT/scripts/buildsystems/vcpkg.cmake
+      shell: pwsh
+      run: |
+        cmake -S . -B build -A Win32 -DCMAKE_TOOLCHAIN_FILE="$env:VCPKG_INSTALLATION_ROOT/scripts/buildsystems/vcpkg.cmake"
 
     - name: build
       run: cmake --build build --config Release
@@ -37,10 +30,10 @@ jobs:
     - name: package
       shell: pwsh
       run: |
-        New-Item -ItemType Directory -Path package
+        New-Item -ItemType Directory -Path package -Force
         Copy-Item build/Release/* package/
-        Remove-Item package/unit_tests.exe
-        Compress-Archive -Path package/* -DestinationPath fontbm.zip
+        Remove-Item package/unit_tests.exe -ErrorAction SilentlyContinue
+        Compress-Archive -Path package/* -DestinationPath fontbm.zip -Force
 
     - name: upload artifact
       uses: actions/upload-artifact@v4
