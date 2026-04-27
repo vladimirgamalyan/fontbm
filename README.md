@@ -98,13 +98,6 @@ make
 ## Using AI agents
 Copy skills/fontbm directory to your agent's skill directory. Ask AI something like `make bitmap font, 24pt, Arial`.
 
-## Contributors
-
-* [AMDmi3](https://github.com/AMDmi3)
-* [cherniid](https://github.com/cherniid)
-* [Radfordhound](https://github.com/Radfordhound)
-* [phoddie](https://github.com/phoddie)
-
 ## Special thanks
 
 * [phoddie](https://github.com/phoddie)
