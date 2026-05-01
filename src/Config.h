@@ -41,7 +41,7 @@ struct Config
 
         bool operator == (const Color& other) const
         {
-            return r == other.r && g == other.b && b == other.b;
+            return r == other.r && g == other.g && b == other.b;
         }
     };
 
