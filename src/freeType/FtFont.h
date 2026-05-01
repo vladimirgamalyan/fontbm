@@ -243,7 +243,7 @@ public:
 
         const auto scale = face->size->metrics.y_scale;
         std::cout << "face->size->metrics.y_scale " << scale << " (" << face->size->metrics.y_scale / 64.0 << ")" << "\n";
-        std::cout << "face->size->metrics.y_ppem " << face->size->metrics.x_ppem << "\n";
+        std::cout << "face->size->metrics.x_ppem " << face->size->metrics.x_ppem << "\n";
         std::cout << "face->bbox.yMax " << FT_CEIL(FT_MulFix(face->bbox.yMax, scale)) << "\n";
         std::cout << "face->bbox.yMin " << FT_FLOOR(FT_MulFix(face->bbox.yMin, scale)) << "\n";
         std::cout << "face->ascender " << FT_CEIL(FT_MulFix(face->ascender, scale)) << "\n";
