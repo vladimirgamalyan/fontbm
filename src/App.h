@@ -10,7 +10,7 @@
 class App
 {
 public:
-    static void execute(int argc, char* argv[]) ;
+    static void execute(int argc, char* argv[]);
 
 private:
     typedef std::map<std::uint32_t, GlyphInfo> Glyphs;
