@@ -104,7 +104,10 @@ make
 ```
 
 ## Using AI agents
-Copy skills/fontbm directory to your agent's skill directory. Ask AI something like `make bitmap font, 24pt, Arial`.
+
+fontbm is self-documenting: `fontbm --help` prints a full reference — every option with its default, the produced files and ready to run examples — so an AI agent can drive it from that output alone. Just point the agent at the binary.
+
+To let an agent reach for fontbm on its own, copy the skills/fontbm directory to your agent's skill directory. It is a thin pointer that tells the agent when fontbm is relevant and sends it to `--help` for the details. Then ask something like `make bitmap font, 24pt, Arial`.
 
 ## Special thanks
 
