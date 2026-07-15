@@ -10,6 +10,36 @@
 
 //TODO: warn about unknown options
 
+namespace {
+
+const char* const defaultTextureSizeList =
+    "32x32,64x32,64x64,128x64,128x128,256x128,256x256,512x256,512x512,"
+    "1024x512,1024x1024,2048x1024,2048x2048";
+
+std::string makeHelpEpilog()
+{
+    return std::string(R"(
+ Produced files:
+      <output>.fnt              font metrics, always with the .fnt extension,
+                                whatever --data-format is used
+      <output>_0.png            one or more texture pages, see
+                                --texture-name-suffix
+
+ Default --texture-size value:
+      )") + defaultTextureSizeList + R"(
+
+ Examples:
+      fontbm --font-file FreeSans.ttf --output myfont
+      fontbm --font-file FreeSans.ttf --output myfont --font-size 24 --data-format json
+      fontbm --font-file FreeSans.ttf --output myfont --chars 32-126,1040-1103 --kerning-pairs regular
+      fontbm --font-file FreeSans.ttf --output myfont --color 255,200,0 --background-color 0,0,0
+
+ Exit code is 0 on success, 1 on error.
+ The .fnt format is described at https://www.angelcode.com/products/bmfont/doc/file_format.html)";
+}
+
+}
+
 Config ProgramOptions::parseCommandLine(int argc, char* argv[])
 {
     try
@@ -28,40 +58,60 @@ Config ProgramOptions::parseCommandLine(int argc, char* argv[])
         std::string kerningPairs;
         std::string textureNameSuffix;
 
-        cxxopts::Options options("fontbm", "Command line bitmap font generator, compatible with bmfont");
+        cxxopts::Options options("fontbm",
+            "Renders a TrueType/OpenType font into a bitmap font (texture pages plus\n"
+            "metrics), compatible with AngelCode BMFont.");
+        options.custom_help("--font-file <path> --output <name> [OPTION...]");
+
         options.add_options()
-            ("help", "produce help message")
-            ("font-file", "path to ttf file, required", cxxopts::value<std::string>(config.fontFile))
-            (charsOptionName, "required characters, for example: 32-64,92,120-126\ndefault value is 32-126 if 'chars-file' option is not defined", cxxopts::value<std::string>(chars))
-            (charsFileOptionName, "optional path to UTF-8 text file with required characters (will be combined with 'chars' option)", cxxopts::value<std::vector<std::string>>(charsFile))
-            ("color", "foreground RGB color, for example: 32,255,255, default value is 255,255,255", cxxopts::value<std::string>(color)->default_value("255,255,255"))
-            (backgroundColorOptionName, "background color RGB color, for example: 0,0,128, transparent by default", cxxopts::value<std::string>(backgroundColor))
-            ("font-size", "font size, default value is 32", cxxopts::value<std::uint16_t>(config.fontSize)->default_value("32"))
-            ("padding-up", "padding up, default value is 0", cxxopts::value<std::uint32_t>(config.padding.up)->default_value("0"))
-            ("padding-right", "padding right, default value is 0", cxxopts::value<std::uint32_t>(config.padding.right)->default_value("0"))
-            ("padding-down", "padding down, default value is 0", cxxopts::value<std::uint32_t>(config.padding.down)->default_value("0"))
-            ("padding-left", "padding left, default value is 0", cxxopts::value<std::uint32_t>(config.padding.left)->default_value("0"))
-            ("spacing-vert", "spacing vert, default value is 0", cxxopts::value<std::uint32_t>(config.spacing.ver)->default_value("0"))
-            ("spacing-horiz", "spacing horiz, default value is 0", cxxopts::value<std::uint32_t>(config.spacing.hor)->default_value("0"))
-            ("output", "output files name without extension, required", cxxopts::value<std::string>(config.output))
-            ("data-format", R"(output data file format: "txt", "xml", "json", "bin", default: "txt")", cxxopts::value<std::string>(dataFormat)->default_value("txt"))
-            ("kerning-pairs", R"("generate kerning pairs: "disabled", "basic", "regular" (tuned by hinter), "extended" (bigger output size, but more precise), default: "disabled")", cxxopts::value<std::string>(kerningPairs)->default_value("disabled"))
+            ("help", "print this help and exit")
+            ("verbose", "print the FreeType version being used", cxxopts::value<bool>(config.verbose))
+            ;
+
+        options.add_options("Font")
+            ("font-file", "font to render, .ttf or .otf (required)", cxxopts::value<std::string>(config.fontFile), "<path>")
+            ("font-size", "character height in pixels (same meaning as the BMFont size value with \"Match char height\" ticked)", cxxopts::value<std::uint16_t>(config.fontSize)->default_value("32"), "<px>")
+            (charsOptionName, "characters to render, as decimal Unicode code points: single values and/or first-last ranges, comma separated, spaces ignored, for example: 32-64,92,120-126 (default: 32-126, unless --chars-file is given)", cxxopts::value<std::string>(chars), "<ranges>")
+            (charsFileOptionName, "UTF-8 text file, every character occurring in it is added to --chars; may be given several times", cxxopts::value<std::vector<std::string>>(charsFile), "<path>")
+            ;
+
+        options.add_options("Output")
+            ("output", "output name without extension (required)", cxxopts::value<std::string>(config.output), "<name>")
+            ("data-format", "format of the .fnt file: txt, xml, json, bin", cxxopts::value<std::string>(dataFormat)->default_value("txt"), "<format>")
+            ("texture-name-suffix", "how the page number is added to the .png name: index_aligned (myfont_00.png, zero padded to the highest page number), index (myfont_0.png), none (myfont.png, single page only)", cxxopts::value<std::string>(textureNameSuffix)->default_value("index_aligned"), "<mode>")
+            ;
+
+        options.add_options("Appearance")
+            ("color", "glyph color, decimal R,G,B in range 0-255, for example: 32,255,255", cxxopts::value<std::string>(color)->default_value("255,255,255"), "<r,g,b>")
+            (backgroundColorOptionName, "background color, decimal R,G,B in range 0-255, for example: 0,0,128; the background is transparent if this option is omitted", cxxopts::value<std::string>(backgroundColor), "<r,g,b>")
             ("monochrome", "disable anti-aliasing", cxxopts::value<bool>(config.monochrome))
-            (textureSizeListOptionName, "list of texture sizes (will be tried from left to right to fit glyphs)", cxxopts::value<std::string>(textureSizeList))
-            ("texture-crop-width", "crop unused parts of output textures (width)", cxxopts::value<bool>(config.cropTexturesWidth))
-            ("texture-crop-height", "crop unused parts of output textures (height)", cxxopts::value<bool>(config.cropTexturesHeight))
-            ("align-horiz", "align glyph horizontal position", cxxopts::value<std::uint32_t>(config.alignment.hor))
-            ("align-vert", "align glyph vertical position", cxxopts::value<std::uint32_t>(config.alignment.ver))
-            ("verbose", "verbose output", cxxopts::value<bool>(config.verbose))
-            ("max-texture-count", "maximum generated textures", cxxopts::value<std::uint32_t>(config.maxTextureCount))
-            ("texture-name-suffix", R"(texture name suffix: "index_aligned", "index", "none", default: "index_aligned")", cxxopts::value<std::string>(textureNameSuffix)->default_value("index_aligned"))
+            ("kerning-pairs", "kerning pairs to write into the .fnt file: disabled, basic, regular (tuned by hinter), extended (more precise, bigger output)", cxxopts::value<std::string>(kerningPairs)->default_value("disabled"), "<mode>")
+            ;
+
+        options.add_options("Texture")
+            (textureSizeListOptionName, "allowed page sizes, <width>x<height> comma separated; tried from left to right, the first one all glyphs fit into is used; the default list is printed below", cxxopts::value<std::string>(textureSizeList), "<sizes>")
+            ("texture-crop-width", "shrink every page to the rightmost used pixel", cxxopts::value<bool>(config.cropTexturesWidth))
+            ("texture-crop-height", "shrink every page to the lowest used pixel", cxxopts::value<bool>(config.cropTexturesHeight))
+            ("max-texture-count", "fail if more pages than this are needed (unlimited if omitted)", cxxopts::value<std::uint32_t>(config.maxTextureCount), "<n>")
+            ;
+
+        options.add_options("Glyph layout")
+            ("padding-up", "pixels added above each glyph, inside its rectangle", cxxopts::value<std::uint32_t>(config.padding.up)->default_value("0"), "<px>")
+            ("padding-right", "pixels added right of each glyph, inside its rectangle", cxxopts::value<std::uint32_t>(config.padding.right)->default_value("0"), "<px>")
+            ("padding-down", "pixels added below each glyph, inside its rectangle", cxxopts::value<std::uint32_t>(config.padding.down)->default_value("0"), "<px>")
+            ("padding-left", "pixels added left of each glyph, inside its rectangle", cxxopts::value<std::uint32_t>(config.padding.left)->default_value("0"), "<px>")
+            ("spacing-vert", "pixels left between glyph rectangles, vertically", cxxopts::value<std::uint32_t>(config.spacing.ver)->default_value("0"), "<px>")
+            ("spacing-horiz", "pixels left between glyph rectangles, horizontally", cxxopts::value<std::uint32_t>(config.spacing.hor)->default_value("0"), "<px>")
+            ("align-horiz", "round glyph rectangle width up to a multiple of this, must be greater than 0", cxxopts::value<std::uint32_t>(config.alignment.hor)->default_value("1"), "<px>")
+            ("align-vert", "round glyph rectangle height up to a multiple of this, must be greater than 0", cxxopts::value<std::uint32_t>(config.alignment.ver)->default_value("1"), "<px>")
             ;
 
         auto result = options.parse(argc, argv);
 
         if (result.count("help"))
         {
-            std::cout << options.help() << std::endl;
+            std::cout << options.help({"", "Font", "Output", "Appearance", "Texture", "Glyph layout"})
+                      << makeHelpEpilog() << std::endl;
             throw HelpException();
         }
 
@@ -118,24 +168,8 @@ Config ProgramOptions::parseCommandLine(int argc, char* argv[])
         else
             throw std::runtime_error("unknown --texture-name-suffix value");
 
-        if (result.count(textureSizeListOptionName))
-            config.textureSizeList = parseTextureSize(textureSizeList);
-        else
-            config.textureSizeList = {
-                {32, 32},
-                {64, 32},
-                {64, 64},
-                {128, 64},
-                {128, 128},
-                {256, 128},
-                {256, 256},
-                {512, 256},
-                {512, 512},
-                {1024, 512},
-                {1024, 1024},
-                {2048, 1024},
-                {2048, 2048}
-        };
+        config.textureSizeList = parseTextureSize(
+                result.count(textureSizeListOptionName) ? textureSizeList : defaultTextureSizeList);
 
         if (!config.alignment.hor)
             throw std::runtime_error("invalid --align-horiz");
@@ -146,8 +180,7 @@ Config ProgramOptions::parseCommandLine(int argc, char* argv[])
     }
     catch (const cxxopts::OptionException& e)
     {
-        std::cout << "error parsing options: " << e.what() << std::endl;
-        throw std::exception();
+        throw std::runtime_error(std::string("error parsing options: ") + e.what());
     }
 }
 

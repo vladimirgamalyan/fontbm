@@ -20,32 +20,40 @@ fontbm --font-file FreeSans.ttf --output myfont
 ```
 It will produce myfont.fnt ([file format](https://www.angelcode.com/products/bmfont/doc/file_format.html)) and myfont_0.png ([how to render text](https://www.angelcode.com/products/bmfont/doc/render_text.html)).
 
+The metrics file always has the `.fnt` extension, whatever `--data-format` is used. Run `fontbm --help` for the same reference right in the terminal.
+
 Available options (**bold** options are required):
 
 
 option  | default | comment
 --------|---------|--------
-**--font-file** |  | path to ttf file, required
-**--output** | | output files name without extension, required
---font-size | 32 | font size (it matches to BMFont size, when "Match char height" option in Font Settings dialog is ticked)
---chars | 32-126 | required characters, for example 32-64,92,120-126 (without spaces), default value is 32-126 if 'chars-file' option is not defined
---texture-size | 32x32,64x32,64x64,128x64, 128x128,256x128,256x256, 512x256,512x512,1024x512, 1024x1024,2048x1024,2048x2048 | comma separated list of allowed texture sizes (without spaces), the first suitable size will be used
---texture-crop-width | | crop unused parts of output textures (width)
---texture-crop-height | | crop unused parts of output textures (height)
---color | 255,255,255 | foreground RGB color, for example: 32,255,255 (without spaces)
---background-color | | background RGB color, for example: 0,0,128 (without spaces), transparent by default
+**--font-file** |  | font to render, .ttf or .otf
+**--output** | | output name without extension
+--font-size | 32 | character height in pixels (it matches to BMFont size, when "Match char height" option in Font Settings dialog is ticked)
+--chars | 32-126 | characters to render, as decimal Unicode code points: single values and/or first-last ranges, comma separated (without spaces), for example 32-64,92,120-126; the default is used only if 'chars-file' option is not defined
 --chars-file | | optional path to UTF-8 text file with additional required characters (will be combined with 'chars' option), can be set multiple times
---data-format | txt | output data file format: txt, xml, bin, [json](https://github.com/Jam3/load-bmfont/blob/master/json-spec.md)
---kerning-pairs | disabled | generate kerning pairs: disabled, basic, regular (tuned by hinter), extended (bigger output size, but more precise)
---padding-up | 0 | padding up
---padding-right | 0 | padding right
---padding-down | 0 | padding down
---padding-left | 0 | padding left
---spacing-vert | 0 | spacing vertical
---spacing-horiz | 0 | spacing horizontal
+--texture-size | 32x32,64x32,64x64,128x64, 128x128,256x128,256x256, 512x256,512x512,1024x512, 1024x1024,2048x1024,2048x2048 | comma separated list of allowed texture sizes as widthxheight (without spaces), tried from left to right, the first one all glyphs fit into is used
+--texture-crop-width | | shrink every texture page to the rightmost used pixel
+--texture-crop-height | | shrink every texture page to the lowest used pixel
+--max-texture-count | | fail if more texture pages than this are needed (unlimited if not set)
+--texture-name-suffix | index_aligned | how the page number is added to the .png name: index_aligned (myfont_00.png, zero padded to the highest page number), index (myfont_0.png), none (myfont.png, single page only)
+--color | 255,255,255 | foreground RGB color, decimal 0-255 each, for example: 32,255,255 (without spaces)
+--background-color | | background RGB color, decimal 0-255 each, for example: 0,0,128 (without spaces), transparent by default
 --monochrome | | disable anti-aliasing
---max-texture-count | | maximum generated texture count (unlimited if not set)
---texture-name-suffix | index_aligned | texture name suffix: "index_aligned", "index" or "none"
+--data-format | txt | output data file format: txt, xml, bin, [json](https://github.com/Jam3/load-bmfont/blob/master/json-spec.md) (the extension stays .fnt in every case)
+--kerning-pairs | disabled | generate kerning pairs: disabled, basic, regular (tuned by hinter), extended (bigger output size, but more precise)
+--padding-up | 0 | pixels added above each glyph, inside its rectangle
+--padding-right | 0 | pixels added right of each glyph, inside its rectangle
+--padding-down | 0 | pixels added below each glyph, inside its rectangle
+--padding-left | 0 | pixels added left of each glyph, inside its rectangle
+--spacing-vert | 0 | pixels left between glyph rectangles, vertically
+--spacing-horiz | 0 | pixels left between glyph rectangles, horizontally
+--align-horiz | 1 | round glyph rectangle width up to a multiple of this value, must be greater than 0
+--align-vert | 1 | round glyph rectangle height up to a multiple of this value, must be greater than 0
+--verbose | | print the FreeType version being used
+--help | | print help and exit
+
+fontbm exits with 0 on success and 1 on error. Errors and warnings are printed to stderr, `--help` and `--verbose` output to stdout.
 
 ## Building Linux
 

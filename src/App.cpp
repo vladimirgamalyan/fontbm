@@ -46,10 +46,10 @@ App::Glyphs App::collectGlyphInfo(const ft::Font& font, const std::set<std::uint
         }
         else
         {
-            std::cout << "warning: glyph " << id << " not found";
+            std::cerr << "warning: glyph " << id << " not found";
             if (id == 65279)
-                std::cout << " (it looks like Unicode byte order mark (BOM))";
-            std::cout << "." << std::endl;
+                std::cerr << " (it looks like Unicode byte order mark (BOM))";
+            std::cerr << "." << std::endl;
         }
     }
 
